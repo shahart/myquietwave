@@ -1,0 +1,20 @@
+plugins {
+	id 'java'
+}
+
+group = 'edu.automations'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.seleniumhq.selenium:selenium-java:4.31.0'
+}
