@@ -1,38 +1,65 @@
 package com.shahartal.myquietchannel
 
 //import android.R
-import android.Manifest
-import android.app.AlertDialog
 //import android.app.Notification
 //import android.app.NotificationChannel
-import android.app.NotificationManager
 //import android.content.Context
-import android.content.Intent
-import android.media.AudioManager
 //import android.media.MediaMetadata
 //import android.media.session.MediaController
 //import android.media.session.MediaSessionManager
 //import android.media.session.PlaybackState
+import android.Manifest
+import android.app.AlertDialog
+import android.app.NotificationManager
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.pm.PackageManager
+//import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.icu.util.HebrewCalendar
+import android.location.Location
+import android.location.LocationManager
+import android.media.AudioManager
+//import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+//import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.shahartal.myquietchannel.parasha.HebCal
+import com.shahartal.myquietchannel.parasha.RetrofitInstance
+import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import com.shahartal.myquietchannel.BuildConfig
+
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.Timer
+import java.util.TimerTask
 
 class MainActivity : ComponentActivity() {
 
     private var isServiceRunning = false
 
     private lateinit var statusText: TextView
+    private lateinit var shabesText: TextView
     private lateinit var toggleButton: Button
+    private lateinit var shareButton: Button
+    private lateinit var rateButton: Button
 
     private lateinit var editTextNumberNewsDuration: TextView
     // private lateinit var editTextNumberVolume: TextView
@@ -40,11 +67,49 @@ class MainActivity : ComponentActivity() {
     private lateinit var textViewNextNews: TextView
 
     private lateinit var textViewNewsGlz: TextView
+    private lateinit var textViewNewsLinks: TextView
     private lateinit var textViewNewsKan: TextView
 
     private lateinit var textViewClock : TextView
+    private lateinit var textViewClock2 : TextView
+    // private lateinit var textViewClock3 : TextView
+
 
     private lateinit var editTextTodo : TextView
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    fun Context.isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and
+                Configuration.UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
+    }
+
+//    @RequiresApi(Build.VERSION_CODES.N)
+//    fun requestPermissions() {
+//        val locationPermissionRequest = registerForActivityResult(
+//            ActivityResultContracts.RequestMultiplePermissions()
+//        ) { permissions ->
+//            when {
+//
+//                permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+//                    // Only approximate location access granted.
+//                }
+//                else -> {
+//                    // No location access granted.
+//                }
+//            }
+//        }
+//
+//        // Before you perform the actual permission request, check whether your app
+//        // already has the permissions, and whether your app needs to show a permission
+//        // rationale dialog. For more details, see Request permissions:
+//        // https://developer.android.com/training/permissions/requesting#request-permission
+//        locationPermissionRequest.launch(
+//            arrayOf(
+//                Manifest.permission.ACCESS_COARSE_LOCATION
+//            )
+//        )
+//    }
 
     override fun onResume() {
         super.onResume()
@@ -54,8 +119,64 @@ class MainActivity : ComponentActivity() {
 
         editTextTodo.text = savedName
 
+        // TODO? if Friday/ Thursday/ Saturday
+/*
+        if (editTextTodo.text.toString().trim().isNotEmpty() && editTextTodo.text.toString().trim().get(0).isUpperCase()) { // startsWith("IL-")) {
+            fetchZmanim(editTextTodo.text.toString().trim())
+        }
+        else if (editTextTodo.text.toString().trim().isNotEmpty() && editTextTodo.text.toString().get(0).isDigit()) {
+            fetchZmanim(editTextTodo.text.toString().trim())
+        }
+        else {
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 0)
+            }
+
+        //    requestPermissions()
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+                val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                var isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+                // isGpsEnabled = true
+
+                if (! isGpsEnabled) {
+                    Log.w("", "MainActivity fetchZmanim location isGpsDisabled")
+                }
+                else {
+                    fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+                    fusedLocationClient.lastLocation
+//                        .addOnCompleteListener(requireActivity()) { task ->
+////                                location: Location? ->
+//                            Log.i("", "MainActivity fetchZmanim location success " + location)
+//                            if (location != null) {
+//                                fetchZmanim(location.latitude.toString() + "," + location.longitude.toString())
+//                            }
+//                        }
+//                        .addOnFailureListener { exception: Exception ->
+//                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
+//                        }
+//                        }
+                        .addOnSuccessListener { location: Location? ->
+                            Log.i("", "MainActivity fetchZmanim location success " + location)
+                            if (location != null) {
+                                fetchZmanim(location.latitude.toString() + "," + location.longitude.toString())
+                            }
+                        }
+                        .addOnFailureListener { exception: Exception ->
+                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
+                        }
+                }
+            }
+        }
+*/
         var newsDuration = sharedPreferences.getInt("newsDuration", 4)
         if (newsDuration > VolumeCycleService.max_news_duration) newsDuration = VolumeCycleService.max_news_duration
+        if ("test5" == savedName && newsDuration > 5-1) newsDuration = 4
         if (newsDuration < 1) newsDuration = 1
         editTextNumberNewsDuration.text = newsDuration.toString()
 
@@ -79,14 +200,16 @@ class MainActivity : ComponentActivity() {
         }
 
         if (isServiceRunning) {
-            statusText.text = getString(R.string.title_name_enabled, BuildConfig.VERSION_NAME)
+            statusText.text = getString(R.string.title_name_enabled, "" /*BuildConfig.VERSION_NAME*/)
             toggleButton.text = getString(R.string.stop)
             toggleButton.setBackgroundColor(Color.Green.toArgb())
         }
         else {
-            statusText.text = getString(R.string.title_name_disabled, BuildConfig.VERSION_NAME)
+            statusText.text = getString(R.string.title_name_disabled, "" /*BuildConfig.VERSION_NAME*/)
             toggleButton.text = getString(R.string.start)
-            toggleButton.setBackgroundColor(Color.White.toArgb())
+
+
+            toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
         }
 
         editTextNumberNewsDuration.isEnabled = ! isServiceRunning
@@ -110,6 +233,7 @@ class MainActivity : ComponentActivity() {
         val newsDurationStr = editTextNumberNewsDuration.text.toString()
         var newsDuration = if (newsDurationStr.isEmpty()) 4 else newsDurationStr.toInt()
         if (newsDuration > VolumeCycleService.max_news_duration) newsDuration = VolumeCycleService.max_news_duration
+        if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1) newsDuration = 4
         if (newsDuration < 1) newsDuration = 1
         editor.putInt("newsDuration", newsDuration)
 
@@ -163,6 +287,94 @@ class MainActivity : ComponentActivity() {
         return nextHoursStr
     }
 
+/*
+    fun fetchZmanim(loc: String) { // }: String {
+
+        textViewClock3 = findViewById(R.id.textViewClock3)
+        var res = ""
+
+        try {
+//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                Log.w("","MainActivity fetchParasha no internet at all")
+//                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 112); // REQUEST_INTERNET_PERMISSION);
+//            }
+
+            val call = if (loc.get(0).isDigit()) RetrofitInstance.api.getShabbatByLoc(loc.split(",")[0].trim(), loc.split(",")[1].trim())
+                else RetrofitInstance.api.getShabbatPerCity(loc)
+
+            call.enqueue(object : Callback<HebCal> {
+
+                override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
+                    if (response.isSuccessful) {
+
+                        if (loc.get(0).isUpperCase())
+                            res = loc + " "
+                        else
+                            res = " "
+
+                        val hebcal = response.body()
+                        hebcal?.items?.forEach {
+                            if (it.category == "candles") {
+                                res += " כניסת שבת " + truncDate(it.date)
+                            }
+                            else if (it.category == "havdalah") {
+                                res += " הבדלה " + truncDate(it.date)
+                            }
+                        }
+                        textViewClock3.text = res
+                    } else {
+                        Log.w("", "MainActivity fetchParasha Error: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<HebCal>, t: Throwable) {
+                    Log.w("", "MainActivity fetchZmanim unable to fetch hebCal $t", t)
+                }
+            })
+        } catch (e: Exception) {
+            Log.e("", "MainActivity fetchZmanim Exception $e", e)
+        }
+    }
+*/
+    fun truncDate(date: String): String {
+        return date.substring(date.indexOf("T")+1, date.indexOf("T")+1 +5)
+    }
+
+    fun fetchParasha() { // }: String {
+
+        try {
+//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+//                Log.w("","MainActivity fetchParasha no internet at all")
+//                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 112); // REQUEST_INTERNET_PERMISSION);
+//            }
+            RetrofitInstance.api.getShabbatPerCity("IL-Jerusalem").enqueue(object : Callback<HebCal> {
+
+                override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
+                    if (response.isSuccessful) {
+                        // val str = response.body()
+                        // Log.i("", "MainActivity fetchParasha " + str)
+                        val hebcal = response.body()
+                        hebcal?.items?.forEach {
+                            if (it.category == "parashat") {
+                                // return it.hebrew;
+                                textViewClock2 = findViewById(R.id.textViewClock2)
+                                textViewClock2.text = it.hebrew
+                            }
+                        }
+                    } else {
+                        Log.w("", "MainActivity fetchParasha Error: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<HebCal>, t: Throwable) {
+                    Log.w("", "MainActivity fetchParasha unable to fetch hebCal $t", t)
+                }
+            })
+        } catch (e: Exception) {
+            Log.e("", "MainActivity fetchParasha Exception $e", e)
+        }
+    }
+
     // @RequiresApi(Build.VERSION_CODES.O) // Unnecessary; SDK_INT is always >= 26
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -171,9 +383,39 @@ class MainActivity : ComponentActivity() {
 
         setContentView(R.layout.activity_main)
 
-        alertMediaIsPlaying("onCreate")
+        if (java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY) {
+            shabesText = findViewById(R.id.textViewShabes)
+            shabesText.text = getString(R.string.shabbath)
+        }
+
+        fetchParasha()
 
         editTextTodo = findViewById(R.id.editTextTodo)
+
+        // fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        alertMediaIsPlaying("onCreate")
+
+        shareButton = findViewById(R.id.shareButton)
+        rateButton = findViewById(R.id.rateButton)
+
+        shareButton.setOnClickListener {
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.setType("text/plain")
+            val shareLink = "https://play.google.com/store/apps/details?id=$packageName"
+            shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text) + " " + shareLink)
+            startActivity(Intent.createChooser(shareIntent, "Share this app"))
+        }
+
+        rateButton.setOnClickListener {
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW,
+                    ("market://details?id=$packageName").toUri()))
+            } catch (_: android.content.ActivityNotFoundException) {
+                startActivity(Intent(Intent.ACTION_VIEW,
+                    ("https://play.google.com/store/apps/details?id=$packageName").toUri()))
+            }
+        }
 
         statusText = findViewById(R.id.statusText)
         toggleButton = findViewById(R.id.toggleButton)
@@ -182,20 +424,11 @@ class MainActivity : ComponentActivity() {
         editTextNumberEveryHour = findViewById(R.id.editTextEveryHour)
         textViewNextNews = findViewById(R.id.textViewNextNewsStr)
 
-        textViewNewsKan = findViewById(R.id.textView13)
-        textViewNewsKan.setOnClickListener {
+        textViewNewsLinks = findViewById(R.id.textView14)
+        textViewNewsLinks.setOnClickListener {
             val browserIntent = Intent(
                 Intent.ACTION_VIEW,
-                "https://www.kan.org.il/hourly-news/".toUri()
-            )
-            startActivity(browserIntent)
-        }
-
-        textViewNewsGlz = findViewById(R.id.textView12)
-        textViewNewsGlz.setOnClickListener {
-            val browserIntent = Intent(
-                Intent.ACTION_VIEW,
-                "https://omny.fm/shows/newsbulletin/playlists/podcast".toUri()
+                "https://shahart.github.io/automations/links.html".toUri()
             )
             startActivity(browserIntent)
         }
@@ -213,6 +446,7 @@ class MainActivity : ComponentActivity() {
                 if (newsDuration > VolumeCycleService.max_news_duration) {
                     editTextNumberNewsDuration.text = VolumeCycleService.max_news_duration.toString()
                 }
+                if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1) editTextNumberNewsDuration.text = "4"
                 if (newsDuration < 1) {
                     editTextNumberNewsDuration.text = "1"
                 }
@@ -233,6 +467,7 @@ class MainActivity : ComponentActivity() {
                 if (newsDuration > VolumeCycleService.max_news_duration) {
                     editTextNumberNewsDuration.text = VolumeCycleService.max_news_duration.toString()
                 }
+                if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1) editTextNumberNewsDuration.text = "4"
                 if (newsDuration < 1) {
                     editTextNumberNewsDuration.text = "1"
                 }
@@ -246,8 +481,14 @@ class MainActivity : ComponentActivity() {
         Thread {
             while (true) {
                 runOnUiThread {
-                    textViewClock.text = LocalDateTime.now().format(DateTimeFormatter.ofPattern("H:mm:ss"))
-                        // "Seconds past minute: " + java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).second
+                    val hebrewCalendar = HebrewCalendar()
+                    val hebrewYear = hebrewCalendar.get(HebrewCalendar.YEAR)
+                    val hebrewMonth = hebrewCalendar.get(HebrewCalendar.MONTH)
+                    val hebrewDay = hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH) // switches at midnight by-design
+                    val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר שני", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
+                    val hebrewMonthName = hebrewMonths[hebrewMonth]
+                    textViewClock.text = "$hebrewYear/$hebrewMonthName/$hebrewDay " +
+                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("H:mm:ss"))
                 }
                 Thread.sleep(1000)
             }
@@ -267,7 +508,7 @@ class MainActivity : ComponentActivity() {
             editTextNumberEveryHour.isEnabled = true
             editTextNumberEveryHour.isClickable = true
 
-            toggleButton.setBackgroundColor(Color.White.toArgb())
+            toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
         }
         else {
             toggleButton.text = getString(R.string.stop)
@@ -343,7 +584,7 @@ class MainActivity : ComponentActivity() {
 
                 val serviceIntent = Intent(this, VolumeCycleService::class.java)
                 stopService(serviceIntent)
-                statusText.text = getString(R.string.title_name_disabled, BuildConfig.VERSION_NAME)
+                statusText.text = getString(R.string.title_name_disabled, "" /*BuildConfig.VERSION_NAME*/)
                 toggleButton.text = getString(R.string.start)
 
                 editTextNumberNewsDuration.isEnabled = true
@@ -352,7 +593,7 @@ class MainActivity : ComponentActivity() {
                 editTextNumberEveryHour.isEnabled = true
                 editTextNumberEveryHour.isClickable = true
 
-                toggleButton.setBackgroundColor(Color.White.toArgb())
+                toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
 
                 isServiceRunning = false
 
@@ -372,6 +613,10 @@ class MainActivity : ComponentActivity() {
                 if (newsDuration > VolumeCycleService.max_news_duration) {
                     newsDuration = VolumeCycleService.max_news_duration
                     editTextNumberNewsDuration.text = VolumeCycleService.max_news_duration.toString()
+                }
+                if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1) {
+                    newsDuration = 4
+                    editTextNumberNewsDuration.text = "4"
                 }
                 if (newsDuration < 1) {
                     newsDuration = 1
@@ -404,24 +649,32 @@ class MainActivity : ComponentActivity() {
                     // alertDialog.setIcon(R.drawable.icon)
 //                    alertDialog.show()
 
-                    val alertDialog = AlertDialog.Builder(this).create()
-                    alertDialog.setMessage(getString(R.string.next_30_sec))
+                    val alertDialogBuilder = AlertDialog.Builder(this)
+                    alertDialogBuilder.setMessage(getString(R.string.next_30_sec))
+                    alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, which: Int ->
+                        if (! this.isFinishing)
+                            dialog!!.cancel()
+                    }
                     // alertDialog.setIcon(R.drawable.icon)
+                    val alertDialog = alertDialogBuilder.create()
                     alertDialog.show()
 
                     Thread {
 
 //                        val next_30_alert = (TextView) this.alertDialog.findViewById(android.R.id.message)
 
+                        val audioManager = this.getSystemService(AUDIO_SERVICE) as AudioManager
                         for (i in 1..30) {
                             if (! alertDialog.isShowing)
                                 break
                             runOnUiThread {
                                 if (isServiceRunning) {
-                                    alertDialog.setMessage(getString(R.string.next_30_sec_with_sec, (31 - i)))
+                                    alertDialog.setMessage(getString(R.string.next_30_sec_with_sec, (31 - i),
+                                        100*audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)/audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)))
                                 }
                                 else {
-                                    alertDialog.cancel()
+                                    if (! this.isFinishing)
+                                        alertDialog.cancel()
                                 }
 //                                if (i == 30) {
 //                                    alertDialog.cancel()
@@ -429,10 +682,12 @@ class MainActivity : ComponentActivity() {
                             }
                             Thread.sleep(1000)
                         }
-                        alertDialog.cancel()
+                        if (! this.isFinishing) {
+                            alertDialog.cancel()
+                        }
                     }.start()
 
-                    statusText.text = getString(R.string.title_name_enabled, BuildConfig.VERSION_NAME)
+                    statusText.text = getString(R.string.title_name_enabled, "" /*BuildConfig.VERSION_NAME*/)
                     toggleButton.text = getString(R.string.stop)
 
                     toggleButton.setBackgroundColor(Color.Green.toArgb())
@@ -449,7 +704,7 @@ class MainActivity : ComponentActivity() {
                     val serviceIntent = Intent(this, VolumeCycleService::class.java)
                     stopService(serviceIntent)
 
-                    statusText.text = getString(R.string.title_name_disabled, BuildConfig.VERSION_NAME)
+                    statusText.text = getString(R.string.title_name_disabled, "" /*BuildConfig.VERSION_NAME*/)
                     toggleButton.text = getString(R.string.start)
 
                     editTextNumberNewsDuration.isEnabled = true
@@ -458,7 +713,7 @@ class MainActivity : ComponentActivity() {
                     editTextNumberEveryHour.isEnabled = true
                     editTextNumberEveryHour.isClickable = true
 
-                    toggleButton.setBackgroundColor(Color.White.toArgb())
+                    toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
 
                     isServiceRunning = false
 
@@ -489,11 +744,27 @@ class MainActivity : ComponentActivity() {
 
         if (! isPlaying || volumeZero) {
 
-            val alertDialog = AlertDialog.Builder(this).create()
+            val alertDialog = AlertDialog.Builder(this)
             alertDialog.setTitle(getString(R.string.alert_title))
             alertDialog.setMessage(getString(R.string.alert_message))
+            alertDialog.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, which: Int ->
+                if (! this.isFinishing)
+                    dialog!!.cancel()
+            }
             // alertDialog.setIcon(R.drawable.icon)
-            alertDialog.show()
+            val dialog = alertDialog.create()
+//            alertDialog.create().show()
+
+            dialog.show()
+
+            val timer = Timer()
+            timer.schedule(object : TimerTask() {
+                override fun run() {
+                    dialog.dismiss()
+                    timer.cancel()
+                }
+            }, 10_000)
+
             return false
         }
         return isPlaying

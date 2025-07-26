@@ -47,11 +47,11 @@ class VolumeCycleService : Service() {
     }
 
     // @RequiresApi(Build.VERSION_CODES.O) // Unnecessary; SDK_INT is always >= 26
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val thisService = this
         job = CoroutineScope(Dispatchers.Default).launch {
 
-            val maxPercentage = 30
+            val maxPercentage = 50
 
             val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
             val stream = AudioManager.STREAM_MUSIC
@@ -62,15 +62,29 @@ class VolumeCycleService : Service() {
             Log.i("", "VolumeCycleService init volume $origVolume out of $maxVolume")
             // val currentVolume = audioManager.getStreamVolume(stream)
 
-            val isNearShabbath = java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY &&
-                    java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).hour > 13
+            var isTest5 = false
+            var newsDuration = 4
+            var hours = 4
+            if (intent == null) {
+                Log.e("", "VolumeCycleService intent is null")
+            }
+            else {
+                isTest5 = ("test5" == intent.getStringExtra("todoList"))
+                newsDuration = intent.getIntExtra("newsDuration", 4)
+                hours = intent.getIntExtra("hours", 4)
+                Log.i("", "VolumeCycleService Initial input: NewsDuration $newsDuration everyHours $hours isTest5 $isTest5")
+            }
 
-            var newsDuration = intent.getIntExtra("newsDuration", 4)
+            val isNearShabbath = isTest5
+                || (
+                java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY &&
+                    java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).hour > 13)
+
             if (newsDuration > max_news_duration) newsDuration = max_news_duration
             if (isNearShabbath && newsDuration > 6) newsDuration = 6
             if (newsDuration < 1) newsDuration = 1
 
-            if ("test5".equals(intent.getStringExtra("todoList"))) {
+            if (isTest5) {
                 minutesPerHours = 5
                 Log.w("", "VolumeCycleService test mode 5 minutes")
                 if (newsDuration > minutesPerHours-1) {
@@ -82,29 +96,30 @@ class VolumeCycleService : Service() {
 //            if (volume > audioManager.getStreamMaxVolume(stream)) volume = 2
 //            if (volume < 1) volume = 1
 
-            var hours = intent.getIntExtra("hours", 4)
             if (hours > 12) hours = 12
             if (hours < 1) hours = 1
+
+            Log.i("", "VolumeCycleService settings: NewsDuration $newsDuration everyHours $hours")
 
             val initSeconds = java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).second
 
             while (isActive) {
 
-                var volume30 = settedVolume //  (maxVolume * volume / 100).coerceAtLeast(1)
-                if (isNearShabbath && volume30 > (maxVolume * maxPercentage / 100).coerceAtLeast(1) + 1) { // 0..15
-                    volume30 = (maxVolume * maxPercentage / 100).coerceAtLeast(1) + 1
+                var volume50 = settedVolume //  (maxVolume * volume / 100).coerceAtLeast(1)
+                if (isNearShabbath && volume50 > (maxVolume * maxPercentage / 100).coerceAtLeast(1) + 1) { // 0..15
+                    volume50 = (maxVolume * maxPercentage / 100).coerceAtLeast(1) + 1
                     Log.w("", "VolumeCycleService Volume crossed threshold")
                 }
-                if (volume30 == 0) {
-                    volume30 = 3 // 2 out of 15 = 13% (maxVolume * 20 / 100).coerceAtLeast(1)
+                if (volume50 == 0) {
+                    volume50 = 3 // 2 out of 15 = 13% (maxVolume * 20 / 100).coerceAtLeast(1)
                 }
 
                 // Set to 20%
                 Log.i("",
-                    "VolumeCycleService started positive volume: $volume30 out of $maxVolume, news duration [minutes] $newsDuration, is near shabbath $isNearShabbath"
+                    "VolumeCycleService started positive volume: $volume50 out of $maxVolume, news duration [minutes] $newsDuration, is near shabbath $isNearShabbath"
                 )
 
-                audioManager.setStreamVolume(stream, volume30, 0)
+                audioManager.setStreamVolume(stream, volume50, 0)
 
                 if (settedVolume == 0) {
                     // delay(30 * 1000L) // first set of volume by the user
@@ -113,7 +128,7 @@ class VolumeCycleService : Service() {
 
                         val notification: Notification = NotificationCompat.Builder(thisService, CHANNEL_ID)
                             .setContentTitle(getString(R.string.notif_title_2))
-                            .setContentText(getString(R.string.notif_text_2, ((61-i)/2)))
+                            .setContentText(getString(R.string.notif_text_2, ((61-i)/2), 100*audioManager.getStreamVolume(stream)/maxVolume))
                             .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
                             .setOngoing(true)
                             .setOnlyAlertOnce(true)
@@ -181,7 +196,7 @@ class VolumeCycleService : Service() {
                         val notification: Notification =
                             NotificationCompat.Builder(thisService, CHANNEL_ID)
                                 .setContentTitle(getString(R.string.notif_title_1))
-                                .setContentText(getString(R.string.notif_text_4,newsDuration - i + 1))
+                                .setContentText(getString(R.string.notif_text_4,newsDuration - i + 1, 100*audioManager.getStreamVolume(stream)/maxVolume))
                                 .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
                                 .setOngoing(true)
                                 .setOnlyAlertOnce(true)
@@ -200,7 +215,7 @@ class VolumeCycleService : Service() {
                         val notification: Notification =
                             NotificationCompat.Builder(thisService, CHANNEL_ID)
                                 .setContentTitle(getString(R.string.notif_title_1))
-                                .setContentText(getString(R.string.notif_text_4,newsDuration - i + 1))
+                                .setContentText(getString(R.string.notif_text_4,newsDuration - i + 1, 100*audioManager.getStreamVolume(stream)/maxVolume))
                                 .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
                                 .setOngoing(true)
                                 .setOnlyAlertOnce(true)
@@ -288,7 +303,7 @@ class VolumeCycleService : Service() {
             }
             Log.w("", "VolumeCycleService not active any more")
         }
-        return START_STICKY
+        return START_STICKY // TODO? START_REDELIVER_INTENT
     }
 
     override fun onDestroy() {
@@ -309,7 +324,7 @@ class VolumeCycleService : Service() {
         // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // Unnecessary; SDK_INT is always >= 26
             val serviceChannel = NotificationChannel(
                 CHANNEL_ID,
-                "Volume Cycle Service Channel",
+                "Volume Cycle Service",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             val manager = getSystemService(NotificationManager::class.java)
@@ -326,6 +341,9 @@ class VolumeCycleService : Service() {
 //            val alertDialog = AlertDialog.Builder(this).create()
 //            alertDialog.setTitle("האם רדיו מנוגן?" + isPlaying)
 //            alertDialog.setMessage("האפליקציה לא מנגנת בעצמה את הרדיו, עליכם מראש לבחור ניגון כלשהו")
+//            alertDialog.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, which: Int ->
+//                dialog!!.cancel()
+//            }
 //            // alertDialog.setIcon(R.drawable.icon)
 //            alertDialog.show()
         }

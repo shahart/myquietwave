@@ -11,33 +11,37 @@
     <string name="start">התחל</string>
     <string name="stop">הפסק</string>
 
-    <string name="glz">גל"צ ▶</string>
-    <string name="kan">"▶ כאן</string>
-
-    <string name="instructions">הפעל ידנית את אפליקציית השמע שלך לרדיו. לחץ למעלה *הפעל*. מעתה והלאה, כשייגמרו החדשות - השמע יושתק</string>
+    <string name="instructions">הפעל ידנית את אפליקציית השמע שלך לרדיו. לחץ למעלה *התחל*. מעתה והלאה, כשייגמרו החדשות - השמע יושתק</string>
     <string name="nextNews">החדשות הבאות תהיינה בשעות</string>
-    <string name="newsLink">קישורים לחדשות האחרונות</string>
+    <string name="newsLink">קישורים שימושיים</string>
     <string name="shabbath">🕯🕯 שבת שלום 🕯🕯</string>
+    <string name="justListen">האזנה נעימה</string>
     <string name="todoList">סידורים לפני שבת:</string>
 
     <string name="newsLength">משך החדשות בדקות (1 עד 6)</string>
     <string name="newsFreq">תדירות החדשות - כל כמה שעות (1 עד 12)</string>
 
     <string name="next_30_sec">כעת - במשך 30 השניות הקרובות - קבע את עוצמת השמע בה אתה מעוניין לשמוע את החדשות. לאחר מכן עוצמת הרדיו תושתק ותתעורר מעצמה בזמנים המתאימים</string>
-    <string name="next_30_sec_with_sec">כעת - במשך %1$d השניות הקרובות - קבע את עוצמת השמע בה אתה מעוניין לשמוע את החדשות. לאחר מכן עוצמת הרדיו תושתק ותתעורר מעצמה בזמנים המתאימים</string>
+    <string name="next_30_sec_with_sec">כעת - במשך %1$d השניות הקרובות - קבע את עוצמת השמע %2$d (מתוך 100) בה אתה מעוניין לשמוע את החדשות. לאחר מכן עוצמת הרדיו תושתק ותתעורר מעצמה בזמנים המתאימים</string>
 
     <string name="alert_title">האם הרדיו מנגן? ואולי עוצמת השמע היא אפס?!</string>
     <string name="alert_message">האפליקציה לא מפעילה בעצמה את הרדיו, עליכם להפעיל מראש את האפליקציה המתאימה</string>
 
+    <string name="close_alert">סגור</string>
+
+    <string name="share">שתף</string>
+    <string name="rate">דרג</string>
+    <string name="share_text"> כדאי לך לנסות את האפליקציה </string>
+
     <!-- notifications -->
 
-    <string name="notif_title_1">מידע מהגל השקט בפעולה</string>
+    <string name="notif_title_1">הגל השקט שלי - בפעולה</string>
     <string name="notif_text_1">מגביר ומשתיק את המדיה בשעות עגולות</string>
 
-    <string name="notif_title_2">מידע מהגל השקט - קביעת עוצמת המדיה</string>
-    <string name="notif_text_2">%1$d שניות נותרו לקביעת העוצמה </string>
+    <string name="notif_title_2">הגל השקט שלי - קביעת עוצמת המדיה</string>
+    <string name="notif_text_2">עוצמה נוכחית: %2$d (מתוך 100). %1$d שניות נותרו לקביעת העוצמה </string>
 
-    <string name="notif_text_4">משמיע חדשות בווליום חלש ב %1$d דקות הקרובות</string>
+    <string name="notif_text_4">משמיע אודיו בווליום %2$d (מתוך 100) ב %1$d דקות הקרובות</string>
 
     <string name="notif_text_5">ממתין בשקט לחדשות הבאות בשעה %1$s</string>
     <string name="notif_text_radio_stopped">הרדיו כבר לא מנגן, יש להפעילו שוב</string>
