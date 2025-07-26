@@ -1,3 +1,45 @@
 <resources>
-    <string name="app_name">Volume Cycler</string>
-</resources> 
+
+    <string name="app_name">My quiet channel</string>
+    <string name="appName">My quiet channel</string>
+    <string name="title_name">My quiet channel 📻</string>
+
+    <string name="title_name_enabled">My quiet channel %1$s 📻 Enabled</string>
+    <string name="title_name_disabled">My quiet channel %1$s 📻 Disabled</string>
+
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+
+    <string name="glz">Glz ▶</string>
+    <string name="kan">"▶ Kan</string>
+
+    <string name="instructions">Manually start your radio app. Click on the top *Start*. From now on, when the news ends - the audio will be muted.</string>
+    <string name="nextNews">Upcoming news</string>
+    <string name="newsLink">Last news links</string>
+    <string name="shabbath">🕯🕯 Shabbat Shalom 🕯🕯</string>
+    <string name="todoList">To do list:</string>
+
+    <string name="newsLength">News Length in minutes (1..6)</string>
+    <string name="newsFreq">News Frequency in hours (1..12)</string>
+
+    <string name="next_30_sec">Now - for the next 30 seconds - set the volume at which you want to hear the news. The radio will then mute and wake up automatically at the appropriate times.</string>
+    <string name="next_30_sec_with_sec">Now - for the next %1$d seconds - set the volume at which you want to hear the news. The radio will then mute and wake up automatically at the appropriate times.</string>
+
+    <string name="alert_title">Is the radio app playing? Maybe the volume is at zero?!</string>
+    <string name="alert_message">The app does not turn on the radio itself, you must first turn on the appropriate app.</string>
+
+    <!-- notifications -->
+
+    <string name="notif_title_1">My quiet channel</string>
+    <string name="notif_text_1">Cycling volume every X hours</string>
+
+    <string name="notif_title_2">My quiet channel - set the volume</string>
+    <string name="notif_text_2">%1$d seconds left to set the volume</string>
+
+    <string name="notif_text_4">Low volume news for the upcoming %1$d minutes</string>
+
+    <string name="notif_text_5">Silent, till the next news at %1$s</string>
+    <string name="notif_text_radio_stopped">The radio app is not playing anymore, you should replay it</string>
+<!--    <string name="notif_text_6">Playing the current news</string>-->
+
+</resources>
