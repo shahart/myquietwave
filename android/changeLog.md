@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.05
+
+Candle Lighting and Havdalah times. As first step, from closed list of ~400 cities.
+See https://github.com/hebcal/dotcom/blob/v1.1/hebcal.com/dist/cities2.txt
+at Israel, the list is IL-Jerusalem, IL-Tel Aviv, IL-Haifa, IL-Be'er Sheva, and also
+IL-Ashdod, IL-Ashkelon, IL-Bat Yam, IL-Beit Shemesh, IL-Bnei Brak, IL-Eilat, IL-Hadera, IL-Herzliya, IL-Holon, IL-Kfar Saba, IL-Lod, IL-Modiin, IL-Nazareth, IL-Netanya, IL-Petach Tikvah, IL-Ra'anana, IL-Ramat Gan, IL-Ramla, IL-Rishon LeZion, IL-Tiberias
+
 ## 1.04 **Live/ Production**
 
 סגירה אוטומטית של החלון הקופץ לאחר 10 שניות
@@ -29,7 +36,7 @@ Support dark theme
 
 Better support for small devices
 
-Added Hebrew data and Parasha
+Add Hebrew data and Parasha
 </en-US>
 
 ## 1.01
@@ -96,4 +103,4 @@ Initial release
 
 ## 0.90 **Cursor**
 
-Basic version - thanks Cursonr - a PoC
+Basic version - thanks Cursor - a PoC

@@ -56,16 +56,22 @@ class ShabbathApiUnitTest {
 
     fun fetchZmanim(): String {
 
+        val city = "il-ramat gan"
+
+        val regex = "^[A-Za-z -.'é]*$".toRegex()
+        if (! regex.matches(city))
+            fail("failed the regex")
+
         var res = ""
 
         val response =
-            RetrofitInstance.api.getShabbatPerCity("IL-Jerusalem").execute()
+            RetrofitInstance.api.getShabbatPerCity(city).execute()
 
         if (/*! */response.isSuccessful) {
             val hebcal = response.body()
             hebcal?.items?.forEach {
                 if (it.category == "candles") {
-                    res += (it.date + " כניסת שבת ")
+                    res += (it.date + " הדלקת נרות ")
                 }
                 else if (it.category == "havdalah") {
                     res += (it.date + " הבדלה ")

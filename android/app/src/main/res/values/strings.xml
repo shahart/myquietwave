@@ -32,6 +32,9 @@
     <string name="rate">Rate</string>
     <string name="share_text">Check out this nice app:</string>
 
+    <string name="candleLighting">Candle Lighting</string>
+    <string name="havdalah">Havdalah</string>
+
     <!-- notifications -->
 
     <string name="notif_title_1">My quiet wave - In action</string>

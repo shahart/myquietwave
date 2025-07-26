@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var textViewClock : TextView
     private lateinit var textViewClock2 : TextView
-    // private lateinit var textViewClock3 : TextView
+    private lateinit var textViewClock3 : TextView
 
 
     private lateinit var editTextTodo : TextView
@@ -119,61 +119,8 @@ class MainActivity : ComponentActivity() {
 
         editTextTodo.text = savedName
 
-        // TODO? if Friday/ Thursday/ Saturday
-/*
-        if (editTextTodo.text.toString().trim().isNotEmpty() && editTextTodo.text.toString().trim().get(0).isUpperCase()) { // startsWith("IL-")) {
-            fetchZmanim(editTextTodo.text.toString().trim())
-        }
-        else if (editTextTodo.text.toString().trim().isNotEmpty() && editTextTodo.text.toString().get(0).isDigit()) {
-            fetchZmanim(editTextTodo.text.toString().trim())
-        }
-        else {
+        fetchZmanim()
 
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 0)
-            }
-
-        //    requestPermissions()
-
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-                val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                var isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-                        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-
-                // isGpsEnabled = true
-
-                if (! isGpsEnabled) {
-                    Log.w("", "MainActivity fetchZmanim location isGpsDisabled")
-                }
-                else {
-                    fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-                    fusedLocationClient.lastLocation
-//                        .addOnCompleteListener(requireActivity()) { task ->
-////                                location: Location? ->
-//                            Log.i("", "MainActivity fetchZmanim location success " + location)
-//                            if (location != null) {
-//                                fetchZmanim(location.latitude.toString() + "," + location.longitude.toString())
-//                            }
-//                        }
-//                        .addOnFailureListener { exception: Exception ->
-//                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
-//                        }
-//                        }
-                        .addOnSuccessListener { location: Location? ->
-                            Log.i("", "MainActivity fetchZmanim location success " + location)
-                            if (location != null) {
-                                fetchZmanim(location.latitude.toString() + "," + location.longitude.toString())
-                            }
-                        }
-                        .addOnFailureListener { exception: Exception ->
-                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
-                        }
-                }
-            }
-        }
-*/
         var newsDuration = sharedPreferences.getInt("newsDuration", 4)
         if (newsDuration > VolumeCycleService.max_news_duration) newsDuration = VolumeCycleService.max_news_duration
         if ("test5" == savedName && newsDuration > 5-1) newsDuration = 4
@@ -287,7 +234,75 @@ class MainActivity : ComponentActivity() {
         return nextHoursStr
     }
 
-/*
+    fun fetchZmanim() {
+        textViewClock3 = findViewById(R.id.textViewClock3)
+        textViewClock3.text = ""
+        val dow = java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).dayOfWeek
+        if ( // (dow == DayOfWeek.THURSDAY || dow == DayOfWeek.FRIDAY || dow == DayOfWeek.SATURDAY) &&
+            editTextTodo.text.toString().trim().isNotEmpty()) {
+
+            val regex = "^[A-Za-z -.'é]*$".toRegex()
+
+            if (regex.matches(editTextTodo.text.toString()
+                    .trim()) // .isLetter() // isUpperCase()
+            ) { // startsWith("IL-")) {
+                fetchZmanim(editTextTodo.text.toString().trim())
+            } else if (editTextTodo.text.toString().trim()
+                    .isNotEmpty() && editTextTodo.text.toString().get(0).isDigit()
+            ) {
+                fetchZmanim(editTextTodo.text.toString().trim())
+            }
+            /*
+        else {
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 0)
+            }
+
+        //    requestPermissions()
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+                val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                var isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+                // isGpsEnabled = true
+
+                if (! isGpsEnabled) {
+                    Log.w("", "MainActivity fetchZmanim location isGpsDisabled")
+                }
+                else {
+                    fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+                    fusedLocationClient.lastLocation
+//                        .addOnCompleteListener(requireActivity()) { task ->
+////                                location: Location? ->
+//                            Log.i("", "MainActivity fetchZmanim location success " + location)
+//                            if (location != null) {
+//                                fetchZmanim(location.latitude.toString() + "," + location.longitude.toString())
+//                            }
+//                        }
+//                        .addOnFailureListener { exception: Exception ->
+//                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
+//                        }
+//                        }
+                        .addOnSuccessListener { location: Location? ->
+                            Log.i("", "MainActivity fetchZmanim location success " + location)
+                            if (location != null) {
+                                fetchZmanim(location.latitude.toString() + "," + location.longitude.toString())
+                            }
+                        }
+                        .addOnFailureListener { exception: Exception ->
+                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
+                        }
+                }
+            }
+        }
+*/
+        }
+    }
+
     fun fetchZmanim(loc: String) { // }: String {
 
         textViewClock3 = findViewById(R.id.textViewClock3)
@@ -299,8 +314,9 @@ class MainActivity : ComponentActivity() {
 //                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 112); // REQUEST_INTERNET_PERMISSION);
 //            }
 
-            val call = if (loc.get(0).isDigit()) RetrofitInstance.api.getShabbatByLoc(loc.split(",")[0].trim(), loc.split(",")[1].trim())
-                else RetrofitInstance.api.getShabbatPerCity(loc)
+            val call = // if (loc.get(0).isDigit()) RetrofitInstance.api.getShabbatByLoc(loc.split(",")[0].trim(), loc.split(",")[1].trim())
+                // else
+                    RetrofitInstance.api.getShabbatPerCity(loc)
 
             call.enqueue(object : Callback<HebCal> {
 
@@ -315,27 +331,30 @@ class MainActivity : ComponentActivity() {
                         val hebcal = response.body()
                         hebcal?.items?.forEach {
                             if (it.category == "candles") {
-                                res += " כניסת שבת " + truncDate(it.date)
+                                res += " " + getString(R.string.candleLighting) + " " + truncDate(it.date)
                             }
                             else if (it.category == "havdalah") {
-                                res += " הבדלה " + truncDate(it.date)
+                                res += " " + getString(R.string.havdalah) + " " +  truncDate(it.date)
                             }
                         }
                         textViewClock3.text = res
                     } else {
                         Log.w("", "MainActivity fetchParasha Error: ${response.code()}")
+                        textViewClock3.text = "Not found " + response.code()
                     }
                 }
 
                 override fun onFailure(call: Call<HebCal>, t: Throwable) {
                     Log.w("", "MainActivity fetchZmanim unable to fetch hebCal $t", t)
+                    textViewClock3.text = "Failure. Not found " + t
                 }
             })
         } catch (e: Exception) {
             Log.e("", "MainActivity fetchZmanim Exception $e", e)
+            textViewClock3.text = "Error. Not found " + e
         }
     }
-*/
+
     fun truncDate(date: String): String {
         return date.substring(date.indexOf("T")+1, date.indexOf("T")+1 +5)
     }
@@ -431,6 +450,12 @@ class MainActivity : ComponentActivity() {
                 "https://shahart.github.io/automations/links.html".toUri()
             )
             startActivity(browserIntent)
+        }
+
+        editTextTodo.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                fetchZmanim()
+            }
         }
 
         editTextNumberEveryHour.setOnFocusChangeListener { _, hasFocus ->

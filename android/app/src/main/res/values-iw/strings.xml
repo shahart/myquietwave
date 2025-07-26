@@ -33,6 +33,9 @@
     <string name="rate">דרג</string>
     <string name="share_text"> כדאי לך לנסות את האפליקציה </string>
 
+    <string name="candleLighting">הדלקת נרות</string>
+    <string name="havdalah">הבדלה</string>
+
     <!-- notifications -->
 
     <string name="notif_title_1">הגל השקט שלי - בפעולה</string>
