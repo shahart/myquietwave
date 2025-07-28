@@ -29,10 +29,11 @@ jobs:
 
       - name: Build with Gradle
         working-directory: ./android
-        run: ./gradlew build # -x test
+        run: ./android/gradlew build test
 
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4
+        working-directory: ./android
         with:
           name: app-debug.apk
           path: android/app/build/intermediates/apk/debug/
