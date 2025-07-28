@@ -207,6 +207,13 @@
         android:textAlignment="center"
         android:visibility="invisible" />
 
+	<!--ImageView
+		android:id="@+id/info_icon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@android:drawable/ic_dialog_info"
+		android:contentDescription="Information" /-->
+	
     <TextView
         android:id="@+id/textViewTodoLabel"
         android:layout_width="match_parent"
@@ -222,7 +229,7 @@
         android:background="@android:color/transparent"
         android:ems="10"
         android:singleLine="false"
-        android:text="פלטה, מיחם, שעון שבת, מזגן"
+        android:text="IL-Tel Aviv, פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן"
         android:textAlignment="center" />
 
     <TextView

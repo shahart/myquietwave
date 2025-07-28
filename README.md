@@ -19,6 +19,8 @@ Current approach: Pros: simplicity, Cons: not being cut at the end of the news
 
     DONE: See https://play.google.com/store/search?q=הגל%20השקט%20שלי&c=apps
 
+   [![Android CI](https://github.com/shahart/automations/workflows/AndroidBuild/badge.svg)](https://github.com/shahart/automations/actions)
+
 - iOS example:
 
 ![iOS shortcut](ios-shortcut.jpg)

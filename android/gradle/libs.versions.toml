@@ -13,7 +13,7 @@ constraintlayout = "2.2.1"
 retrofit = "2.12.0"
 converterGson = "2.12.0"
 converterScalars = "2.12.0"
-playServicesLocation = "21.3.0"
+#playServicesLocation = "21.3.0"
 #rules = "1.6.1"
 
 [libraries]
@@ -37,7 +37,8 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "converterScalars" }
-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+
+#play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

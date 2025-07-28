@@ -17,8 +17,8 @@ android {
         applicationId = "com.shahartal.myquietchannel"
         minSdk = 26
         targetSdk = 36
-        versionCode = 18
-        versionName = "1.05"
+        versionCode = 19
+        versionName = "1.06"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -68,7 +68,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.play.services.location)
+//    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

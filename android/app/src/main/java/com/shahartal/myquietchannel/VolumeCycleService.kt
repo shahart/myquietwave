@@ -4,6 +4,7 @@ package com.shahartal.myquietchannel
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.media.AudioManager
@@ -13,13 +14,18 @@ import android.util.Log
 //import android.widget.TextView
 //import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.app.TaskStackBuilder
 import kotlinx.coroutines.*
 import java.time.DayOfWeek
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class VolumeCycleService : Service() {
 
     companion object {
         var isRunning = false
+        var startHour = -1
+        var startSeconds = 0
         const val max_news_duration = 59
         const val CHANNEL_ID = "VolumeCycleChannel"
     }
@@ -31,17 +37,31 @@ class VolumeCycleService : Service() {
     private var settedVolume = 0
     private var origVolume = 0
 
+    var mainIntent = Intent(this, MainActivity::class.java)
+    var mainPendingIntent: PendingIntent? = null
+
     override fun onCreate() {
         super.onCreate()
         isRunning = true
+        startHour = ZonedDateTime.now(ZoneId.systemDefault()).hour
+        startSeconds = ZonedDateTime.now(ZoneId.systemDefault()).second
 
         createNotificationChannel()
+
+        mainIntent = Intent(this, MainActivity::class.java)
+
+        mainPendingIntent = TaskStackBuilder.create(this).run {
+            addNextIntentWithParentStack(mainIntent)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        }
+
         val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.notif_title_1)) // ""Volume Cycler Running")
             .setContentText(getString(R.string.notif_text_1)) // ""Cycling volume every X hours.")
             .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
+            .setContentIntent(mainPendingIntent)
             .build()
         startForeground(1, notification)
     }
@@ -77,12 +97,18 @@ class VolumeCycleService : Service() {
 
             val isNearShabbath = isTest5
                 || (
-                java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY &&
-                    java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).hour > 13)
+                ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY &&
+                    ZonedDateTime.now(ZoneId.systemDefault()).hour >= 12)
 
-            if (newsDuration > max_news_duration) newsDuration = max_news_duration
-            if (isNearShabbath && newsDuration > 6) newsDuration = 6
-            if (newsDuration < 1) newsDuration = 1
+            if (newsDuration > max_news_duration) {
+                newsDuration = max_news_duration
+            }
+            if (isNearShabbath && newsDuration > 6) {
+                newsDuration = 6
+            }
+            if (newsDuration < 1) {
+                newsDuration = 1
+            }
 
             if (isTest5) {
                 minutesPerHours = 5
@@ -96,12 +122,16 @@ class VolumeCycleService : Service() {
 //            if (volume > audioManager.getStreamMaxVolume(stream)) volume = 2
 //            if (volume < 1) volume = 1
 
-            if (hours > 12) hours = 12
-            if (hours < 1) hours = 1
+            if (hours > 12) {
+                hours = 12
+            }
+            if (hours < 1) {
+                hours = 1
+            }
 
             Log.i("", "VolumeCycleService settings: NewsDuration $newsDuration everyHours $hours")
 
-            val initSeconds = java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).second
+            val initSeconds = ZonedDateTime.now(ZoneId.systemDefault()).second
 
             while (isActive) {
 
@@ -119,6 +149,7 @@ class VolumeCycleService : Service() {
                     "VolumeCycleService started positive volume: $volume50 out of $maxVolume, news duration [minutes] $newsDuration, is near shabbath $isNearShabbath"
                 )
 
+
                 audioManager.setStreamVolume(stream, volume50, 0)
 
                 if (settedVolume == 0) {
@@ -132,6 +163,7 @@ class VolumeCycleService : Service() {
                             .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
                             .setOngoing(true)
                             .setOnlyAlertOnce(true)
+                            .setContentIntent(mainPendingIntent)
                             .build()
                         getSystemService(NotificationManager::class.java).notify(1, notification)
 
@@ -146,6 +178,7 @@ class VolumeCycleService : Service() {
                                 .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
                                 .setOngoing(true)
                                 .setOnlyAlertOnce(true)
+                                .setContentIntent(mainPendingIntent)
                                 .build()
                             getSystemService(NotificationManager::class.java).notify(1, notification)
                             // break
@@ -171,6 +204,7 @@ class VolumeCycleService : Service() {
                         .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
                         .setOngoing(true)
                         .setOnlyAlertOnce(true)
+                        .setContentIntent(mainPendingIntent)
                         .build()
                     getSystemService(NotificationManager::class.java).notify(1, notification)
 
@@ -182,9 +216,12 @@ class VolumeCycleService : Service() {
                             .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
                             .setOngoing(true)
                             .setOnlyAlertOnce(true)
+                            .setContentIntent(mainPendingIntent)
                             .build()
                         getSystemService(NotificationManager::class.java).notify(1, notification)
                     }
+
+                    // delay(30_000)
 
                 }
                 else {
@@ -200,13 +237,14 @@ class VolumeCycleService : Service() {
                                 .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
                                 .setOngoing(true)
                                 .setOnlyAlertOnce(true)
+                                .setContentIntent(mainPendingIntent)
                                 .build()
                         getSystemService(NotificationManager::class.java).notify(1, notification)
 
                         delay(60 * 1000L) // 6 minutes
                     }
                 }
-                var now = java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).minute
+                var now = ZonedDateTime.now(ZoneId.systemDefault()).minute
                 // continue the current news
                 if (now < newsDuration) {
                     Log.d("", "VolumeCycleService continue positive volume, more delay (as part of news duration) [minutes] " + (newsDuration - now))
@@ -219,6 +257,7 @@ class VolumeCycleService : Service() {
                                 .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
                                 .setOngoing(true)
                                 .setOnlyAlertOnce(true)
+                                .setContentIntent(mainPendingIntent)
                                 .build()
                         getSystemService(NotificationManager::class.java).notify(1, notification)
 
@@ -228,7 +267,7 @@ class VolumeCycleService : Service() {
 
                 var nextDelay = (minutesPerHours * hours - newsDuration)
 
-                now = java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).hour
+                now = ZonedDateTime.now(ZoneId.systemDefault()).hour
                 var nextHour = now
 
                 // this happens only in the Init
@@ -238,7 +277,7 @@ class VolumeCycleService : Service() {
                     if (settedVolume == 0) {
                         settedVolume = 3 // (maxVolume * 15 / 100).coerceAtLeast(1) // let's start with 1 or 2
                     }
-                    now = java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).minute
+                    now = ZonedDateTime.now(ZoneId.systemDefault()).minute
                     nextDelay = minutesPerHours - now
 
                     if (minutesPerHours != 60) {
@@ -251,7 +290,9 @@ class VolumeCycleService : Service() {
                     nextHour += hours
                 }
 
-                if (nextHour > 24) nextHour -= 24
+                if (nextHour > 24) {
+                    nextHour -= 24
+                }
 
                 val notification: Notification = NotificationCompat.Builder(thisService, CHANNEL_ID)
                     .setContentTitle(getString(R.string.notif_title_1))
@@ -259,6 +300,7 @@ class VolumeCycleService : Service() {
                     .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
                     .setOngoing(true)
                     .setOnlyAlertOnce(true)
+                    .setContentIntent(mainPendingIntent)
                     .build()
                 getSystemService(NotificationManager::class.java).notify(1, notification)
 
@@ -273,31 +315,39 @@ class VolumeCycleService : Service() {
                 Log.d("","VolumeCycleService started zero volume, delay till the next news [minutes] $nextDelay") //  + currentVolume)
                 audioManager.setStreamVolume(stream, 0, 0)
 
-                delay(30_000)
-                for (i in 1..(nextDelay-1)*2) {
+                // delay(30_000)
+
+                // WAS: for (i in 1..(nextDelay-1)*2) {
+                while (
+                    (ZonedDateTime.now(ZoneId.systemDefault()).minute != 0 || (isTest5 && ZonedDateTime.now(ZoneId.systemDefault()).minute % 5 != 0)) &&
+                       ZonedDateTime.now(ZoneId.systemDefault()).hour != nextHour)
+                {
+                    if (ZonedDateTime.now(ZoneId.systemDefault()).minute == 0 &&
+                        ZonedDateTime.now(ZoneId.systemDefault()).hour == nextHour &&
+                        (ZonedDateTime.now(ZoneId.systemDefault()).second >= startSeconds ||
+                        ZonedDateTime.now(ZoneId.systemDefault()).second >= 30)) {
+                        break
+                    }
                     delay(30 * 1000L) // 54 minutes
-                    if (! alertMediaIsPlaying("waiting for news")) {
+                    var text: String
+                    text = if (! alertMediaIsPlaying("waiting for news")) {
                         // cancel("VolumeCycleService media was stopped, cancelling", null)
                         // break
-                        val notification: Notification = NotificationCompat.Builder(thisService, CHANNEL_ID)
-                            .setContentTitle(getString(R.string.notif_title_1))
-                            .setContentText(getString(R.string.notif_text_radio_stopped))
-                            .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
-                            .setOngoing(true)
-                            .setOnlyAlertOnce(true)
-                            .build()
-                        getSystemService(NotificationManager::class.java).notify(1, notification)
+                        getString(R.string.notif_text_radio_stopped)
+                    } else {
+                        getString(R.string.notif_text_5, "" + nextHour + ":00:" + (if (initSeconds < 10) "0$initSeconds" else initSeconds))
                     }
-                    else {
-                        val notification: Notification = NotificationCompat.Builder(thisService, CHANNEL_ID)
-                            .setContentTitle(getString(R.string.notif_title_1))
-                            .setContentText(getString(R.string.notif_text_5, "" + nextHour + ":00:" + (if (initSeconds < 10) "0$initSeconds" else initSeconds)))
-                            .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
-                            .setOngoing(true)
-                            .setOnlyAlertOnce(true)
-                            .build()
-                        getSystemService(NotificationManager::class.java).notify(1, notification)
-                    }
+
+                    val notification: Notification = NotificationCompat.Builder(thisService, CHANNEL_ID)
+                        .setContentTitle(getString(R.string.notif_title_1))
+                        .setContentText(text)
+                        .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
+                        .setOngoing(true)
+                        .setOnlyAlertOnce(true)
+                        .setContentIntent(mainPendingIntent)
+                        .build()
+                    getSystemService(NotificationManager::class.java).notify(1, notification)
+
                     // infoText.text = "54"
                 }
             }
@@ -315,6 +365,8 @@ class VolumeCycleService : Service() {
         job?.cancel()
         super.onDestroy()
         isRunning = false
+        startHour = -1
+        startSeconds = 0
         getSystemService(NotificationManager::class.java).cancel(1)
     }
 

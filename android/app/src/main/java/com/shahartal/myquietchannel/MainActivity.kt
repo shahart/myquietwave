@@ -11,34 +11,35 @@ package com.shahartal.myquietchannel
 import android.Manifest
 import android.app.AlertDialog
 import android.app.NotificationManager
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 //import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.icu.util.HebrewCalendar
-import android.location.Location
-import android.location.LocationManager
+//import android.location.Location
+//import android.location.LocationManager
 import android.media.AudioManager
 //import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+//import android.widget.ImageView
 import android.widget.TextView
+//import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
+//import androidx.activity.result.contract.ActivityResultContracts
+//import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 //import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+//import com.google.android.gms.location.FusedLocationProviderClient
+//import com.google.android.gms.location.LocationServices
 import com.shahartal.myquietchannel.parasha.HebCal
 import com.shahartal.myquietchannel.parasha.RetrofitInstance
 import java.time.DayOfWeek
@@ -48,6 +49,8 @@ import java.time.format.DateTimeFormatter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.Timer
 import java.util.TimerTask
 
@@ -66,9 +69,9 @@ class MainActivity : ComponentActivity() {
     private lateinit var editTextNumberEveryHour: TextView
     private lateinit var textViewNextNews: TextView
 
-    private lateinit var textViewNewsGlz: TextView
+    // private lateinit var textViewNewsGlz: TextView
     private lateinit var textViewNewsLinks: TextView
-    private lateinit var textViewNewsKan: TextView
+    // private lateinit var textViewNewsKan: TextView
 
     private lateinit var textViewClock : TextView
     private lateinit var textViewClock2 : TextView
@@ -77,7 +80,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var editTextTodo : TextView
 
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    // private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and
@@ -115,7 +118,7 @@ class MainActivity : ComponentActivity() {
         super.onResume()
 
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
-        val savedName = sharedPreferences.getString("todoList", "פלטה, מיחם, שעון שבת, מזגן")
+        val savedName = sharedPreferences.getString("todoList", "IL-Tel Aviv, פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן")
 
         editTextTodo.text = savedName
 
@@ -123,8 +126,10 @@ class MainActivity : ComponentActivity() {
 
         var newsDuration = sharedPreferences.getInt("newsDuration", 4)
         if (newsDuration > VolumeCycleService.max_news_duration) newsDuration = VolumeCycleService.max_news_duration
-        if ("test5" == savedName && newsDuration > 5-1) newsDuration = 4
-        if (newsDuration < 1) newsDuration = 1
+        if ("test5" == savedName && newsDuration > 5-1)
+            newsDuration = 4
+        if (newsDuration < 1)
+            newsDuration = 1
         editTextNumberNewsDuration.text = newsDuration.toString()
 
         var everyHour = sharedPreferences.getInt("everyHour", 4)
@@ -132,18 +137,19 @@ class MainActivity : ComponentActivity() {
         if (everyHour < 1) everyHour = 1
         editTextNumberEveryHour.text = everyHour.toString()
 
-        textViewNextNews.text = getEveryHourStr()
-
         val serviceIntent = Intent(this, VolumeCycleService::class.java)
         if (VolumeCycleService.isRunning) {
+            textViewNextNews.text = getEveryHourStr(VolumeCycleService.startHour)
             if (! alertMediaIsPlaying("onResume")) {
                 stopService(serviceIntent)
                 isServiceRunning = false
+                textViewNextNews.text = getEveryHourStr()
             }
         }
         else {
             stopService(serviceIntent)
             isServiceRunning = false
+            textViewNextNews.text = getEveryHourStr()
         }
 
         if (isServiceRunning) {
@@ -154,8 +160,6 @@ class MainActivity : ComponentActivity() {
         else {
             statusText.text = getString(R.string.title_name_disabled, "" /*BuildConfig.VERSION_NAME*/)
             toggleButton.text = getString(R.string.start)
-
-
             toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
         }
 
@@ -180,8 +184,10 @@ class MainActivity : ComponentActivity() {
         val newsDurationStr = editTextNumberNewsDuration.text.toString()
         var newsDuration = if (newsDurationStr.isEmpty()) 4 else newsDurationStr.toInt()
         if (newsDuration > VolumeCycleService.max_news_duration) newsDuration = VolumeCycleService.max_news_duration
-        if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1) newsDuration = 4
-        if (newsDuration < 1) newsDuration = 1
+        if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1)
+            newsDuration = 4
+        if (newsDuration < 1)
+            newsDuration = 1
         editor.putInt("newsDuration", newsDuration)
 
         val everyHourStr = editTextNumberEveryHour.text.toString()
@@ -191,10 +197,9 @@ class MainActivity : ComponentActivity() {
         editor.putInt("everyHour", everyHour)
 
         editor.apply()
-
     }
 
-    fun getEveryHourStr(): String {
+    fun getEveryHourStr(now: Int = -1): String {
         var everyHoursStr = editTextNumberEveryHour.text.toString()
         if (everyHoursStr == "") {
             everyHoursStr = "4"
@@ -210,8 +215,7 @@ class MainActivity : ComponentActivity() {
             editTextNumberEveryHour.text = "1"
         }
 
-        val now = java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).hour
-        var nextHour = now + 1 //  + everyHours
+        var nextHour = if (now == -1) ZonedDateTime.now(ZoneId.systemDefault()).hour + 1 else now + 1 //  + everyHours
         if (nextHour > 24) nextHour -= 24
         // Log.d("", "MainActivity nextHour: " + nextHour)
 
@@ -220,6 +224,8 @@ class MainActivity : ComponentActivity() {
 
         var plusHours = everyHours
 
+        // the real code:
+
         nextHour += everyHours
         if (nextHour > 24) nextHour -= 24
         nextHoursStr += ", $nextHour"
@@ -227,7 +233,9 @@ class MainActivity : ComponentActivity() {
         while (plusHours < 24) {
             nextHour += everyHours
             plusHours += everyHours
-            if (nextHour > 24) nextHour -= 24
+            if (nextHour > 24) {
+                nextHour -= 24
+            }
             nextHoursStr += ", $nextHour"
         }
 
@@ -237,20 +245,22 @@ class MainActivity : ComponentActivity() {
     fun fetchZmanim() {
         textViewClock3 = findViewById(R.id.textViewClock3)
         textViewClock3.text = ""
-        val dow = java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).dayOfWeek
+        // val dow = ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek
         if ( // (dow == DayOfWeek.THURSDAY || dow == DayOfWeek.FRIDAY || dow == DayOfWeek.SATURDAY) &&
             editTextTodo.text.toString().trim().isNotEmpty()) {
 
             val regex = "^[A-Za-z -.'é]*$".toRegex()
-
-            if (regex.matches(editTextTodo.text.toString()
-                    .trim()) // .isLetter() // isUpperCase()
+            var firstItem = editTextTodo.text.toString().trim()
+            if (firstItem.contains(",")) {
+                firstItem = firstItem.substring(0, firstItem.indexOf(","))
+            }
+            if (regex.matches(firstItem) // .isLetter() // isUpperCase()
             ) { // startsWith("IL-")) {
-                fetchZmanim(editTextTodo.text.toString().trim())
-            } else if (editTextTodo.text.toString().trim()
-                    .isNotEmpty() && editTextTodo.text.toString().get(0).isDigit()
+                fetchZmanim(firstItem)
+            } else if (firstItem
+                    .isNotEmpty() && editTextTodo.text.toString()[0].isDigit()
             ) {
-                fetchZmanim(editTextTodo.text.toString().trim())
+                fetchZmanim(firstItem)
             }
             /*
         else {
@@ -306,7 +316,7 @@ class MainActivity : ComponentActivity() {
     fun fetchZmanim(loc: String) { // }: String {
 
         textViewClock3 = findViewById(R.id.textViewClock3)
-        var res = ""
+        var res: String
 
         try {
 //            if (ContextCompat.checkSelfPermission(this, Manifest.permission.LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -323,10 +333,11 @@ class MainActivity : ComponentActivity() {
                 override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
                     if (response.isSuccessful) {
 
-                        if (loc.get(0).isUpperCase())
+                        if (loc[0].isUpperCase()) {
                             res = loc + " "
-                        else
+                        } else {
                             res = " "
+                        }
 
                         val hebcal = response.body()
                         hebcal?.items?.forEach {
@@ -402,7 +413,7 @@ class MainActivity : ComponentActivity() {
 
         setContentView(R.layout.activity_main)
 
-        if (java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY) {
+        if (ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY) {
             shabesText = findViewById(R.id.textViewShabes)
             shabesText.text = getString(R.string.shabbath)
         }
@@ -410,6 +421,12 @@ class MainActivity : ComponentActivity() {
         fetchParasha()
 
         editTextTodo = findViewById(R.id.editTextTodo)
+
+
+        /* val infoIcon: ImageView = findViewById(R.id.info_icon)
+        infoIcon.setOnClickListener {
+            Toast.makeText(this, "Here you can place your city, with a comma, for Candle lighting and Havdalah times", Toast.LENGTH_LONG).show();
+        }*/
 
         // fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -430,7 +447,7 @@ class MainActivity : ComponentActivity() {
             try {
                 startActivity(Intent(Intent.ACTION_VIEW,
                     ("market://details?id=$packageName").toUri()))
-            } catch (_: android.content.ActivityNotFoundException) {
+            } catch (_: ActivityNotFoundException) {
                 startActivity(Intent(Intent.ACTION_VIEW,
                     ("https://play.google.com/store/apps/details?id=$packageName").toUri()))
             }
@@ -471,7 +488,9 @@ class MainActivity : ComponentActivity() {
                 if (newsDuration > VolumeCycleService.max_news_duration) {
                     editTextNumberNewsDuration.text = VolumeCycleService.max_news_duration.toString()
                 }
-                if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1) editTextNumberNewsDuration.text = "4"
+                if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1) {
+                    editTextNumberNewsDuration.text = "4"
+                }
                 if (newsDuration < 1) {
                     editTextNumberNewsDuration.text = "1"
                 }
@@ -492,7 +511,9 @@ class MainActivity : ComponentActivity() {
                 if (newsDuration > VolumeCycleService.max_news_duration) {
                     editTextNumberNewsDuration.text = VolumeCycleService.max_news_duration.toString()
                 }
-                if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1) editTextNumberNewsDuration.text = "4"
+                if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1) {
+                    editTextNumberNewsDuration.text = "4"
+                }
                 if (newsDuration < 1) {
                     editTextNumberNewsDuration.text = "1"
                 }
@@ -507,12 +528,14 @@ class MainActivity : ComponentActivity() {
             while (true) {
                 runOnUiThread {
                     val hebrewCalendar = HebrewCalendar()
-                    val hebrewYear = hebrewCalendar.get(HebrewCalendar.YEAR)
+                    val hebrewYear = Utils.getYY(hebrewCalendar.get(HebrewCalendar.YEAR))
                     val hebrewMonth = hebrewCalendar.get(HebrewCalendar.MONTH)
                     val hebrewDay = hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH) // switches at midnight by-design
+                    val hebrewDays = arrayOf("א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ", "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל")
                     val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר שני", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
                     val hebrewMonthName = hebrewMonths[hebrewMonth]
-                    textViewClock.text = "$hebrewYear/$hebrewMonthName/$hebrewDay " +
+                    val hebrewDayName = hebrewDays[hebrewDay-1]
+                    textViewClock.text = "$hebrewDayName/$hebrewMonthName/$hebrewYear - " +
                             LocalDateTime.now().format(DateTimeFormatter.ofPattern("H:mm:ss"))
                 }
                 Thread.sleep(1000)
@@ -582,33 +605,11 @@ class MainActivity : ComponentActivity() {
                 editTextNumberEveryHour.text = "1"
             }
 
-            val now = java.time.ZonedDateTime.now(java.time.ZoneId.systemDefault()).hour
-            var nextHour = now + 1 //  + everyHours
-            if (nextHour > 24) nextHour -= 24
-            // Log.d("", "MainActivity nextHour: " + nextHour)
-
-            var nextHoursStr = // "החדשות הבאות תהיינה בשעות " +
-                nextHour.toString()
-
-            var plusHours = everyHours
-
-            nextHour += everyHours
-            if (nextHour > 24) nextHour -= 24
-            nextHoursStr += ", $nextHour"
-
-            while (plusHours < 24) {
-                nextHour += everyHours
-                plusHours += everyHours
-                if (nextHour > 24) nextHour -= 24
-                nextHoursStr += ", $nextHour"
-            }
-
-            textViewNextNews.text = nextHoursStr
-
             if (isServiceRunning) {
 
                 val serviceIntent = Intent(this, VolumeCycleService::class.java)
                 stopService(serviceIntent)
+                textViewNextNews.text = getEveryHourStr()
                 statusText.text = getString(R.string.title_name_disabled, "" /*BuildConfig.VERSION_NAME*/)
                 toggleButton.text = getString(R.string.start)
 
@@ -623,7 +624,6 @@ class MainActivity : ComponentActivity() {
                 isServiceRunning = false
 
                 getSystemService(NotificationManager::class.java).cancel(1)
-
 
             } else {
 
@@ -658,6 +658,7 @@ class MainActivity : ComponentActivity() {
                 if (alertMediaIsPlaying("onClick to turn on")) {
 
                     startForegroundService(serviceIntent)
+                    textViewNextNews.text = getEveryHourStr(ZonedDateTime.now(ZoneId.systemDefault()).hour)
 
 //                    val alertDialog = AlertDialog.Builder(this).create()
 
@@ -677,8 +678,9 @@ class MainActivity : ComponentActivity() {
                     val alertDialogBuilder = AlertDialog.Builder(this)
                     alertDialogBuilder.setMessage(getString(R.string.next_30_sec))
                     alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, which: Int ->
-                        if (! this.isFinishing)
+                        if (! this.isFinishing) {
                             dialog!!.cancel()
+                        }
                     }
                     // alertDialog.setIcon(R.drawable.icon)
                     val alertDialog = alertDialogBuilder.create()
@@ -690,16 +692,18 @@ class MainActivity : ComponentActivity() {
 
                         val audioManager = this.getSystemService(AUDIO_SERVICE) as AudioManager
                         for (i in 1..30) {
-                            if (! alertDialog.isShowing)
+                            if (! alertDialog.isShowing) {
                                 break
+                            }
                             runOnUiThread {
                                 if (isServiceRunning) {
                                     alertDialog.setMessage(getString(R.string.next_30_sec_with_sec, (31 - i),
                                         100*audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)/audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)))
                                 }
                                 else {
-                                    if (! this.isFinishing)
+                                    if (! this.isFinishing) {
                                         alertDialog.cancel()
+                                    }
                                 }
 //                                if (i == 30) {
 //                                    alertDialog.cancel()
@@ -743,6 +747,7 @@ class MainActivity : ComponentActivity() {
                     isServiceRunning = false
 
                     getSystemService(NotificationManager::class.java).cancel(1)
+                    textViewNextNews.text = getEveryHourStr()
 
                 }
             }
@@ -773,8 +778,9 @@ class MainActivity : ComponentActivity() {
             alertDialog.setTitle(getString(R.string.alert_title))
             alertDialog.setMessage(getString(R.string.alert_message))
             alertDialog.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, which: Int ->
-                if (! this.isFinishing)
+                if (! this.isFinishing) {
                     dialog!!.cancel()
+                }
             }
             // alertDialog.setIcon(R.drawable.icon)
             val dialog = alertDialog.create()

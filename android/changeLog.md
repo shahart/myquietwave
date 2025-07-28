@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.06
+
+Clicking on the notification now opens the app
+
+Minor fixes
+
+לחיצה על ההתראה פותחת כעת את האפליקציה
+
+תיקונים קלים
+
 ## 1.05
 
 Candle Lighting and Havdalah times. As first step, from closed list of ~400 cities.
