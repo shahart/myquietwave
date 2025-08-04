@@ -38,6 +38,12 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
 //import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
+
 //import com.google.android.gms.location.FusedLocationProviderClient
 //import com.google.android.gms.location.LocationServices
 import com.shahartal.myquietchannel.parasha.HebCal
@@ -79,6 +85,8 @@ class MainActivity : ComponentActivity() {
 
 
     private lateinit var editTextTodo : TextView
+
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
 
     // private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -409,6 +417,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        firebaseAnalytics = Firebase.analytics
+
         Log.i("", "MainActivity Version " + BuildConfig.VERSION_NAME)
 
         setContentView(R.layout.activity_main)
@@ -658,6 +668,12 @@ class MainActivity : ComponentActivity() {
                 if (alertMediaIsPlaying("onClick to turn on")) {
 
                     startForegroundService(serviceIntent)
+
+                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
+                        param("everyHours", everyHours.toLong())
+                        param("newsDuration", newsDuration.toLong())
+                    }
+
                     textViewNextNews.text = getEveryHourStr(ZonedDateTime.now(ZoneId.systemDefault()).hour)
 
 //                    val alertDialog = AlertDialog.Builder(this).create()

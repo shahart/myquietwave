@@ -17,7 +17,7 @@ Current approach: Pros: simplicity, Cons: not being cut at the end of the news
 
 - ~~Mobile App. For Android's Routines. Validate it's necessary as iOS, for example, has its own Shortcuts + Automations.~~
 
-    DONE: See https://play.google.com/store/search?q=הגל%20השקט%20שלי&c=apps
+    DONE: See https://play.google.com/store/apps/details?id=com.shahartal.myquietchannels
 
    [![Android CI](https://github.com/shahart/automations/actions/workflows/AndroidBuild.yml/badge.svg)](https://github.com/shahart/automations/actions/workflows/AndroidBuild.yml)
 

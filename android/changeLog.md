@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.07
+
+איסוף נתוני הפעלות, לחישוב עתידי של ערכי ברירת המחדל
+
+Prepare for calculation of the average default values (both newsDuration and everyHours are 4 for now)
+
 ## 1.06
 
 Clicking on the notification now opens the app

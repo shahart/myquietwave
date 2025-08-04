@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -17,8 +18,8 @@ android {
         applicationId = "com.shahartal.myquietchannel"
         minSdk = 26
         targetSdk = 36
-        versionCode = 19
-        versionName = "1.06"
+        versionCode = 21
+        versionName = "1.07"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -68,6 +69,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.play.services.measurement.api)
 //    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -85,4 +87,7 @@ dependencies {
     androidTestImplementation("androidx.test:rules:1.6.1")
 
 //    implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    implementation(libs.firebase.analytics)
+    implementation(platform(libs.firebase.bom))
 }
