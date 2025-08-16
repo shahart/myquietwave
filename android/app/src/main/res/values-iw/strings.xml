@@ -8,10 +8,10 @@
     <string name="title_name_enabled">הגל השקט שלי %1$s 📻 פועל</string>
     <string name="title_name_disabled">הגל השקט שלי %1$s 📻 כבוי</string>
 
-    <string name="start">התחל</string>
+    <string name="start">הפעל</string>
     <string name="stop">הפסק</string>
 
-    <string name="instructions">הפעל ידנית את אפליקציית השמע שלך לרדיו. לחץ למעלה *התחל*. מעתה והלאה, כשייגמרו החדשות - השמע יושתק</string>
+    <string name="instructions">הפעל ידנית את אפליקציית השמע שלך לרדיו. לחץ למעלה *הפעל*. מעתה והלאה, כשייגמרו החדשות - השמע יושתק</string>
     <string name="nextNews">החדשות הבאות תהיינה בשעות</string>
     <string name="newsLink">קישורים שימושיים</string>
     <string name="shabbath">🕯🕯 שבת שלום 🕯🕯</string>
@@ -45,6 +45,7 @@
     <string name="notif_text_2">עוצמה נוכחית: %2$d (מתוך 100). %1$d שניות נותרו לקביעת העוצמה </string>
 
     <string name="notif_text_4">משמיע אודיו בווליום %2$d (מתוך 100) ב %1$d דקות הקרובות</string>
+    <string name="notif_text_4_1">משמיע אודיו בווליום %1$d (מתוך 100) בדקה הקרובה</string>
 
     <string name="notif_text_5">ממתין בשקט לחדשות הבאות בשעה %1$s</string>
     <string name="notif_text_radio_stopped">הרדיו כבר לא מנגן, יש להפעילו שוב</string>

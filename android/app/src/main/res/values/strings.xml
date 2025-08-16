@@ -44,6 +44,7 @@
     <string name="notif_text_2">%1$d seconds left to set the volume. Current value is %2$d (out of 100)</string>
 
     <string name="notif_text_4">Low volume %2$d (out of 100) audio for the upcoming %1$d minutes</string>
+    <string name="notif_text_4_1">Low volume %1$d (out of 100) audio for the upcoming minute</string>
 
     <string name="notif_text_5">Silent, till the next news at %1$s</string>
     <string name="notif_text_radio_stopped">The radio app is not playing anymore, you should replay it</string>

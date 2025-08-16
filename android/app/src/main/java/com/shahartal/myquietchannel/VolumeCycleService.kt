@@ -82,23 +82,23 @@ class VolumeCycleService : Service() {
             Log.i("", "VolumeCycleService init volume $origVolume out of $maxVolume")
             // val currentVolume = audioManager.getStreamVolume(stream)
 
-            var isTest5 = false
+//            var isTest5 = false
             var newsDuration = 4
             var hours = 4
             if (intent == null) {
                 Log.e("", "VolumeCycleService intent is null")
             }
             else {
-                isTest5 = ("test5" == intent.getStringExtra("todoList"))
+//                isTest5 = ("test5" == intent.getStringExtra("todoList"))
                 newsDuration = intent.getIntExtra("newsDuration", 4)
                 hours = intent.getIntExtra("hours", 4)
-                Log.i("", "VolumeCycleService Initial input: NewsDuration $newsDuration everyHours $hours isTest5 $isTest5")
+                Log.i("", "VolumeCycleService Initial input: NewsDuration $newsDuration everyHours $hours") // isTest5 $isTest5")
             }
 
-            val isNearShabbath = isTest5
-                || (
+            val isNearShabbath = // isTest5
+                // || (
                 ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY &&
-                    ZonedDateTime.now(ZoneId.systemDefault()).hour >= 12)
+                    ZonedDateTime.now(ZoneId.systemDefault()).hour >= 12 // )
 
             if (newsDuration > max_news_duration) {
                 newsDuration = max_news_duration
@@ -110,13 +110,13 @@ class VolumeCycleService : Service() {
                 newsDuration = 1
             }
 
-            if (isTest5) {
-                minutesPerHours = 5
-                Log.w("", "VolumeCycleService test mode 5 minutes")
-                if (newsDuration > minutesPerHours-1) {
-                    Log.w("", "VolumeCycleService newsDuration > 5")
-                }
-            }
+//            if (isTest5) {
+//                minutesPerHours = 5
+//                Log.w("", "VolumeCycleService test mode 5 minutes")
+//                if (newsDuration > minutesPerHours-1) {
+//                    Log.w("", "VolumeCycleService newsDuration > 5")
+//                }
+//            }
 
 //            var volume = intent.getIntExtra("volume", 2)
 //            if (volume > audioManager.getStreamMaxVolume(stream)) volume = 2
@@ -233,7 +233,7 @@ class VolumeCycleService : Service() {
                         val notification: Notification =
                             NotificationCompat.Builder(thisService, CHANNEL_ID)
                                 .setContentTitle(getString(R.string.notif_title_1))
-                                .setContentText(getString(R.string.notif_text_4,newsDuration - i + 1, 100*audioManager.getStreamVolume(stream)/maxVolume))
+                                .setContentText(if (newsDuration - i + 1 > 1) getString(R.string.notif_text_4,newsDuration - i + 1, 100*audioManager.getStreamVolume(stream)/maxVolume) else getString(R.string.notif_text_4_1, 100*audioManager.getStreamVolume(stream)/maxVolume))
                                 .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
                                 .setOngoing(true)
                                 .setOnlyAlertOnce(true)
@@ -253,7 +253,7 @@ class VolumeCycleService : Service() {
                         val notification: Notification =
                             NotificationCompat.Builder(thisService, CHANNEL_ID)
                                 .setContentTitle(getString(R.string.notif_title_1))
-                                .setContentText(getString(R.string.notif_text_4,newsDuration - i + 1, 100*audioManager.getStreamVolume(stream)/maxVolume))
+                                .setContentText(if (newsDuration - i + 1 > 1) getString(R.string.notif_text_4,newsDuration - i + 1, 100*audioManager.getStreamVolume(stream)/maxVolume) else getString(R.string.notif_text_4_1, 100*audioManager.getStreamVolume(stream)/maxVolume))
                                 .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
                                 .setOngoing(true)
                                 .setOnlyAlertOnce(true)
@@ -265,7 +265,7 @@ class VolumeCycleService : Service() {
                     }
                 }
 
-                var nextDelay = (minutesPerHours * hours - newsDuration)
+//                var nextDelay = (minutesPerHours * hours - newsDuration)
 
                 now = ZonedDateTime.now(ZoneId.systemDefault()).hour
                 var nextHour = now
@@ -278,11 +278,11 @@ class VolumeCycleService : Service() {
                         settedVolume = 3 // (maxVolume * 15 / 100).coerceAtLeast(1) // let's start with 1 or 2
                     }
                     now = ZonedDateTime.now(ZoneId.systemDefault()).minute
-                    nextDelay = minutesPerHours - now
+//                    nextDelay = minutesPerHours - now
 
-                    if (minutesPerHours != 60) {
-                        nextDelay = minutesPerHours - now % minutesPerHours
-                    }
+//                    if (minutesPerHours != 60) {
+//                        nextDelay = minutesPerHours - now % minutesPerHours
+//                    }
 
                     nextHour += 1
                 }
@@ -312,23 +312,24 @@ class VolumeCycleService : Service() {
 
                 // infoText.text = "6"
                 // Mute
-                Log.d("","VolumeCycleService started zero volume, delay till the next news [minutes] $nextDelay") //  + currentVolume)
+                Log.d("","VolumeCycleService started zero volume") // , delay till the next news [minutes] $nextDelay") //  + currentVolume)
                 audioManager.setStreamVolume(stream, 0, 0)
+
+                var oldText = ""
 
                 // delay(30_000)
 
                 // WAS: for (i in 1..(nextDelay-1)*2) {
-                while (
-                    (ZonedDateTime.now(ZoneId.systemDefault()).minute != 0 || (isTest5 && ZonedDateTime.now(ZoneId.systemDefault()).minute % 5 != 0)) &&
-                       ZonedDateTime.now(ZoneId.systemDefault()).hour != nextHour)
+                while ( true)
                 {
                     if (ZonedDateTime.now(ZoneId.systemDefault()).minute == 0 &&
                         ZonedDateTime.now(ZoneId.systemDefault()).hour == nextHour &&
-                        (ZonedDateTime.now(ZoneId.systemDefault()).second >= startSeconds ||
-                        ZonedDateTime.now(ZoneId.systemDefault()).second >= 30)) {
+                        (ZonedDateTime.now(ZoneId.systemDefault()).second >= startSeconds-1 // ||
+                        // ZonedDateTime.now(ZoneId.systemDefault()).second >= 30
+                                )) {
                         break
                     }
-                    delay(30 * 1000L) // 54 minutes
+                    delay(1 * 1000L) // 54 minutes
                     var text: String
                     text = if (! alertMediaIsPlaying("waiting for news")) {
                         // cancel("VolumeCycleService media was stopped, cancelling", null)
@@ -338,15 +339,21 @@ class VolumeCycleService : Service() {
                         getString(R.string.notif_text_5, "" + nextHour + ":00:" + (if (initSeconds < 10) "0$initSeconds" else initSeconds))
                     }
 
-                    val notification: Notification = NotificationCompat.Builder(thisService, CHANNEL_ID)
-                        .setContentTitle(getString(R.string.notif_title_1))
-                        .setContentText(text)
-                        .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
-                        .setOngoing(true)
-                        .setOnlyAlertOnce(true)
-                        .setContentIntent(mainPendingIntent)
-                        .build()
-                    getSystemService(NotificationManager::class.java).notify(1, notification)
+                    if (oldText != text) {
+
+                        val notification: Notification =
+                            NotificationCompat.Builder(thisService, CHANNEL_ID)
+                                .setContentTitle(getString(R.string.notif_title_1))
+                                .setContentText(text)
+                                .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
+                                .setOngoing(true)
+                                .setOnlyAlertOnce(true)
+                                .setContentIntent(mainPendingIntent)
+                                .build()
+                        getSystemService(NotificationManager::class.java).notify(1, notification)
+                    }
+
+                    oldText = text
 
                     // infoText.text = "54"
                 }

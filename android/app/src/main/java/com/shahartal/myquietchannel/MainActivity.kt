@@ -126,7 +126,12 @@ class MainActivity : ComponentActivity() {
         super.onResume()
 
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
-        val savedName = sharedPreferences.getString("todoList", "IL-Tel Aviv, פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן")
+        var savedName = sharedPreferences.getString("todoList", "IL-Tel Aviv, פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן")
+
+        // upgrade from version <= 1.06
+        if (savedName == "פלטה, מיחם, שעון שבת, מזגן") {
+            savedName = "IL-Tel Aviv, פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן"
+        }
 
         editTextTodo.text = savedName
 
@@ -324,7 +329,15 @@ class MainActivity : ComponentActivity() {
     fun fetchZmanim(loc: String) { // }: String {
 
         textViewClock3 = findViewById(R.id.textViewClock3)
+        val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
+
         var res: String
+
+        if (loc[0].isUpperCase()) {
+            res = loc + " "
+        } else {
+            res = " "
+        }
 
         try {
 //            if (ContextCompat.checkSelfPermission(this, Manifest.permission.LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -334,43 +347,51 @@ class MainActivity : ComponentActivity() {
 
             val call = // if (loc.get(0).isDigit()) RetrofitInstance.api.getShabbatByLoc(loc.split(",")[0].trim(), loc.split(",")[1].trim())
                 // else
-                    RetrofitInstance.api.getShabbatPerCity(loc)
+                RetrofitInstance.api.getShabbatPerCity(loc)
 
             call.enqueue(object : Callback<HebCal> {
 
                 override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
                     if (response.isSuccessful) {
 
-                        if (loc[0].isUpperCase()) {
-                            res = loc + " "
-                        } else {
-                            res = " "
-                        }
+                        val editor = sharedPreferences.edit()
 
                         val hebcal = response.body()
                         hebcal?.items?.forEach {
                             if (it.category == "candles") {
                                 res += " " + getString(R.string.candleLighting) + " " + truncDate(it.date)
+                                textViewClock3.text = res
+                                editor.putString("candles", getString(R.string.candleLighting) + " " + truncDate(it.date))
+                                editor.apply()
                             }
                             else if (it.category == "havdalah") {
                                 res += " " + getString(R.string.havdalah) + " " +  truncDate(it.date)
+                                textViewClock3.text = res
+                                editor.putString("havdalah", getString(R.string.havdalah) + " " +  truncDate(it.date))
+                                editor.apply()
                             }
                         }
-                        textViewClock3.text = res
+                        // textViewClock3.text = res
                     } else {
                         Log.w("", "MainActivity fetchParasha Error: ${response.code()}")
-                        textViewClock3.text = "Not found " + response.code()
+                        // textViewClock3.text = "" // ""Not found " + response.code()
+                        res += " " + sharedPreferences.getString("candles", "") + " " + sharedPreferences.getString("havdalah", "")
+                        textViewClock3.text = res
                     }
                 }
 
                 override fun onFailure(call: Call<HebCal>, t: Throwable) {
                     Log.w("", "MainActivity fetchZmanim unable to fetch hebCal $t", t)
-                    textViewClock3.text = "Failure. Not found " + t
+                    // textViewClock3.text = "" // ""Failure. Not found " + t
+                    res += " " + sharedPreferences.getString("candles", "") + " " + sharedPreferences.getString("havdalah", "")
+                    textViewClock3.text = res
                 }
             })
         } catch (e: Exception) {
             Log.e("", "MainActivity fetchZmanim Exception $e", e)
-            textViewClock3.text = "Error. Not found " + e
+            // textViewClock3.text = "" // ""Error. Not found " + e
+            res += " " + sharedPreferences.getString("candles", "") + " " + sharedPreferences.getString("havdalah", "")
+            textViewClock3.text = res
         }
     }
 
@@ -380,36 +401,45 @@ class MainActivity : ComponentActivity() {
 
     fun fetchParasha() { // }: String {
 
+        val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
+        textViewClock2 = findViewById(R.id.textViewClock2)
+
         try {
 //            if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
 //                Log.w("","MainActivity fetchParasha no internet at all")
 //                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 112); // REQUEST_INTERNET_PERMISSION);
 //            }
+
             RetrofitInstance.api.getShabbatPerCity("IL-Jerusalem").enqueue(object : Callback<HebCal> {
 
                 override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
                     if (response.isSuccessful) {
+                        val editor = sharedPreferences.edit()
                         // val str = response.body()
                         // Log.i("", "MainActivity fetchParasha " + str)
                         val hebcal = response.body()
                         hebcal?.items?.forEach {
                             if (it.category == "parashat") {
                                 // return it.hebrew;
-                                textViewClock2 = findViewById(R.id.textViewClock2)
                                 textViewClock2.text = it.hebrew
+                                editor.putString("parashat", it.hebrew)
+                                editor.apply()
                             }
                         }
                     } else {
                         Log.w("", "MainActivity fetchParasha Error: ${response.code()}")
+                        textViewClock2.text = sharedPreferences.getString("parashat", "")
                     }
                 }
 
                 override fun onFailure(call: Call<HebCal>, t: Throwable) {
                     Log.w("", "MainActivity fetchParasha unable to fetch hebCal $t", t)
+                    textViewClock2.text = sharedPreferences.getString("parashat", "")
                 }
             })
         } catch (e: Exception) {
             Log.e("", "MainActivity fetchParasha Exception $e", e)
+            textViewClock2.text = sharedPreferences.getString("parashat", "")
         }
     }
 
@@ -672,6 +702,7 @@ class MainActivity : ComponentActivity() {
                     firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
                         param("everyHours", everyHours.toLong())
                         param("newsDuration", newsDuration.toLong())
+                        param("isFriday", if (ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY) 1L else 0L)
                     }
 
                     textViewNextNews.text = getEveryHourStr(ZonedDateTime.now(ZoneId.systemDefault()).hour)
@@ -681,7 +712,7 @@ class MainActivity : ComponentActivity() {
 //                    try {
 //                        val mediaSessionManager =
 //                            getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
-                        // TODO add the current media that is being used
+                    // TODO add the current media that is being used
 //                    }
 //                    catch (e: Exception) {
 //                        Log.w("", "MainActivity Unable to get the active media session " + e)
@@ -811,6 +842,11 @@ class MainActivity : ComponentActivity() {
                     timer.cancel()
                 }
             }, 10_000)
+
+            if (from == "onResume") {
+                Log.w("", "MainActivity Not disabling the app, might be a network glitch")
+                return true
+            }
 
             return false
         }
