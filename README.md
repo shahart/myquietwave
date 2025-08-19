@@ -1,7 +1,5 @@
 # Auto listen to radio news #
 
-THIS IS DEPRECATED - MOBILE AUTOMATION ACHIEVES THE SAME.
-
 As the "quiet channel" on the radio doesn't include news, allow such an ability.
 
 - Make sure you have an internet connection the whole period (like using a HotSpot - phone connected to a power supply, not low power mode; Android dev mode - don't turn off the screen while charging)
@@ -17,7 +15,7 @@ Current approach: Pros: simplicity, Cons: not being cut at the end of the news
 
 - ~~Mobile App. For Android's Routines. Validate it's necessary as iOS, for example, has its own Shortcuts + Automations.~~
 
-    DONE: See https://play.google.com/store/apps/details?id=com.shahartal.myquietchannels
+    DONE: See https://play.google.com/store/apps/details?id=com.shahartal.myquietchannel
 
    [![Android CI](https://github.com/shahart/automations/actions/workflows/AndroidBuild.yml/badge.svg)](https://github.com/shahart/automations/actions/workflows/AndroidBuild.yml)
 
