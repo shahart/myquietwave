@@ -1,0 +1,25 @@
+name: Swift CI
+
+on:
+  pull_request :
+    branches : [ main ]
+  push :
+    branches : [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: check Xcode version
+        run: /usr/bin/xcodebuild -version
+
+      - name: Checkout code
+        uses: actions/checkout@v4.1.0
+
+      - uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "5.10.0" # Specify your desired Swift version
+      
+      - name: Build iOS App
+        run: xcodebuild build -workspace VolumeCyclerApp.xcworkspace -scheme VolumeCyclerApp -destination 'platform=iOS Simulator,name=iPhone 15'
