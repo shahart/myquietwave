@@ -44,6 +44,10 @@
 		<string>background-processing</string>
 		<string>background-fetch</string>
 	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.volumecycler.app.refresh</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -65,3 +69,4 @@
 	</array>
 </dict>
 </plist>
+
