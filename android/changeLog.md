@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.10
+
+Fix Two Havdalah/ Lighting times on Moadim, shows only times of Shabbat
+
+תיקון שני זמנים להבדלה/ הדלקת נרות במועדים/ חול המועד, יוצג רק הזמן של השבת הקרובה
+
+## 1.09
+
+minSdk --> Android 7 (by mistake)
+
 ## 1.08
 
 טיפול טוב יותר במידה ואין רשת

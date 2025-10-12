@@ -228,6 +228,7 @@ class MainActivity : ComponentActivity() {
             editTextNumberEveryHour.text = "1"
         }
 
+        // @RequiresApi(8
         var nextHour = if (now == -1) ZonedDateTime.now(ZoneId.systemDefault()).hour + 1 else now + 1 //  + everyHours
         if (nextHour > 24) nextHour -= 24
         // Log.d("", "MainActivity nextHour: " + nextHour)
@@ -358,13 +359,13 @@ class MainActivity : ComponentActivity() {
 
                         val hebcal = response.body()
                         hebcal?.items?.forEach {
-                            if (it.category == "candles") {
+                            if (it.category == "candles" && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat") || it.memo.contains("Parashat"))) {
                                 res += " " + getString(R.string.candleLighting) + " " + truncDate(it.date)
                                 textViewClock3.text = res
                                 editor.putString("candles", getString(R.string.candleLighting) + " " + truncDate(it.date))
                                 editor.apply()
                             }
-                            else if (it.category == "havdalah") {
+                            else if (it.category == "havdalah" && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat"))) {
                                 res += " " + getString(R.string.havdalah) + " " +  truncDate(it.date)
                                 textViewClock3.text = res
                                 editor.putString("havdalah", getString(R.string.havdalah) + " " +  truncDate(it.date))
@@ -421,8 +422,8 @@ class MainActivity : ComponentActivity() {
                         hebcal?.items?.forEach {
                             if (it.category == "parashat") {
                                 // return it.hebrew;
-                                textViewClock2.text = it.hebrew
-                                editor.putString("parashat", it.hebrew)
+                                textViewClock2.text = " שבת " + it.hebrew
+                                editor.putString("parashat", " שבת " + it.hebrew)
                                 editor.apply()
                             }
                         }
@@ -453,6 +454,7 @@ class MainActivity : ComponentActivity() {
 
         setContentView(R.layout.activity_main)
 
+        // @RequiresApi(8
         if (ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY) {
             shabesText = findViewById(R.id.textViewShabes)
             shabesText.text = getString(R.string.shabbath)
@@ -575,8 +577,11 @@ class MainActivity : ComponentActivity() {
                     val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר שני", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
                     val hebrewMonthName = hebrewMonths[hebrewMonth]
                     val hebrewDayName = hebrewDays[hebrewDay-1]
-                    textViewClock.text = "$hebrewDayName/$hebrewMonthName/$hebrewYear - " +
+                    var txt = "$hebrewDayName/$hebrewMonthName/$hebrewYear"
+                    // @RequiresApi(8
+                    txt += " - " +
                             LocalDateTime.now().format(DateTimeFormatter.ofPattern("H:mm:ss"))
+                    textViewClock.text = txt
                 }
                 Thread.sleep(1000)
             }
@@ -697,11 +702,13 @@ class MainActivity : ComponentActivity() {
 
                 if (alertMediaIsPlaying("onClick to turn on")) {
 
+                    // @RequiresApi(8
                     startForegroundService(serviceIntent)
 
                     firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
                         param("everyHours", everyHours.toLong())
                         param("newsDuration", newsDuration.toLong())
+                        // @RequiresApi(8
                         param("isFriday", if (ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY) 1L else 0L)
                     }
 

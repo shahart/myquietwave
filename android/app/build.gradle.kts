@@ -18,8 +18,9 @@ android {
         applicationId = "com.shahartal.myquietchannel"
         minSdk = 26
         targetSdk = 36
-        versionCode = 23
-        versionName = "1.08"
+
+        versionCode = 25
+        versionName = "1.10"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -87,10 +88,10 @@ dependencies {
     androidTestImplementation("androidx.test:rules:1.6.1")
 
 //    implementation("com.google.android.gms:play-services-location:21.3.0")
-
 //    implementation("com.google.firebase:firebase-analytics:34.0.0")
 
     implementation(libs.firebase.analytics)
-
     implementation(platform(libs.firebase.bom))
+
+   //  implementation(libs.androidx.leanback)
 }

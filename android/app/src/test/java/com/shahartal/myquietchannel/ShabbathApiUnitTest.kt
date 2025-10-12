@@ -70,10 +70,10 @@ class ShabbathApiUnitTest {
         if (/*! */response.isSuccessful) {
             val hebcal = response.body()
             hebcal?.items?.forEach {
-                if (it.category == "candles") {
+                if (it.category == "candles" && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat") || it.memo.contains("Parashat"))) {
                     res += (it.date + " הדלקת נרות ")
                 }
-                else if (it.category == "havdalah") {
+                else if (it.category == "havdalah" && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbath"))) {
                     res += (it.date + " הבדלה ")
                 }
             }
@@ -89,6 +89,10 @@ class ShabbathApiUnitTest {
     @Test
     fun fetchZmanim_works() {
         val res = fetchZmanim()
+        // before
+        // 2025-10-10T17:56:00+03:00 הדלקת נרות 2025-10-11T18:49:00+03:00 הבדלה 2025-10-13T17:52:00+03:00 הדלקת נרות 2025-10-14T18:46:00+03:00 הבדלה
+        // after
+        // 2025-10-10T17:56:00+03:00 הדלקת נרות 2025-10-11T18:49:00+03:00 הבדלה
         assertTrue("res: '$res'", res.contains("+"))
     }
 }
