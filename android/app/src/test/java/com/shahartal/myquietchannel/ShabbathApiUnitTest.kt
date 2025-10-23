@@ -89,10 +89,30 @@ class ShabbathApiUnitTest {
     @Test
     fun fetchZmanim_works() {
         val res = fetchZmanim()
-        // before
-        // 2025-10-10T17:56:00+03:00 הדלקת נרות 2025-10-11T18:49:00+03:00 הבדלה 2025-10-13T17:52:00+03:00 הדלקת נרות 2025-10-14T18:46:00+03:00 הבדלה
-        // after
-        // 2025-10-10T17:56:00+03:00 הדלקת נרות 2025-10-11T18:49:00+03:00 הבדלה
         assertTrue("res: '$res'", res.contains("+"))
+    }
+
+    fun fetchDafYomi(): String {
+        var res = ""
+        val response =
+            RetrofitInstance.api.getDafYomi("2025-10-20", "2025-10-20").execute()
+        if (/*! */response.isSuccessful) {
+            val hebcal = response.body()
+            hebcal?.items?.forEach {
+                if (it.category == "dafyomi") {
+                    res = it.hebrew
+                }
+            }
+        }
+        else {
+            fail(response.toString() + response.body())
+        }
+        return res
+    }
+
+    @Test
+    fun fetchDafYomi_works() {
+        val res = fetchDafYomi()
+        assertTrue("res: '$res'", res.contains("דף"))
     }
 }

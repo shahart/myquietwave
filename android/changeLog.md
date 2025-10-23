@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.12
+
+Link to 'Daf Yomi'
+
 ## 1.10
 
 Fix Two Havdalah/ Lighting times on Moadim, shows only times of Shabbat

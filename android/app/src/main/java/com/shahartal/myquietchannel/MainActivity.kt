@@ -38,6 +38,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
 //import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+//import com.google.android.play.core.review.ReviewException
+//import com.google.android.play.core.review.ReviewManagerFactory
+//import com.google.android.play.core.review.model.ReviewErrorCode
 
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.Firebase
@@ -55,8 +58,10 @@ import java.time.format.DateTimeFormatter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.util.Date
 import java.util.Timer
 import java.util.TimerTask
 
@@ -82,7 +87,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var textViewClock : TextView
     private lateinit var textViewClock2 : TextView
     private lateinit var textViewClock3 : TextView
-
+    private lateinit var textViewClock4dafYomi : TextView
 
     private lateinit var editTextTodo : TextView
 
@@ -254,6 +259,50 @@ class MainActivity : ComponentActivity() {
         }
 
         return nextHoursStr
+    }
+
+    fun fetchDafYomi() {
+        textViewClock4dafYomi = findViewById(R.id.textViewClock4dafYomi)
+        textViewClock4dafYomi.text = ""
+        val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
+        var res: String = ""
+        try {
+            val start = SimpleDateFormat("yyyy-MM-dd").format(Date())
+            RetrofitInstance.api.getDafYomi(start, start).enqueue(object : Callback<HebCal> {
+
+                override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
+                    if (response.isSuccessful) {
+                        val hebcal = response.body()
+                        hebcal?.items?.forEach { it ->
+                            if (it.category == "dafyomi") {
+                                textViewClock4dafYomi.text = " הדף היומי " + it.hebrew
+                                res = it.link
+                            }
+                        }
+                        if (res.isNotEmpty()) {
+                            textViewClock4dafYomi.setOnClickListener {
+                                val browserIntent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    res.toUri()
+                                )
+                                startActivity(browserIntent)
+                            }
+                        }
+                    } else {
+                        Log.w("", "MainActivity fetchDafYomi Error: ${response.code()}")
+                        textViewClock4dafYomi.text = sharedPreferences.getString("dafYomi", "")
+                    }
+                }
+
+                override fun onFailure(call: Call<HebCal>, t: Throwable) {
+                    Log.w("", "MainActivity fetchDafYomi unable to fetch hebCal $t", t)
+                    textViewClock4dafYomi.text = sharedPreferences.getString("dafYomi", "")
+                }
+            })
+        } catch (e: Exception) {
+            Log.e("", "MainActivity fetchDafYomi Exception $e", e)
+            textViewClock4dafYomi.text = sharedPreferences.getString("dafYomi", "")
+        }
     }
 
     fun fetchZmanim() {
@@ -461,6 +510,7 @@ class MainActivity : ComponentActivity() {
         }
 
         fetchParasha()
+        fetchDafYomi()
 
         editTextTodo = findViewById(R.id.editTextTodo)
 
@@ -486,6 +536,31 @@ class MainActivity : ComponentActivity() {
         }
 
         rateButton.setOnClickListener {
+/*
+            val manager = ReviewManagerFactory.create(applicationContext )
+            val request = manager.requestReviewFlow()
+            request.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // We got the ReviewInfo object
+                    val reviewInfo = task.result
+
+                    val flow = manager.launchReviewFlow(this, reviewInfo)
+                    flow.addOnCompleteListener { l ->
+                        Log.i("", "inapp review finished successfully")
+                        // The flow has finished. The API does not indicate whether the user
+                        // reviewed or not, or even whether the review dialog was shown. Thus, no
+                        // matter the result, we continue our app flow.
+                    }
+
+                } else {
+                    // There was some problem, log or handle the error code.
+                    @ReviewErrorCode val reviewErrorCode = (task.getException() as ReviewException).errorCode
+
+                    Log.e("", "MainActivity reviewManager.requestReviewFlow error code: $reviewErrorCode")
+
+                }
+            }
+*/
             try {
                 startActivity(Intent(Intent.ACTION_VIEW,
                     ("market://details?id=$packageName").toUri()))

@@ -1,5 +1,11 @@
 <resources>
 
+    <!--string name="APP Name">com.shahartal.myquietchannel</string>
+    <string name="PLAY_TITLE">My quiet wave</string>
+    <string name="PLAY_SHORT_DESCRIPTION">Almost like the Quiet Wave, only the news of the hour (without alerts).</string>
+    <string name="PLAY_FULL_DESCRIPTION">Stay informed in times of emergency....</string-->
+    <!-- keep in mind to not translate the hebCal constants for fixed locations -->
+
     <string name="app_name">My quiet wave</string>
     <string name="appName">My quiet wave</string>
     <string name="title_name">My quiet wave 📻</string>
