@@ -36,6 +36,9 @@
     <string name="candleLighting">הדלקת נרות</string>
     <string name="havdalah">הבדלה</string>
 
+    <string name="sunrise">זריחה 🔆</string>
+    <string name="sunset">שקיעה 🌅</string>
+
     <!-- notifications -->
 
     <string name="notif_title_1">הגל השקט שלי - בפעולה</string>

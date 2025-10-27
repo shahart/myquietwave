@@ -8,7 +8,7 @@
     <string name="title_name_enabled">Ma vague silencieuse %1$s 📻 Activé</string>
     <string name="title_name_disabled">Ma vague silencieuse %1$s 📻 Désactivé</string>
 
-    <string name="start">Commencer</string>
+    <string name="start">Démarrer</string>
     <string name="stop">Arrêt</string>
 
     <string name="instructions">Démarrez manuellement votre application radio. Cliquez sur «Démarrer» en haut de la page. Le son sera coupé à la fin de l\'enregistrement.</string>
@@ -35,6 +35,9 @@
 
     <string name="candleLighting">Allumage de bougies</string>
     <string name="havdalah">Havdalah</string>
+
+    <string name="sunrise">Aurore 🔆</string>
+    <string name="sunset">Crépuscule 🌅</string>
 
     <!-- notifications -->
 

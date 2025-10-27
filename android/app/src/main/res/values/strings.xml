@@ -41,6 +41,9 @@
     <string name="candleLighting">Candle Lighting</string>
     <string name="havdalah">Havdalah</string>
 
+    <string name="sunrise">Sunrise 🔆</string>
+    <string name="sunset">Sunset 🌅</string>
+
     <!-- notifications -->
 
     <string name="notif_title_1">My quiet wave - In action</string>

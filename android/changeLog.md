@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.13
+
+Add SunSet and SunRise times
+
+הוספת זמני זריחה ושקיעה
+
 ## 1.12
 
 Link to 'Daf Yomi'

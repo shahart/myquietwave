@@ -22,4 +22,9 @@ interface JsonHebCalShabbatApi {
     fun getDafYomi(@Query("start") start: String,
                    @Query("end") end: String): Call<HebCal>
 
+    
+    @GET("zmanim?cfg=json")
+    fun getZmanimPerCity(@Query("city") city: String): Call<HebCalZmanimModel>
+
+
 }

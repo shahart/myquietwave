@@ -115,4 +115,26 @@ class ShabbathApiUnitTest {
         val res = fetchDafYomi()
         assertTrue("res: '$res'", res.contains("דף"))
     }
+
+    fun fetchYomZmanim(): String {
+        var res = ""
+        val response =
+            RetrofitInstance.api.getZmanimPerCity("IL-Tel Aviv").execute()
+        if (/*! */response.isSuccessful) {
+            val hebcal = response.body()
+            if (hebcal != null) {
+                res = hebcal.times.sunrise + ", " + hebcal.times.chatzot + ", " + hebcal.times.sunset
+            }
+        }
+        else {
+            fail(response.toString() + response.body())
+        }
+        return res
+    }
+
+    @Test
+    fun fetchYomZmanim_works() {
+        val res = fetchYomZmanim()
+        assertTrue("res: '$res'", res.contains(", "))
+    }
 }

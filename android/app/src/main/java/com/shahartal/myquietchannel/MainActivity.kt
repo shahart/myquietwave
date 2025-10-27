@@ -50,6 +50,7 @@ import com.google.firebase.analytics.logEvent
 //import com.google.android.gms.location.FusedLocationProviderClient
 //import com.google.android.gms.location.LocationServices
 import com.shahartal.myquietchannel.parasha.HebCal
+import com.shahartal.myquietchannel.parasha.HebCalZmanimModel
 import com.shahartal.myquietchannel.parasha.RetrofitInstance
 import java.time.DayOfWeek
 import java.time.LocalDateTime
@@ -88,6 +89,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var textViewClock2 : TextView
     private lateinit var textViewClock3 : TextView
     private lateinit var textViewClock4dafYomi : TextView
+    private lateinit var textViewClock5suns : TextView
+
 
     private lateinit var editTextTodo : TextView
 
@@ -141,6 +144,7 @@ class MainActivity : ComponentActivity() {
         editTextTodo.text = savedName
 
         fetchZmanim()
+        fetchSunsZmanim()
 
         var newsDuration = sharedPreferences.getInt("newsDuration", 4)
         if (newsDuration > VolumeCycleService.max_news_duration) newsDuration = VolumeCycleService.max_news_duration
@@ -445,8 +449,152 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    fun fetchSunsZmanim() {
+        textViewClock5suns = findViewById(R.id.textViewClock5suns)
+        textViewClock5suns.text = ""
+
+        // val dow = ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek
+        if ( // (dow == DayOfWeek.THURSDAY || dow == DayOfWeek.FRIDAY || dow == DayOfWeek.SATURDAY) &&
+            editTextTodo.text.toString().trim().isNotEmpty()) {
+
+            val regex = "^[A-Za-z -.'é]*$".toRegex()
+            var firstItem = editTextTodo.text.toString().trim()
+            if (firstItem.contains(",")) {
+                firstItem = firstItem.substring(0, firstItem.indexOf(","))
+            }
+            if (regex.matches(firstItem) // .isLetter() // isUpperCase()
+            ) { // startsWith("IL-")) {
+                fetchSunsZmanim(firstItem)
+            } else if (firstItem
+                    .isNotEmpty() && editTextTodo.text.toString()[0].isDigit()
+            ) {
+                fetchSunsZmanim(firstItem)
+            }
+            /*
+        else {
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 0)
+            }
+
+        //    requestPermissions()
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+                val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                var isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+                // isGpsEnabled = true
+
+                if (! isGpsEnabled) {
+                    Log.w("", "MainActivity fetchZmanim location isGpsDisabled")
+                }
+                else {
+                    fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+                    fusedLocationClient.lastLocation
+//                        .addOnCompleteListener(requireActivity()) { task ->
+////                                location: Location? ->
+//                            Log.i("", "MainActivity fetchZmanim location success " + location)
+//                            if (location != null) {
+//                                fetchZmanim(location.latitude.toString() + "," + location.longitude.toString())
+//                            }
+//                        }
+//                        .addOnFailureListener { exception: Exception ->
+//                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
+//                        }
+//                        }
+                        .addOnSuccessListener { location: Location? ->
+                            Log.i("", "MainActivity fetchZmanim location success " + location)
+                            if (location != null) {
+                                fetchZmanim(location.latitude.toString() + "," + location.longitude.toString())
+                            }
+                        }
+                        .addOnFailureListener { exception: Exception ->
+                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
+                        }
+                }
+            }
+        }
+*/
+        }
+    }
+
+    fun fetchSunsZmanim(loc: String) { // }: String {
+
+        textViewClock5suns = findViewById(R.id.textViewClock5suns)
+
+        val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
+
+        var res: String
+
+        if (loc[0].isUpperCase()) {
+            res = loc + " "
+        } else {
+            res = " "
+        }
+
+        try {
+//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                Log.w("","MainActivity fetchParasha no internet at all")
+//                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 112); // REQUEST_INTERNET_PERMISSION);
+//            }
+
+            val call = // if (loc.get(0).isDigit()) RetrofitInstance.api.getShabbatByLoc(loc.split(",")[0].trim(), loc.split(",")[1].trim())
+                // else
+                RetrofitInstance.api.getZmanimPerCity(loc)
+
+            call.enqueue(object : Callback<HebCalZmanimModel> {
+
+                override fun onResponse(call: Call<HebCalZmanimModel>, response: Response<HebCalZmanimModel>) {
+                    if (response.isSuccessful) {
+
+                        val editor = sharedPreferences.edit()
+
+                        val hebcal = response.body()
+                        if (hebcal != null) {
+                            res =
+                                " " + getString(R.string.sunrise) + " " + truncDate(hebcal.times.sunrise)
+                            editor.putString(
+                                "sunrise",
+                                getString(R.string.sunrise) + " " + truncDate(hebcal.times.sunrise)
+                            )
+                            res += " " + getString(R.string.sunset) + " " + truncDate(hebcal.times.sunset)
+                            textViewClock5suns.text = res
+                            editor.putString(
+                                "sunset",
+                                getString(R.string.sunset) + " " + truncDate(hebcal.times.sunset)
+                            )
+                            editor.apply()
+                            // textViewClock3.text = res
+                        }
+                    } else {
+                        Log.w("", "MainActivity fetchSunsZmanim Error: ${response.code()}")
+                        // textViewClock3.text = "" // ""Not found " + response.code()
+                        res += " " + sharedPreferences.getString("sunrise", "") + " " + sharedPreferences.getString("sunset", "")
+                        textViewClock5suns.text = res
+                    }
+                }
+
+                override fun onFailure(call: Call<HebCalZmanimModel>, t: Throwable) {
+                    Log.w("", "MainActivity fetchSunsZmanim unable to fetch hebCal $t", t)
+                    // textViewClock3.text = "" // ""Failure. Not found " + t
+                    res += " " + sharedPreferences.getString("sunrise", "") + " " + sharedPreferences.getString("sunset", "")
+                    textViewClock5suns.text = res
+                }
+            })
+        } catch (e: Exception) {
+            Log.e("", "MainActivity fetchSunsZmanim Exception $e", e)
+            // textViewClock3.text = "" // ""Error. Not found " + e
+            res += " " + sharedPreferences.getString("sunrise", "") + " " + sharedPreferences.getString("sunset", "")
+            textViewClock5suns.text = res
+        }
+    }
+
+
     fun truncDate(date: String): String {
-        return date.substring(date.indexOf("T")+1, date.indexOf("T")+1 +5)
+        return " " + date.substring(date.indexOf("T")+1, date.indexOf("T")+1 +5) + " "
     }
 
     fun fetchParasha() { // }: String {
@@ -589,6 +737,7 @@ class MainActivity : ComponentActivity() {
         editTextTodo.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 fetchZmanim()
+                fetchSunsZmanim()
             }
         }
 
