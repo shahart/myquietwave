@@ -16,9 +16,9 @@
     <string name="newsLink">קישורים שימושיים</string>
     <string name="shabbath">🕯🕯 שבת שלום 🕯🕯</string>
     <string name="justListen">האזנה נעימה</string>
-    <string name="todoList">סידורים לפני שבת:</string>
+    <string name="todoList">סידורים לפני שבת 📝</string>
 
-    <string name="newsLength">משך החדשות בדקות (1 עד 6)</string>
+    <string name="newsLength">משך החדשות בדקות (1 עד 6) ⏱️</string>
     <string name="newsFreq">תדירות החדשות - כל כמה שעות (1 עד 12)</string>
 
     <string name="next_30_sec">כעת - במשך 30 השניות הקרובות - קבע את עוצמת השמע בה אתה מעוניין לשמוע את החדשות. לאחר מכן עוצמת הרדיו תושתק ותתעורר מעצמה בזמנים המתאימים</string>
@@ -34,10 +34,12 @@
     <string name="share_text"> כדאי לך לנסות את האפליקציה </string>
 
     <string name="candleLighting">הדלקת נרות</string>
-    <string name="havdalah">הבדלה</string>
+    <string name="havdalah">הבדלה 🌠</string>
 
     <string name="sunrise">זריחה 🔆</string>
     <string name="sunset">שקיעה 🌅</string>
+
+    <string name="location">מיקום 📍</string>
 
     <!-- notifications -->
 
@@ -52,6 +54,6 @@
 
     <string name="notif_text_5">ממתין בשקט לחדשות הבאות בשעה %1$s</string>
     <string name="notif_text_radio_stopped">הרדיו כבר לא מנגן, יש להפעילו שוב</string>
-<!--    <string name="notif_text_6">מנגן את החדשות הנוכחיות</string>-->
+    <!--    <string name="notif_text_6">מנגן את החדשות הנוכחיות</string>-->
 
 </resources>

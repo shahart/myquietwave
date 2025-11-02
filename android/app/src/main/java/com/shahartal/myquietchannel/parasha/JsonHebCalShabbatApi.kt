@@ -10,11 +10,14 @@ interface JsonHebCalShabbatApi {
     fun getShabbat(): Call<HebCal>
 
     @GET("shabbat?cfg=json")
-    fun getShabbatPerCity(@Query("city") city: String): Call<HebCal>
+    fun getShabbatPerCity(@Query("city") city: String, @Query("ue") ue: String): Call<HebCal>
 
     @GET("shabbat?cfg=json")
     fun getShabbatByLoc(@Query("latitude") latitude: String,
-                        @Query("longitude") longitude: String): Call<HebCal>
+                        @Query("longitude") longitude: String, @Query("ue") ue: String): Call<HebCal>
+
+    @GET("shabbat?cfg=json")
+    fun getShabbatPerGeoNameId(@Query("geonameid") geonameid: String, @Query("ue") ue: String): Call<HebCal>
 
     // https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&start=2025-10-20&end=2025-10-20
 
@@ -24,7 +27,13 @@ interface JsonHebCalShabbatApi {
 
     
     @GET("zmanim?cfg=json")
-    fun getZmanimPerCity(@Query("city") city: String): Call<HebCalZmanimModel>
+    fun getZmanimPerCity(@Query("city") city: String, @Query("ue") ue: String): Call<HebCalZmanimModel>
 
+    @GET("zmanim?cfg=json")
+    fun getZmanimPerGeoNameId(@Query("geonameid") geonameid: String, @Query("ue") ue: String): Call<HebCalZmanimModel>
+
+    @GET("zmanim?cfg=json")
+    fun getZmanimByLoc(@Query("latitude") latitude: String,
+                       @Query("longitude") longitude: String, @Query("ue") ue: String): Call<HebCalZmanimModel>
 
 }

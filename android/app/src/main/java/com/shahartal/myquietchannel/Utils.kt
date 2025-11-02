@@ -2,6 +2,24 @@ package com.shahartal.myquietchannel
 
 object Utils {
 
+    fun getUe(loc: String): String {
+        if (loc.contains(", ue")) {
+            return "on"
+        }
+        else {
+            return "off"
+        }
+    }
+
+    fun getCity(loc: String): String {
+        if (loc.contains(",")) {
+            return loc.trim().split(",")[0]
+        }
+        else {
+            return loc
+        }
+    }
+
     fun getYY(no: Int): String {
         var input = no
         val letters = arrayOf("ה'","ד'","ג'","ב'","א'","ת","ש","ר","ק","צ","פ","ע","ס","נ","מ","ל","כ","י","ט","ח","ז","ו","ה","ד","ג","ב","א")

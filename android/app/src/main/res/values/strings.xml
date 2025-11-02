@@ -21,9 +21,9 @@
     <string name="newsLink">Useful links</string>
     <string name="shabbath">🕯🕯 Shabbat Shalom 🕯🕯</string>
     <string name="justListen">Enjoy</string>
-    <string name="todoList">To do list:</string>
+    <string name="todoList">To do list 📝</string>
 
-    <string name="newsLength">News Length in Minutes (1..6)</string>
+    <string name="newsLength">News Length in Minutes (1..6) ⏱️</string>
     <string name="newsFreq">News Frequency in Hours (1..12)</string>
 
     <string name="next_30_sec">Now - for the next 30 seconds - set the volume at which you want to hear the news. The radio will then mute and wake up automatically at the appropriate times.</string>
@@ -39,10 +39,12 @@
     <string name="share_text">Check out this nice app:</string>
 
     <string name="candleLighting">Candle Lighting</string>
-    <string name="havdalah">Havdalah</string>
+    <string name="havdalah">Havdalah 🌠</string>
 
     <string name="sunrise">Sunrise 🔆</string>
     <string name="sunset">Sunset 🌅</string>
+
+    <string name="location">Location 📍</string>
 
     <!-- notifications -->
 

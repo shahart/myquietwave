@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.14
+
+UX: שדה חדש למיקום, ותמיכה גם ב-GeoName וב-Latitude/ Longitude
+UX: new field for the position, supports also GeoName, and Latitude/ Longitude
+
 ## 1.13
 
 Add SunSet and SunRise times

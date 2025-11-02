@@ -59,6 +59,7 @@ import java.time.format.DateTimeFormatter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Character
 import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -93,6 +94,7 @@ class MainActivity : ComponentActivity() {
 
 
     private lateinit var editTextTodo : TextView
+    private lateinit var editTextLocation : TextView
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
 
@@ -134,16 +136,13 @@ class MainActivity : ComponentActivity() {
         super.onResume()
 
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
-        var savedName = sharedPreferences.getString("todoList", "IL-Tel Aviv, פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן")
-
-        // upgrade from version <= 1.06
-        if (savedName == "פלטה, מיחם, שעון שבת, מזגן") {
-            savedName = "IL-Tel Aviv, פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן"
-        }
+        val savedName = sharedPreferences.getString("todoList", "פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן")
+        val savedLocation = sharedPreferences.getString("location", "IL-Tel Aviv")
 
         editTextTodo.text = savedName
+        editTextLocation.text = savedLocation
 
-        fetchZmanim()
+        fetchShabatZmanim()
         fetchSunsZmanim()
 
         var newsDuration = sharedPreferences.getInt("newsDuration", 4)
@@ -202,6 +201,7 @@ class MainActivity : ComponentActivity() {
         val editor = sharedPreferences.edit()
 
         editor.putString("todoList", editTextTodo.text.toString())
+        editor.putString("location", editTextLocation.text.toString())
 
         val newsDurationStr = editTextNumberNewsDuration.text.toString()
         var newsDuration = if (newsDurationStr.isEmpty()) 4 else newsDurationStr.toInt()
@@ -309,26 +309,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun fetchZmanim() {
+    fun fetchShabatZmanim() {
         textViewClock3 = findViewById(R.id.textViewClock3)
         textViewClock3.text = ""
+
         // val dow = ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek
         if ( // (dow == DayOfWeek.THURSDAY || dow == DayOfWeek.FRIDAY || dow == DayOfWeek.SATURDAY) &&
-            editTextTodo.text.toString().trim().isNotEmpty()) {
+            editTextLocation.text.toString().trim().isNotEmpty()) {
 
-            val regex = "^[A-Za-z -.'é]*$".toRegex()
-            var firstItem = editTextTodo.text.toString().trim()
-            if (firstItem.contains(",")) {
-                firstItem = firstItem.substring(0, firstItem.indexOf(","))
-            }
-            if (regex.matches(firstItem) // .isLetter() // isUpperCase()
-            ) { // startsWith("IL-")) {
-                fetchZmanim(firstItem)
-            } else if (firstItem
-                    .isNotEmpty() && editTextTodo.text.toString()[0].isDigit()
-            ) {
-                fetchZmanim(firstItem)
-            }
+            val firstItem = editTextLocation.text.toString().trim()
+            fetchShabatZmanim(firstItem)
             /*
         else {
 
@@ -380,9 +370,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun fetchZmanim(loc: String) { // }: String {
+    fun fetchShabatZmanim(loc: String) { // }: String {
 
         textViewClock3 = findViewById(R.id.textViewClock3)
+
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
 
         var res: String
@@ -401,7 +392,14 @@ class MainActivity : ComponentActivity() {
 
             val call = // if (loc.get(0).isDigit()) RetrofitInstance.api.getShabbatByLoc(loc.split(",")[0].trim(), loc.split(",")[1].trim())
                 // else
-                RetrofitInstance.api.getShabbatPerCity(loc)
+                if (Character.isDigit(loc.trim().get(0))) {
+                    if (loc.contains(",") && Character.isDigit(loc.split(",")[1].trim().get(0)))
+                        RetrofitInstance.api.getShabbatByLoc(loc.split(",")[0].trim(), loc.split(",")[1].trim(), Utils.getUe(loc))
+                    else
+                        RetrofitInstance.api.getShabbatPerGeoNameId(Utils.getCity(loc), Utils.getUe(loc))
+                }
+                else
+                    RetrofitInstance.api.getShabbatPerCity(Utils.getCity(loc), Utils.getUe(loc))
 
             call.enqueue(object : Callback<HebCal> {
 
@@ -455,21 +453,10 @@ class MainActivity : ComponentActivity() {
 
         // val dow = ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek
         if ( // (dow == DayOfWeek.THURSDAY || dow == DayOfWeek.FRIDAY || dow == DayOfWeek.SATURDAY) &&
-            editTextTodo.text.toString().trim().isNotEmpty()) {
+            editTextLocation.text.toString().trim().isNotEmpty()) {
 
-            val regex = "^[A-Za-z -.'é]*$".toRegex()
-            var firstItem = editTextTodo.text.toString().trim()
-            if (firstItem.contains(",")) {
-                firstItem = firstItem.substring(0, firstItem.indexOf(","))
-            }
-            if (regex.matches(firstItem) // .isLetter() // isUpperCase()
-            ) { // startsWith("IL-")) {
-                fetchSunsZmanim(firstItem)
-            } else if (firstItem
-                    .isNotEmpty() && editTextTodo.text.toString()[0].isDigit()
-            ) {
-                fetchSunsZmanim(firstItem)
-            }
+            val firstItem = editTextLocation.text.toString().trim()
+            fetchSunsZmanim(firstItem)
             /*
         else {
 
@@ -541,9 +528,21 @@ class MainActivity : ComponentActivity() {
 //                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 112); // REQUEST_INTERNET_PERMISSION);
 //            }
 
-            val call = // if (loc.get(0).isDigit()) RetrofitInstance.api.getShabbatByLoc(loc.split(",")[0].trim(), loc.split(",")[1].trim())
+            val call =
+            // if (loc.get(0).isDigit()) RetrofitInstance.api.getShabbatByLoc(loc.split(",")[0].trim(), loc.split(",")[1].trim())
                 // else
-                RetrofitInstance.api.getZmanimPerCity(loc)
+                if (Character.isDigit(loc.trim().get(0)))  {
+                    if (loc.contains(",") && Character.isDigit(loc.split(",")[1].trim().get(0)))
+                        RetrofitInstance.api.getZmanimByLoc(
+                            loc.split(",")[0].trim(),
+                            loc.split(",")[1].trim(),
+                            Utils.getUe(loc)
+                        )
+                    else
+                        RetrofitInstance.api.getZmanimPerGeoNameId(Utils.getCity(loc), Utils.getUe(loc))
+                }
+            else
+                RetrofitInstance.api.getZmanimPerCity(Utils.getCity(loc), Utils.getUe(loc))
 
             call.enqueue(object : Callback<HebCalZmanimModel> {
 
@@ -561,11 +560,15 @@ class MainActivity : ComponentActivity() {
                                 getString(R.string.sunrise) + " " + truncDate(hebcal.times.sunrise)
                             )
                             res += " " + getString(R.string.sunset) + " " + truncDate(hebcal.times.sunset)
+
+                            res = hebcal.location.title + " " + res
+
                             textViewClock5suns.text = res
                             editor.putString(
                                 "sunset",
                                 getString(R.string.sunset) + " " + truncDate(hebcal.times.sunset)
                             )
+
                             editor.apply()
                             // textViewClock3.text = res
                         }
@@ -608,7 +611,7 @@ class MainActivity : ComponentActivity() {
 //                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 112); // REQUEST_INTERNET_PERMISSION);
 //            }
 
-            RetrofitInstance.api.getShabbatPerCity("IL-Jerusalem").enqueue(object : Callback<HebCal> {
+            RetrofitInstance.api.getShabbatPerCity("IL-Jerusalem", "off").enqueue(object : Callback<HebCal> {
 
                 override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
                     if (response.isSuccessful) {
@@ -661,6 +664,7 @@ class MainActivity : ComponentActivity() {
         fetchDafYomi()
 
         editTextTodo = findViewById(R.id.editTextTodo)
+        editTextLocation = findViewById(R.id.editTextLocation)
 
 
         /* val infoIcon: ImageView = findViewById(R.id.info_icon)
@@ -734,9 +738,9 @@ class MainActivity : ComponentActivity() {
             startActivity(browserIntent)
         }
 
-        editTextTodo.setOnFocusChangeListener { _, hasFocus ->
+        editTextLocation.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
-                fetchZmanim()
+                fetchShabatZmanim()
                 fetchSunsZmanim()
             }
         }
@@ -923,6 +927,7 @@ class MainActivity : ComponentActivity() {
 
                 // for testing
                 serviceIntent.putExtra("todoList", editTextTodo.text.toString())
+                serviceIntent.putExtra("location", editTextLocation.text.toString())
 
                 if (alertMediaIsPlaying("onClick to turn on")) {
 

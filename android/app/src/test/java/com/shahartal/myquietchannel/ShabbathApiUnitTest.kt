@@ -65,7 +65,10 @@ class ShabbathApiUnitTest {
         var res = ""
 
         val response =
-            RetrofitInstance.api.getShabbatPerCity(city).execute()
+            RetrofitInstance.api.getShabbatPerCity(
+                city,
+                ue = Utils.getUe(city)
+            ).execute()
 
         if (/*! */response.isSuccessful) {
             val hebcal = response.body()
@@ -118,8 +121,9 @@ class ShabbathApiUnitTest {
 
     fun fetchYomZmanim(): String {
         var res = ""
+        val city = "IL-Jerusalem"
         val response =
-            RetrofitInstance.api.getZmanimPerCity("IL-Tel Aviv").execute()
+            RetrofitInstance.api.getZmanimPerCity(Utils.getCity(city), Utils.getUe(city)).execute()
         if (/*! */response.isSuccessful) {
             val hebcal = response.body()
             if (hebcal != null) {

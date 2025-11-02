@@ -231,6 +231,31 @@
 		android:contentDescription="Information" /-->
 	
     <TextView
+        android:id="@+id/textViewLocationLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/location"
+        android:textAlignment="center"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/editTextLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:ems="10"
+        android:singleLine="false"
+        android:text="IL-Tel Aviv"
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/textViewPad8"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:visibility="invisible" />
+
+    <TextView
         android:id="@+id/textViewTodoLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -245,7 +270,7 @@
         android:background="@android:color/transparent"
         android:ems="10"
         android:singleLine="false"
-        android:text="IL-Tel Aviv, פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן"
+        android:text="פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן"
         android:textAlignment="center" />
 
     <TextView
