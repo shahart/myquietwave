@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.15
+
+Add an option to use the device's location
+אופציה לשימוש במיקום המכשיר
+
 ## 1.14
 
 UX: שדה חדש למיקום, ותמיכה גם ב-GeoName וב-Latitude/ Longitude

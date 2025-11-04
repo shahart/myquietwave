@@ -19,8 +19,8 @@ android {
         minSdk = 26
         targetSdk = 36
 
-        versionCode = 29
-        versionName = "1.14"
+        versionCode = 30
+        versionName = "1.15"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -75,7 +75,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.play.services.measurement.api)
-//    implementation(libs.play.services.location)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -92,9 +92,11 @@ dependencies {
     androidTestImplementation("androidx.test:rules:1.6.1")
 
 //    implementation("com.google.android.gms:play-services-location:21.3.0")
+
 //    implementation("com.google.firebase:firebase-analytics:34.0.0")
 
     implementation(libs.firebase.analytics)
+
     implementation(platform(libs.firebase.bom))
 
 //    implementation(libs.androidx.leanback)

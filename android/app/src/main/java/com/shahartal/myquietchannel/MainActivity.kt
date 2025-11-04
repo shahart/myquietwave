@@ -15,12 +15,12 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-//import android.content.pm.PackageManager
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.icu.util.HebrewCalendar
-//import android.location.Location
-//import android.location.LocationManager
+import android.location.Location
+import android.location.LocationManager
 import android.media.AudioManager
 //import android.net.Uri
 import android.os.Build
@@ -36,7 +36,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
-//import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 //import com.google.android.play.core.review.ReviewException
 //import com.google.android.play.core.review.ReviewManagerFactory
@@ -47,8 +47,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
 
-//import com.google.android.gms.location.FusedLocationProviderClient
-//import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.shahartal.myquietchannel.parasha.HebCal
 import com.shahartal.myquietchannel.parasha.HebCalZmanimModel
 import com.shahartal.myquietchannel.parasha.RetrofitInstance
@@ -84,6 +84,7 @@ class MainActivity : ComponentActivity() {
 
     // private lateinit var textViewNewsGlz: TextView
     private lateinit var textViewNewsLinks: TextView
+    private lateinit var textViewPosition: TextView
     // private lateinit var textViewNewsKan: TextView
 
     private lateinit var textViewClock : TextView
@@ -96,9 +97,10 @@ class MainActivity : ComponentActivity() {
     private lateinit var editTextTodo : TextView
     private lateinit var editTextLocation : TextView
 
+
     private lateinit var firebaseAnalytics: FirebaseAnalytics
 
-    // private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and
@@ -319,55 +321,11 @@ class MainActivity : ComponentActivity() {
 
             val firstItem = editTextLocation.text.toString().trim()
             fetchShabatZmanim(firstItem)
-            /*
+        }
         else {
-
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 0)
-            }
-
-        //    requestPermissions()
-
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-                val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                var isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-                        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-
-                // isGpsEnabled = true
-
-                if (! isGpsEnabled) {
-                    Log.w("", "MainActivity fetchZmanim location isGpsDisabled")
-                }
-                else {
-                    fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-                    fusedLocationClient.lastLocation
-//                        .addOnCompleteListener(requireActivity()) { task ->
-////                                location: Location? ->
-//                            Log.i("", "MainActivity fetchZmanim location success " + location)
-//                            if (location != null) {
-//                                fetchZmanim(location.latitude.toString() + "," + location.longitude.toString())
-//                            }
-//                        }
-//                        .addOnFailureListener { exception: Exception ->
-//                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
-//                        }
-//                        }
-                        .addOnSuccessListener { location: Location? ->
-                            Log.i("", "MainActivity fetchZmanim location success " + location)
-                            if (location != null) {
-                                fetchZmanim(location.latitude.toString() + "," + location.longitude.toString())
-                            }
-                        }
-                        .addOnFailureListener { exception: Exception ->
-                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
-                        }
-                }
-            }
         }
-*/
-        }
+
+
     }
 
     fun fetchShabatZmanim(loc: String) { // }: String {
@@ -378,7 +336,7 @@ class MainActivity : ComponentActivity() {
 
         var res: String
 
-        if (loc[0].isUpperCase()) {
+        if ((loc.trim().get(0).isLetter())) {
             res = loc + " "
         } else {
             res = " "
@@ -457,55 +415,8 @@ class MainActivity : ComponentActivity() {
 
             val firstItem = editTextLocation.text.toString().trim()
             fetchSunsZmanim(firstItem)
-            /*
-        else {
-
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 0)
-            }
-
-        //    requestPermissions()
-
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-                val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                var isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-                        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-
-                // isGpsEnabled = true
-
-                if (! isGpsEnabled) {
-                    Log.w("", "MainActivity fetchZmanim location isGpsDisabled")
-                }
-                else {
-                    fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-                    fusedLocationClient.lastLocation
-//                        .addOnCompleteListener(requireActivity()) { task ->
-////                                location: Location? ->
-//                            Log.i("", "MainActivity fetchZmanim location success " + location)
-//                            if (location != null) {
-//                                fetchZmanim(location.latitude.toString() + "," + location.longitude.toString())
-//                            }
-//                        }
-//                        .addOnFailureListener { exception: Exception ->
-//                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
-//                        }
-//                        }
-                        .addOnSuccessListener { location: Location? ->
-                            Log.i("", "MainActivity fetchZmanim location success " + location)
-                            if (location != null) {
-                                fetchZmanim(location.latitude.toString() + "," + location.longitude.toString())
-                            }
-                        }
-                        .addOnFailureListener { exception: Exception ->
-                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
-                        }
-                }
-            }
         }
-*/
-        }
+
     }
 
     fun fetchSunsZmanim(loc: String) { // }: String {
@@ -516,11 +427,7 @@ class MainActivity : ComponentActivity() {
 
         var res: String
 
-        if (loc[0].isUpperCase()) {
-            res = loc + " "
-        } else {
-            res = " "
-        }
+        res = " "
 
         try {
 //            if (ContextCompat.checkSelfPermission(this, Manifest.permission.LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -672,7 +579,7 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this, "Here you can place your city, with a comma, for Candle lighting and Havdalah times", Toast.LENGTH_LONG).show();
         }*/
 
-        // fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         alertMediaIsPlaying("onCreate")
 
@@ -736,6 +643,45 @@ class MainActivity : ComponentActivity() {
                 "https://shahart.github.io/automations/links.html".toUri()
             )
             startActivity(browserIntent)
+        }
+
+        textViewPosition = findViewById(R.id.textViewLocationLabel)
+        textViewPosition.setOnClickListener {
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 0)
+            }
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+                val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                var isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+                if (! isGpsEnabled) {
+                    Log.w("", "MainActivity fetchZmanim location isGpsDisabled")
+                }
+                else {
+                    fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+                    fusedLocationClient.lastLocation
+
+                        .addOnSuccessListener { location: Location? ->
+                            Log.i("", "MainActivity fetchZmanim location success " + location)
+                            if (location != null) {
+                                // firebaseAnalytics.logEvent(FirebaseAnalytics.Param.LOCATION) {
+                                // }
+                                val locStr = Utils.roundToDecimalPlaces(location.latitude).toString() + "," +
+                                        Utils.roundToDecimalPlaces(location.longitude).toString()
+                                editTextLocation.text = locStr
+                                fetchShabatZmanim(locStr)
+                            }
+                        }
+                        .addOnFailureListener { exception: Exception ->
+                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
+                        }
+                }
+            }
         }
 
         editTextLocation.setOnFocusChangeListener { _, hasFocus ->

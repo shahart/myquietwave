@@ -1,6 +1,15 @@
 package com.shahartal.myquietchannel
 
+import kotlin.math.pow
+import kotlin.math.roundToInt
+
 object Utils {
+
+    fun roundToDecimalPlaces(number: Double): Double {
+        val decimalPlaces: Int = 2
+        val factor = 10.0.pow(decimalPlaces)
+        return (number * factor).roundToInt() / factor
+    }
 
     fun getUe(loc: String): String {
         if (loc.contains(", ue")) {
