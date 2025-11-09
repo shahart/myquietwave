@@ -7,6 +7,54 @@
     <title>App</title>
 </head>
 <body>
+
+    <script>
+        async function calc() {
+            var postfix = document.getElementById('location').value;
+            if (postfix.indexOf(',') > 0) {
+                postfix = "latitude=" + postfix.split(',')[0].trim() + "&longitude=" + postfix.split(',')[1].trim();
+            } else if (postfix.charAt(0) >= '0' && postfix.charAt(0) <= '9') {
+                postfix = "geonameid=" + postfix;
+            } else {
+                postfix = "city=" + postfix;
+            }
+            const url = `https://www.hebcal.com/zmanim?cfg=json&` + postfix; 
+            try {
+                const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                document.getElementById('sunrise').innerHTML = data.times.sunrise;
+                document.getElementById('sunset') .innerHTML = data.times.sunset;
+                document.getElementById('foundLoc').innerHTML = data.location.title;
+            } catch (error) {
+                alert("Error fetching zmanim data " + error);
+            }
+
+            //
+            const url2 = `https://www.hebcal.com/shabbat?cfg=json&` + postfix;
+            try {
+                const response = await fetch(url2, { headers: { 'Accept': 'application/json' } });
+                if (! response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                document.getElementById('parasha') .innerHTML = data.items[1].hebrew;
+                document.getElementById('lighting').innerHTML = data.items[0].title;
+                for (let i = 2; i < data.items.length; i++) {
+                    if (data.items[i].category === 'havdalah') {
+                        document.getElementById('havdala').innerHTML = data.items[i].title;
+                        break;
+                    }
+                }
+            } catch (error) {
+                alert("Error fetching Shabbat data " + error);
+            }
+
+            // TODO dafYomi. hebcal?v=1&cfg=json&F=on&start=2025-10-20&end=2025-10-20
+            // html: הדף היומי<br><p id="dafyomi"><br>
+
+        }
+
+    </script>
+
 <h2>App</h2>
 <hr>
 Links: <a href="links-shabbat.html">links.html</a><br>
@@ -16,5 +64,37 @@ iPhone Shortcut: <a href="https://www.icloud.com/shortcuts/0b04a8e93d9a47e2977a0
 <br>
 Android App: <a href="https://play.google.com/store/apps/details?id=com.shahartal.myquietchannel">https://play.google.com/store/apps/details?id=com.shahartal.myquietchannel</a><br>
 <br><img src="Google_Play_Store_badge_EN.svg" width="150p">
+
+<br>
+<br>
+<hr>
+<br>
+<label id="clock"></label><br><br>
+🕯🕯 שבת <label id="parasha"></label><br><br>
+<label id="lighting"></label><br>
+🌠<label id="havdala"></label><br><br>
+זריחה היום🔆<br><label id="sunrise"></label><br>
+שקיעה🌅<br><label id="sunset"></label><br><br>
+מיקום 📍<br>
+<input type="text" id="location" value="IL-Jerusalem">
+<button onClick="calc()">Refresh</button><br>
+<label id="foundLoc">IL-Jerusalem</label>
+<script>
+    calc();
+        
+    function updateClock() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+        const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        document.getElementById('clock').innerHTML = formattedTime;
+    }
+
+    updateClock();
+
+    setInterval(updateClock, 1000);
+
+</script>
 </body>
 </html>
