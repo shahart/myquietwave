@@ -41,13 +41,16 @@
                 const response = await fetch(url2, { headers: { 'Accept': 'application/json' } });
                 if (! response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
-                document.getElementById('parasha') .innerHTML = data.items[1].hebrew;
-                document.getElementById('lighting').innerHTML = data.items[0].title;
-                for (let i = 2; i < data.items.length; i++) {
+                for (let i = 0; i < data.items.length; i++) {
                     if (data.items[i].category === 'havdalah') {
                         document.getElementById('havdala').innerHTML = data.items[i].title;
-                        break;
                     }
+                    else if (data.items[i].category === 'parashat') {
+                        document.getElementById('parasha').innerHTML = data.items[i].hebrew;
+                    }
+                    else if (data.items[i].category === 'candles') {
+                        document.getElementById('lighting').innerHTML = data.items[i].title;
+                    } 
                 }
             } catch (error) {
                 alert("Error fetching Shabbat data " + error);
@@ -64,6 +67,7 @@
                 if (! response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
                 document.getElementById('dafYomi').innerHTML = data.items[0].hebrew;
+                document.getElementById('dafYomiUrl').href = data.items[0].link;
             } catch (error) {
                 alert("Error fetching DafYomi data " + error);
             }
@@ -92,7 +96,7 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
 🌠<label id="havdala"></label><br><br>
 🔆 זריחה היום<br><label id="sunrise"></label><br>
 🌅 שקיעה<br><label id="sunset"></label><br><br>
-הדף היומי<br><label id="dafYomi"></label><br><br>
+<a id="dafYomiUrl" href="">הדף היומי</a><br><label id="dafYomi"></label><br><br>
 📍 מיקום<br>
 <input type="text" id="location" value="IL-Jerusalem">
 <button onClick="calc()">Refresh</button><br>
