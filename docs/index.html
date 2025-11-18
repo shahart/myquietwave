@@ -7,75 +7,8 @@
     <title>App</title>
 </head>
 <body>
-
-    <script>
-        async function calc() {
-            var postfix = document.getElementById('location').value;
-            var useElevationParam = "&ue=off"; 
-            if (postfix.indexOf(",ue") >= 1 ) {
-                useElevationParam = "&ue=on";
-                postfix = postfix.replace(",ue", "");
-            }
-            if (postfix.indexOf(',') > 0) {
-                postfix = "latitude=" + postfix.split(',')[0].trim() + "&longitude=" + postfix.split(',')[1].trim();
-            } else if (postfix.charAt(0) >= '0' && postfix.charAt(0) <= '9') {
-                postfix = "geonameid=" + postfix;
-            } else {
-                postfix = "city=" + postfix;
-            }
-            const url = `https://www.hebcal.com/zmanim?cfg=json&` + postfix + useElevationParam; 
-            try {
-                const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                document.getElementById('sunrise') .innerHTML = data.times.sunrise;
-                document.getElementById('sunset')  .innerHTML = data.times.sunset;
-                document.getElementById('foundLoc').innerHTML = data.location.title;
-            } catch (error) {
-                alert("Error fetching zmanim data " + error);
-            }
-
-            //
-            const url2 = `https://www.hebcal.com/shabbat?cfg=json&` + postfix + useElevationParam;
-            try {
-                const response = await fetch(url2, { headers: { 'Accept': 'application/json' } });
-                if (! response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                for (let i = 0; i < data.items.length; i++) {
-                    if (data.items[i].category === 'havdalah') {
-                        document.getElementById('havdala').innerHTML = data.items[i].title;
-                    }
-                    else if (data.items[i].category === 'parashat') {
-                        document.getElementById('parasha').innerHTML = data.items[i].hebrew;
-                    }
-                    else if (data.items[i].category === 'candles') {
-                        document.getElementById('lighting').innerHTML = data.items[i].title;
-                    } 
-                }
-            } catch (error) {
-                alert("Error fetching Shabbat data " + error);
-            }
-
-            const date = new Date();
-            const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
-            const day = date.getDate().toString().padStart(2, '0');
-            const formattedDate = `${year}-${month}-${day}`;
-            const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&start=` + formattedDate + `&end=` + formattedDate;
-            try {
-                const response = await fetch(url3, { headers: { 'Accept': 'application/json' } });
-                if (! response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                document.getElementById('dafYomi').innerHTML = data.items[0].hebrew;
-                document.getElementById('dafYomiUrl').href = data.items[0].link;
-            } catch (error) {
-                alert("Error fetching DafYomi data " + error);
-            }
-            
-        }
-
-    </script>
-
+    
+<script src="script.js" ></script>
 <h2>App</h2>
 <hr>
 Links: <a href="links-shabbat.html">links.html</a><br>
@@ -102,6 +35,12 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
 <button onClick="calc()">Refresh</button><br>
 <label id="foundLoc">IL-Jerusalem</label>
 <script>
+
+    let cookieInput = this.loadInput("zmanim-location");
+    if (cookieInput !== "") {
+        document.getElementById('location').value = cookieInput;
+    }
+
     calc();
         
     function updateClock() {
