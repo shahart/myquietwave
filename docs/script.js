@@ -104,3 +104,16 @@ async function calc() {
     }
     
 }
+
+function getLoc() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            document.getElementById('location').value = 
+                position.coords.latitude.toFixed(2) + ", " + 
+                position.coords.longitude.toFixed(2);
+            calc();
+        });
+    } else {
+        alert("GeoLocation is not supported by this browser.");
+    }
+}
