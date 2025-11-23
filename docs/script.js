@@ -38,9 +38,13 @@ function loadInput(cname) {
 }
 
 async function calc() {
-    var postfix = document.getElementById('location').value;
-
+    var postfix = document.getElementById('locationSelect').value;
     saveInput("zmanim-location", postfix);
+
+    if (postfix === 'other') {
+        postfix = document.getElementById('otherLocation').value.trim();
+        saveInput("zmanim-location-other", document.getElementById('otherLocation').value.trim());
+    }
 
     var useElevationParam = "&ue=off"; 
     if (postfix.indexOf(",ue") >= 1 ) {
@@ -108,12 +112,30 @@ async function calc() {
 function getLoc() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
-            document.getElementById('location').value = 
+            document.getElementById('otherLocation').value = 
                 position.coords.latitude.toFixed(2) + ", " + 
                 position.coords.longitude.toFixed(2);
+            document.getElementById('otherLocation').style.display = 'block';
+            document.getElementById('locationSelect').value = 'other';
             calc();
         });
     } else {
         alert("GeoLocation is not supported by this browser.");
     }
 }
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    const dropdown = document.getElementById('locationSelect');
+    const otherInput = document.getElementById('otherLocation');
+
+    dropdown.addEventListener('change', function() {
+        if (this.value === 'other') {
+            otherInput.style.display = 'block';
+            otherInput.focus(); 
+        } else {
+            otherInput.style.display = 'none';
+            otherInput.value = '';
+            calc();
+        }
+    });  
+})

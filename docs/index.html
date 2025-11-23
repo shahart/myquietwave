@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <meta name="description" content="App">
     <meta name='viewport' content='width=device-width, height=device-height, initial-scale=1.0'>
-    <title>App</title>
+    <title>Radio for Shabbat App 📻</title>
 </head>
 <body>
     
 <script src="script.js" ></script>
-<h2>App</h2>
+<h2>Radio for Shabbat App 📻</h2>
 <hr>
 Links: <a href="links-shabbat.html">links.html</a><br>
 <br/>
@@ -31,15 +31,135 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
 🌅 שקיעה<br><label id="sunset"></label><br><br>
 <a id="dafYomiUrl" href="">הדף היומי</a><br><label id="dafYomi"></label><br><br>
 <button onClick="getLoc()">📍</button>
- מיקום<br>
-<input type="text" id="location" value="IL-Jerusalem">
+<label for="locationSelect">
+ מיקום</label><br>
+<select id="locationSelect">
+    <optgroup label="ישראל"> 
+        <option value="IL-Jerusalem">IL-Jerusalem</option>
+        <option value="IL-Tel Aviv">IL-Tel Aviv</option>
+        <option value="IL-Haifa">IL-Haifa</option>
+        <option value="IL-Be'er Sheva">IL-Be'er Sheva</option>
+        <option value="IL-Ashdod">IL-Ashdod</option>
+        <option value="IL-Ashkelon">IL-Ashkelon</option>
+        <option value="IL-Bat Yam">IL-Bat Yam</option>
+        <option value="IL-Beit Shemesh">IL-Beit Shemesh</option>
+        <option value="IL-Bnei Brak">IL-Bnei Brak</option>
+        <option value="IL-Eilat">IL-Eilat</option>
+        <option value="IL-Hadera">IL-Hadera</option>
+        <option value="IL-Herzliya">IL-Herzliya</option>
+        <option value="IL-Holon">IL-Holon</option>
+        <option value="IL-Kfar Saba">IL-Kfar Saba</option>
+        <option value="IL-Lod">IL-Lod</option>
+        <option value="IL-Modiin">IL-Modiin</option>
+        <option value="IL-Nazareth">IL-Nazareth</option>
+        <option value="IL-Netanya">IL-Netanya</option>
+        <option value="IL-Petach Tikvah">IL-Petach Tikvah</option>
+        <option value="IL-Ra'anana">IL-Ra'anana</option>
+        <option value="IL-Ramat Gan">IL-Ramat Gan</option>
+        <option value="IL-Ramla">IL-Ramla</option>
+        <option value="IL-Rishon LeZion">IL-Rishon LeZion</option>
+        <option value="IL-Tiberias">IL-Tiberias</option>
+    </optgroup>
+    <optgroup label="Other"> 
+        <option value="other">Geo/ GPS-Lat, Lon</option>
+    </optgroup>
+    <optgroup label="US"> 
+        <option value="US-Atlanta-GA">US-Atlanta-GA</option>
+        <option value="US-Austin-TX">US-Austin-TX</option>
+        <option value="US-Baltimore-MD">US-Baltimore-MD</option>
+        <option value="US-Boston-MA">US-Boston-MA</option>
+        <option value="US-Buffalo-NY">US-Buffalo-NY</option>
+        <option value="US-Chicago-IL">US-Chicago-IL</option>
+        <option value="US-Cincinnati-OH">US-Cincinnati-OH</option>
+        <option value="US-Cleveland-OH">US-Cleveland-OH</option>
+        <option value="US-Columbus-OH">US-Columbus-OH</option>
+        <option value="US-Dallas-TX">US-Dallas-TX</option>
+        <option value="US-Denver-CO">US-Denver-CO</option>
+        <option value="US-Detroit-MI">US-Detroit-MI</option>
+        <option value="US-Hartford-CT">US-Hartford-CT</option>
+        <option value="US-Honolulu-HI">US-Honolulu-HI</option>
+        <option value="US-Houston-TX">US-Houston-TX</option>
+        <option value="US-Lakewood-NJ">US-Lakewood-NJ</option>
+        <option value="US-Las Vegas-NV">US-Las Vegas-NV</option>
+        <option value="US-Livingston-NY">US-Livingston-NY</option>
+        <option value="US-Los Angeles-CA">US-Los Angeles-CA</option>
+        <option value="US-Memphis-TN">US-Memphis-TN</option>
+        <option value="US-Miami-FL">US-Miami-FL</option>
+        <option value="US-Milwaukee-WI">US-Milwaukee-WI</option>
+        <option value="US-Monsey-NY">US-Monsey-NY</option>
+        <option value="US-New Haven-CT">US-New Haven-CT</option>
+        <option value="US-New York-NY">US-New York-NY</option>
+        <option value="US-Omaha-NE">US-Omaha-NE</option>
+        <option value="US-Orlando-FL">US-Orlando-FL</option>
+        <option value="US-Passaic-NJ">US-Passaic-NJ</option>
+        <option value="US-Philadelphia-PA">US-Philadelphia-PA</option>
+        <option value="US-Phoenix-AZ">US-Phoenix-AZ</option>
+        <option value="US-Pittsburgh-PA">US-Pittsburgh-PA</option>
+        <option value="US-Portland-OR">US-Portland-OR</option>
+        <option value="US-Providence-RI">US-Providence-RI</option>
+        <option value="US-Richmond-VA">US-Richmond-VA</option>
+        <option value="US-Rochester-NY">US-Rochester-NY</option>
+        <option value="US-Saint Louis-MO">US-Saint Louis-MO</option>
+        <option value="US-Saint Paul-MN">US-Saint Paul-MN</option>
+        <option value="US-San Diego-CA">US-San Diego-CA</option>
+        <option value="US-San Francisco-CA">US-San Francisco-CA</option>
+        <option value="US-Seattle-WA">US-Seattle-WA</option>
+        <option value="US-Silver Spring-MD">US-Silver Spring-MD</option>
+        <option value="US-Teaneck-NJ">US-Teaneck-NJ</option>
+        <option value="US-Washington-DC">US-Washington-DC</option>
+        <option value="US-White Plains-NY">US-White Plains-NY</option>
+    </optgroup>
+    <optgroup label="Canada"> 
+        <option value="CA-Calgary">CA-Calgary</option>
+        <option value="CA-Edmonton">CA-Edmonton</option>
+        <option value="CA-Halifax">CA-Halifax</option>
+        <option value="CA-Mississauga">CA-Mississauga</option>
+        <option value="CA-Montreal">CA-Montreal</option>
+        <option value="CA-Ottawa">CA-Ottawa</option>
+        <option value="CA-Quebec City">CA-Quebec City</option>
+        <option value="CA-Regina">CA-Regina</option>
+        <option value="CA-Saskatoon">CA-Saskatoon</option>
+        <option value="CA-St. John's-05">CA-St. John's-05</option>
+        <option value="CA-Toronto">CA-Toronto</option>
+        <option value="CA-Vancouver">CA-Vancouver</option>
+        <option value="CA-Victoria">CA-Victoria</option>
+        <option value="CA-Winnipeg">CA-Winnipeg</option>
+    </optgroup>
+    <optgroup label="France"> 
+        <option value="FR-Marseilles">FR-Marseilles</option>
+        <option value="FR-Paris">FR-Paris</option>
+    </optgroup>
+    <optgroup label="Great Britain"> 
+        <option value="GB-Belfast">GB-Belfast</option>
+        <option value="GB-Birmingham">GB-Birmingham</option>
+        <option value="GB-Bristol">GB-Bristol</option>
+        <option value="GB-Cardiff">GB-Cardiff</option>
+        <option value="GB-Edinburgh">GB-Edinburgh</option>
+        <option value="GB-Glasgow">GB-Glasgow</option>
+        <option value="GB-Leeds">GB-Leeds</option>
+        <option value="GB-Liverpool">GB-Liverpool</option>
+        <option value="GB-London">GB-London</option>
+        <option value="GB-Manchester">GB-Manchester</option>
+        <option value="GB-Sheffield">GB-Sheffield</option>
+    </optgroup>
+</select>
+<input type="text" id="otherLocation" value="IL-Jerusalem" name="otherLocation" style="display:none;">
 <button onClick="calc()">Refresh</button><br>
-<label id="foundLoc">IL-Jerusalem</label>
+<label id="foundLoc"></label>
 <script>
 
     let cookieInput = this.loadInput("zmanim-location");
     if (cookieInput !== "") {
-        document.getElementById('location').value = cookieInput;
+        document.getElementById('locationSelect').value = cookieInput;
+        if (cookieInput === 'other') {
+            document.getElementById('otherLocation').style.display = 'block';
+            document.getElementById('otherLocation').value = this.loadInput("zmanim-location-other");
+        }
+        else {
+            document.getElementById('otherLocation').style.display = 'none';
+            document.getElementById('otherLocation').value = '';
+            calc();
+        }
     }
 
     calc();
