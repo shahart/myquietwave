@@ -25,8 +25,16 @@ import android.media.AudioManager
 //import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.text.Selection.setSelection
 import android.util.Log
+import android.view.Gravity
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.Spinner
 //import android.widget.ImageView
 import android.widget.TextView
 //import android.widget.Toast
@@ -139,10 +147,21 @@ class MainActivity : ComponentActivity() {
 
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         val savedName = sharedPreferences.getString("todoList", "פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן")
-        val savedLocation = sharedPreferences.getString("location", "IL-Tel Aviv")
+        val savedLocation = sharedPreferences.getString("location", "IL-Jerusalem")
 
         editTextTodo.text = savedName
         editTextLocation.text = savedLocation
+
+        val locations = resources.getStringArray(R.array.locations)
+        val spinner = findViewById<Spinner>(R.id.editTextLocationSpinner)
+
+        if (locations.contains(savedLocation)) {
+            spinner.setSelection(locations.indexOf(savedLocation))
+        }
+        else {
+            spinner.setSelection(locations.indexOf("Geo/ GPS-Lat, Lon"))
+        }
+
 
         fetchShabatZmanim()
         fetchSunsZmanim()
@@ -551,6 +570,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
     // @RequiresApi(Build.VERSION_CODES.O) // Unnecessary; SDK_INT is always >= 26
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -560,6 +580,46 @@ class MainActivity : ComponentActivity() {
         Log.i("", "MainActivity Version " + BuildConfig.VERSION_NAME)
 
         setContentView(R.layout.activity_main)
+
+        editTextLocation = findViewById(R.id.editTextLocation)
+
+        val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
+        val savedLocation = sharedPreferences.getString("location", "IL-Jerusalem")
+
+        editTextLocation.text = savedLocation
+        val locations = resources.getStringArray(R.array.locations)
+
+        val spinner = findViewById<Spinner>(R.id.editTextLocationSpinner)
+
+        if (locations.contains(savedLocation)) {
+            spinner.setSelection(locations.indexOf(savedLocation))
+        }
+        else {
+            spinner.setSelection(locations.indexOf("Geo/ GPS-Lat, Lon"))
+        }
+
+        if (spinner != null) {
+            val adapter = ArrayAdapter(this,
+                android.R.layout.simple_spinner_item, locations)
+
+            spinner.adapter = adapter
+
+            spinner.onItemSelectedListener = object :
+                AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>,
+                                            view: View, position: Int, id: Long) {
+                    if (locations[position] != "Geo/ GPS-Lat, Lon" && locations[position].isNotEmpty()) {
+                        editTextLocation.text = locations[position]
+                    }
+                    fetchShabatZmanim()
+                    fetchSunsZmanim()
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>) {
+                    // TODO?
+                }
+            }
+        }
 
         // @RequiresApi(8
         if (ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY) {
@@ -571,8 +631,6 @@ class MainActivity : ComponentActivity() {
         fetchDafYomi()
 
         editTextTodo = findViewById(R.id.editTextTodo)
-        editTextLocation = findViewById(R.id.editTextLocation)
-
 
         /* val infoIcon: ImageView = findViewById(R.id.info_icon)
         infoIcon.setOnClickListener {
@@ -674,6 +732,7 @@ class MainActivity : ComponentActivity() {
                                 val locStr = Utils.roundToDecimalPlaces(location.latitude).toString() + "," +
                                         Utils.roundToDecimalPlaces(location.longitude).toString()
                                 editTextLocation.text = locStr
+                                spinner.setSelection(locations.indexOf("Geo/ GPS-Lat, Lon"))
                                 fetchShabatZmanim(locStr)
                             }
                         }

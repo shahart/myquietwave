@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2
+
+Better Ux: drop-down for the supported cities
+
 ## 1.15
 
 Add an option to use the device's location

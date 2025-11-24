@@ -61,4 +61,109 @@
     <string name="notif_text_radio_stopped">The radio app is not playing anymore, you should replay it</string>
 <!--    <string name="notif_text_6">Playing the current news</string>-->
 
+
+    <string-array name="locations">
+        <item>IL-Jerusalem</item>
+        <item>IL-Tel Aviv</item>
+        <item>IL-Haifa</item>
+        <item>IL-Be\'er Sheva</item>
+        <item> </item>
+        <item>Geo/ GPS-Lat, Lon</item>
+        <item> </item>
+        <item>IL-Ashdod</item>
+        <item>IL-Ashkelon</item>
+        <item>IL-Bat Yam</item>
+        <item>IL-Beit Shemesh</item>
+        <item>IL-Bnei Brak</item>
+        <item>IL-Eilat</item>
+        <item>IL-Hadera</item>
+        <item>IL-Herzliya</item>
+        <item>IL-Holon</item>
+        <item>IL-Kfar Saba</item>
+        <item>IL-Lod</item>
+        <item>IL-Modiin</item>
+        <item>IL-Nazareth</item>
+        <item>IL-Netanya</item>
+        <item>IL-Petach Tikvah</item>
+        <item>IL-Ra\'anana</item>
+        <item>IL-Ramat Gan</item>
+        <item>IL-Ramla</item>
+        <item>IL-Rishon LeZion</item>
+        <item>IL-Tiberias</item>
+        <item> </item>
+        <item>US-Atlanta-GA</item>
+        <item>US-Austin-TX</item>
+        <item>US-Baltimore-MD</item>
+        <item>US-Boston-MA</item>
+        <item>US-Buffalo-NY</item>
+        <item>US-Chicago-IL</item>
+        <item>US-Cincinnati-OH</item>
+        <item>US-Cleveland-OH</item>
+        <item>US-Columbus-OH</item>
+        <item>US-Dallas-TX</item>
+        <item>US-Denver-CO</item>
+        <item>US-Detroit-MI</item>
+        <item>US-Hartford-CT</item>
+        <item>US-Honolulu-HI</item>
+        <item>US-Houston-TX</item>
+        <item>US-Lakewood-NJ</item>
+        <item>US-Las Vegas-NV</item>
+        <item>US-Livingston-NY</item>
+        <item>US-Los Angeles-CA</item>
+        <item>US-Memphis-TN</item>
+        <item>US-Miami-FL</item>
+        <item>US-Milwaukee-WI</item>
+        <item>US-Monsey-NY</item>
+        <item>US-New Haven-CT</item>
+        <item>US-New York-NY</item>
+        <item>US-Omaha-NE</item>
+        <item>US-Orlando-FL</item>
+        <item>US-Passaic-NJ</item>
+        <item>US-Philadelphia-PA</item>
+        <item>US-Phoenix-AZ</item>
+        <item>US-Pittsburgh-PA</item>
+        <item>US-Portland-OR</item>
+        <item>US-Providence-RI</item>
+        <item>US-Richmond-VA</item>
+        <item>US-Rochester-NY</item>
+        <item>US-Saint Louis-MO</item>
+        <item>US-Saint Paul-MN</item>
+        <item>US-San Diego-CA</item>
+        <item>US-San Francisco-CA</item>
+        <item>US-Seattle-WA</item>
+        <item>US-Silver Spring-MD</item>
+        <item>US-Teaneck-NJ</item>
+        <item>US-Washington-DC</item>
+        <item>US-White Plains-NY</item>
+        <item> </item>
+        <item>CA-Calgary</item>
+        <item>CA-Edmonton</item>
+        <item>CA-Halifax</item>
+        <item>CA-Mississauga</item>
+        <item>CA-Montreal</item>
+        <item>CA-Ottawa</item>
+        <item>CA-Quebec City</item>
+        <item>CA-Regina</item>
+        <item>CA-Saskatoon</item>
+        <item>CA-St. John\'s-05</item>
+        <item>CA-Toronto</item>
+        <item>CA-Vancouver</item>
+        <item>CA-Victoria</item>
+        <item>CA-Winnipeg</item>
+        <item> </item>
+        <item>FR-Marseilles</item>
+        <item>FR-Paris</item>
+        <item> </item>
+        <item>GB-Belfast</item>
+        <item>GB-Birmingham</item>
+        <item>GB-Bristol</item>
+        <item>GB-Cardiff</item>
+        <item>GB-Edinburgh</item>
+        <item>GB-Glasgow</item>
+        <item>GB-Leeds</item>
+        <item>GB-Liverpool</item>
+        <item>GB-London</item>
+        <item>GB-Manchester</item>
+        <item>GB-Sheffield</item>
+    </string-array>
 </resources>

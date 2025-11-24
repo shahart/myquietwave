@@ -91,16 +91,16 @@
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="wrap_content">-->
 
-      <TextView
-          android:id="@+id/textView14"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_alignParentLeft="true"
-          android:layout_alignParentRight="true"
-          android:text="@string/newsLink"
-          android:textAlignment="center"
-          android:textColor="#03A9F4"
-          android:textSize="20sp" />
+    <TextView
+        android:id="@+id/textView14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:text="@string/newsLink"
+        android:textAlignment="center"
+        android:textColor="#03A9F4"
+        android:textSize="20sp" />
 
 <!--    </RelativeLayout>-->
 
@@ -229,7 +229,7 @@
 		android:layout_height="wrap_content"
 		android:src="@android:drawable/ic_dialog_info"
 		android:contentDescription="Information" /-->
-	
+
     <TextView
         android:id="@+id/textViewLocationLabel"
         android:layout_width="match_parent"
@@ -238,17 +238,24 @@
         android:textAlignment="center"
         android:textSize="20sp" />
 
-    <EditText
-        android:id="@+id/editTextLocation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:ems="10"
-        android:singleLine="false"
-        android:text="IL-Tel Aviv"
-        android:textAlignment="center" />
+      <EditText
+          android:id="@+id/editTextLocation"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@android:color/transparent"
+          android:ems="10"
+          android:singleLine="false"
+          android:text="IL-Jerusalem"
+          android:textAlignment="center" />
 
-    <TextView
+      <Spinner
+          android:id="@+id/editTextLocationSpinner"
+          android:layout_width="287dp"
+          android:layout_height="match_parent"
+          android:prompt="@string/location"
+          android:textAlignment="center" />
+
+      <TextView
         android:id="@+id/textViewPad8"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
