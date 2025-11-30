@@ -130,6 +130,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     dropdown.addEventListener('change', function() {
         if (this.value === 'other') {
+            alert('הוסף ue, עבור use elevation בחישובים');
             otherInput.style.display = 'block';
             otherInput.focus(); 
         } else {
