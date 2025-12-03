@@ -82,6 +82,7 @@ async function calc() {
             }
             else if (data.items[i].category === 'parashat') {
                 document.getElementById('parasha').innerHTML = data.items[i].hebrew;
+                document.getElementById('parashaUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew;
             }
             else if (data.items[i].category === 'candles') {
                 document.getElementById('lighting').innerHTML = data.items[i].title;
@@ -111,6 +112,7 @@ async function calc() {
 
 function getLoc() {
     if (navigator.geolocation) {
+        alert('הוסף ue, עבור use elevation בחישובים');
         navigator.geolocation.getCurrentPosition(function(position) {
             document.getElementById('otherLocation').value = 
                 position.coords.latitude.toFixed(2) + ", " + 
@@ -130,7 +132,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     dropdown.addEventListener('change', function() {
         if (this.value === 'other') {
-            alert('הוסף ue, עבור use elevation בחישובים');
+             alert('הוסף ue, עבור use elevation בחישובים');
             otherInput.style.display = 'block';
             otherInput.focus(); 
         } else {

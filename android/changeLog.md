@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.21
+
+Expose UE to the user
+Add link to the weekly parasha
+More cities
+Hebrew IL cities
+
 ## 1.2
 
 Better Ux: drop-down for the supported cities

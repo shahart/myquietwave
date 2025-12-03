@@ -234,6 +234,7 @@
         android:id="@+id/textViewLocationLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
         android:text="@string/location"
         android:textAlignment="center"
         android:textSize="20sp" />
@@ -245,7 +246,7 @@
           android:background="@android:color/transparent"
           android:ems="10"
           android:singleLine="false"
-          android:text="IL-Jerusalem"
+          android:text="IL-ירושלים"
           android:textAlignment="center" />
 
       <Spinner

@@ -41,6 +41,8 @@
 
     <string name="location">Lieu 📍</string>
 
+    <string name="ue_usage">ajoutez \',ue\' pour utiliser l'élévation dans les calculs</string>
+
     <!-- notifications -->
 
     <string name="notif_title_1">Ma vague silencieuse - En action</string>

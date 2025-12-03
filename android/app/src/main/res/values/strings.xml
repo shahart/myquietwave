@@ -61,35 +61,36 @@
     <string name="notif_text_radio_stopped">The radio app is not playing anymore, you should replay it</string>
 <!--    <string name="notif_text_6">Playing the current news</string>-->
 
+    <string name="ue_usage">Add \',ue\' for use elevation in the calculations</string>
 
     <string-array name="locations">
-        <item>IL-Jerusalem</item>
-        <item>IL-Tel Aviv</item>
-        <item>IL-Haifa</item>
-        <item>IL-Be\'er Sheva</item>
+        <item>IL-ירושלים</item>
+        <item>IL-תל אביב</item>
+        <item>IL-חיפה</item>
+        <item>IL-באר שבע</item>
+        <item>IL-אילת</item>
         <item> </item>
         <item>Geo/ GPS-Lat, Lon</item>
         <item> </item>
-        <item>IL-Ashdod</item>
-        <item>IL-Ashkelon</item>
-        <item>IL-Bat Yam</item>
-        <item>IL-Beit Shemesh</item>
-        <item>IL-Bnei Brak</item>
-        <item>IL-Eilat</item>
-        <item>IL-Hadera</item>
-        <item>IL-Herzliya</item>
-        <item>IL-Holon</item>
-        <item>IL-Kfar Saba</item>
-        <item>IL-Lod</item>
-        <item>IL-Modiin</item>
-        <item>IL-Nazareth</item>
-        <item>IL-Netanya</item>
-        <item>IL-Petach Tikvah</item>
-        <item>IL-Ra\'anana</item>
-        <item>IL-Ramat Gan</item>
-        <item>IL-Ramla</item>
-        <item>IL-Rishon LeZion</item>
-        <item>IL-Tiberias</item>
+        <item>IL-אשדוד</item>
+        <item>IL-אשקלון</item>
+        <item>IL-בית שמש</item>
+        <item>IL-בני ברק</item>
+        <item>IL-בת ים</item>
+        <item>IL-הרצליה</item>
+        <item>IL-חדרה</item>
+        <item>IL-חולון</item>
+        <item>IL-טבריה</item>
+        <item>IL-כפר סבא</item>
+        <item>IL-לוד</item>
+        <item>IL-מודיעין</item>
+        <item>IL-נצרת</item>
+        <item>IL-נתניה</item>
+        <item>IL-פתח תקוה</item>
+        <item>IL-ראשון לציון</item>
+        <item>IL-רעננה</item>
+        <item>IL-רמלה</item>
+        <item>IL-רמת גן</item>
         <item> </item>
         <item>US-Atlanta-GA</item>
         <item>US-Austin-TX</item>
@@ -165,5 +166,97 @@
         <item>GB-London</item>
         <item>GB-Manchester</item>
         <item>GB-Sheffield</item>
+        <item> </item>
+        <item>AR-Buenos Aires</item>
+        <item>AR-Cordoba</item>
+        <item>AR-Rosario</item>
+        <item> </item>
+        <item>AU-Adelaide</item>
+        <item>AU-Brisbane</item>
+        <item>AU-Canberra</item>
+        <item>AU-Gold Coast</item>
+        <item>AU-Hobart</item>
+        <item>AU-Melbourne</item>
+        <item>AU-Perth</item>
+        <item>AU-Sydney</item>
+        <item> </item>
+        <item>UA-Kharkiv</item>
+        <item>UA-Kiev</item>
+        <item> </item>
+        <item>IT-Milano</item>
+        <item>IT-Rome</item>
+        <item> </item>
+        <item>IE-Dublin</item>
+        <item> </item>
+        <item>BE-Brussels</item>
+        <item> </item>
+        <item>CY-Nicosia</item>
+        <item> </item>
+        <item>CZ-Prague</item>
+        <item> </item>
+        <item>DE-Berlin</item>
+        <item>DE-Hamburg</item>
+        <item>DE-Munich</item>
+        <item> </item>
+        <item>CR-San José</item>
+        <item> </item>
+        <item>GE-Tbilisi</item>
+        <item> </item>
+        <item>GI-Gibraltar</item>
+        <item> </item>
+        <item>GR-Athens</item>
+        <item> </item>
+        <item>HK-Hong Kong</item>
+        <item> </item>
+        <item>HR-Zagreb</item>
+        <item> </item>
+        <item>HU-Budapest</item>
+        <item> </item>
+        <item>LU-Luxemburg</item>
+        <item> </item>
+        <item>NL-Amsterdam</item>
+        <item> </item>
+        <item>NO-Oslo</item>
+        <item> </item>
+        <item>NZ-Auckland</item>
+        <item>NZ-Christchurch</item>
+        <item>NZ-Wellington</item>
+        <item> </item>
+        <item>PA-Panama City</item>
+        <item> </item>
+        <item>PE-Lima</item>
+        <item> </item>
+        <item>PT-Lisbon</item>
+        <item> </item>
+        <item>RO-Bucharest</item>
+        <item> </item>
+        <item>RS-Belgrade</item>
+        <item> </item>
+        <item>RU-Moscow</item>
+        <item>RU-Novosibirsk</item>
+        <item>RU-Saint Petersburg</item>
+        <item>RU-Yekaterinburg</item>
+        <item> </item>
+        <item>SE-Stockholm</item>
+        <item> </item>
+        <item>SG-Singapore</item>
+        <item> </item>
+        <item>SK-Bratislava</item>
+        <item> </item>
+        <item>PL-Warsaw</item>
+        <item> </item>
+        <item>IN-Ahmadabad</item>
+        <item>IN-Bangalore</item>
+        <item>IN-Bombay</item>
+        <item>IN-Calcutta</item>
+        <item>IN-Chennai</item>
+        <item>IN-Cochin</item>
+        <item>IN-Hyderabad</item>
+        <item>IN-Jaipur</item>
+        <item>IN-Kanpur</item>
+        <item>IN-New Delhi</item>
+        <item>IN-Pune</item>
+        <item>IN-Surat</item>
     </string-array>
+
 </resources>

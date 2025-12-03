@@ -10,6 +10,7 @@ package com.shahartal.myquietchannel
 //import android.media.session.PlaybackState
 import android.Manifest
 import android.app.AlertDialog
+import android.app.Notification
 import android.app.NotificationManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -44,6 +45,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 //import com.google.android.play.core.review.ReviewException
@@ -57,6 +59,7 @@ import com.google.firebase.analytics.logEvent
 
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.shahartal.myquietchannel.VolumeCycleService.Companion.CHANNEL_ID
 import com.shahartal.myquietchannel.parasha.HebCal
 import com.shahartal.myquietchannel.parasha.HebCalZmanimModel
 import com.shahartal.myquietchannel.parasha.RetrofitInstance
@@ -155,8 +158,8 @@ class MainActivity : ComponentActivity() {
         val locations = resources.getStringArray(R.array.locations)
         val spinner = findViewById<Spinner>(R.id.editTextLocationSpinner)
 
-        if (locations.contains(savedLocation)) {
-            spinner.setSelection(locations.indexOf(savedLocation))
+        if (savedLocation != null && locations.contains(Utils.convertLocationIL(savedLocation))) {
+                spinner.setSelection(locations.indexOf(Utils.convertLocationIL(savedLocation)))
         }
         else {
             spinner.setSelection(locations.indexOf("Geo/ GPS-Lat, Lon"))
@@ -551,6 +554,16 @@ class MainActivity : ComponentActivity() {
                                 textViewClock2.text = " שבת " + it.hebrew
                                 editor.putString("parashat", " שבת " + it.hebrew)
                                 editor.apply()
+
+                                val str: String = it.hebrew
+                                textViewClock2.setOnClickListener {
+                                    val browserIntent = Intent(
+                                        Intent.ACTION_VIEW,
+                                        ("https://he.wikipedia.org/wiki/" + str.replace(" ", "_")).toUri()
+                                    )
+                                    startActivity(browserIntent)
+                                }
+
                             }
                         }
                     } else {
@@ -591,8 +604,9 @@ class MainActivity : ComponentActivity() {
 
         val spinner = findViewById<Spinner>(R.id.editTextLocationSpinner)
 
-        if (locations.contains(savedLocation)) {
-            spinner.setSelection(locations.indexOf(savedLocation))
+
+        if (savedLocation != null && locations.contains(Utils.convertLocationIL(savedLocation))) {
+            spinner.setSelection(locations.indexOf(Utils.convertLocationIL(savedLocation)))
         }
         else {
             spinner.setSelection(locations.indexOf("Geo/ GPS-Lat, Lon"))
@@ -609,7 +623,7 @@ class MainActivity : ComponentActivity() {
                 override fun onItemSelected(parent: AdapterView<*>,
                                             view: View, position: Int, id: Long) {
                     if (locations[position] != "Geo/ GPS-Lat, Lon" && locations[position].isNotEmpty()) {
-                        editTextLocation.text = locations[position]
+                        editTextLocation.text = Utils.convertFromLocationIL(locations[position])
                     }
                     fetchShabatZmanim()
                     fetchSunsZmanim()
@@ -734,6 +748,17 @@ class MainActivity : ComponentActivity() {
                                 editTextLocation.text = locStr
                                 spinner.setSelection(locations.indexOf("Geo/ GPS-Lat, Lon"))
                                 fetchShabatZmanim(locStr)
+
+                                val alertDialogBuilder = AlertDialog.Builder(this)
+                                alertDialogBuilder.setMessage(getString(R.string.ue_usage) + " -- Version: " + BuildConfig.VERSION_NAME)
+                                alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, which: Int ->
+                                    if (! this.isFinishing) {
+                                        dialog!!.cancel()
+                                    }
+                                }
+				val alertDialog = alertDialogBuilder.create()
+                                alertDialog.show()
+
                             }
                         }
                         .addOnFailureListener { exception: Exception ->

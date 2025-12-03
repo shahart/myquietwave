@@ -41,6 +41,8 @@
 
     <string name="location">מיקום 📍</string>
 
+    <string name="ue_usage">הוסף ue, עבור use elevation בחישובים</string>
+
     <!-- notifications -->
 
     <string name="notif_title_1">הגל השקט שלי - בפעולה</string>
