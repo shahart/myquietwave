@@ -27,6 +27,7 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
 
 🕯🕯 שבת <a id="parashaUrl" href=""> 
 <label id="parasha"></label></a><br>
+<a id="haftarahUrl" href="" target="_blank" ></a>
 <label id="haftarah"></label><br><br>
 <label id="lighting"></label><br>
 🌠<label id="havdala"></label><br><br>
@@ -240,7 +241,9 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
 </select>
 <input type="text" id="otherLocation" value="IL-Jerusalem" name="otherLocation" style="display:none;">
 <button onClick="calc()">Refresh</button><br>
-<label id="foundLoc"></label>
+<label id="foundLoc"></label><br><br>
+<b>סידורים לקראת שבת</b><br>
+<textarea rows="4" id="todo">שעון שבת</textarea>
 <script>
 
     let cookieInput = this.loadInput("zmanim-location");
@@ -255,6 +258,11 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
             document.getElementById('otherLocation').value = '';
             calc();
         }
+    }
+
+    let todocookieInput = this.loadInput("todo");
+    if (todocookieInput !== "") {
+        document.getElementById('todo').value = todocookieInput;
     }
 
     calc();

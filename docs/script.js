@@ -82,7 +82,9 @@ async function calc() {
             }
             else if (data.items[i].category === 'parashat') {
                 document.getElementById('parasha').innerHTML = data.items[i].hebrew;
-                document.getElementById('haftarah').innerHTML = 'הפטרה: ' + data.items[i].leyning.haftarah;
+                document.getElementById('haftarahUrl').innerHTML = 'הפטרה: ';
+                document.getElementById('haftarah').innerHTML = data.items[i].leyning.haftarah;
+                document.getElementById('haftarahUrl').href = "https://shahart.github.io/heb-bible/index.html?b=" + data.items[i].leyning.haftarah.split(':')[0];
                 document.getElementById('parashaUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew;
             }
             else if (data.items[i].category === 'candles') {
@@ -145,4 +147,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
             calc();
         }
     });  
+
+    document.getElementById("todo").addEventListener("focusout", function () {
+        saveInput("todo", document.getElementById('todo').value);
+}   );
 })
