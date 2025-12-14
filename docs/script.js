@@ -144,7 +144,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         } else {
             otherInput.style.display = 'none';
             otherInput.value = '';
-            calc();
         }
     });  
 
