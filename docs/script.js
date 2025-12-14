@@ -59,10 +59,26 @@ async function calc() {
         postfix = "city=" + postfix;
     }
     const url = `https://www.hebcal.com/zmanim?cfg=json&` + postfix + useElevationParam; 
+
+    const url2 = `https://www.hebcal.com/shabbat?cfg=json&` + postfix + useElevationParam;
+
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
+    const day = date.getDate().toString().padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&start=` + formattedDate + `&end=` + formattedDate;
+
+    const [resp1, resp2, resp3] = await Promise.all([
+        (await fetch(url,  { headers: { 'Accept': 'application/json' } })).json(),
+        (await fetch(url2, { headers: { 'Accept': 'application/json' } })).json(),
+        (await fetch(url3, { headers: { 'Accept': 'application/json' } })).json()
+    ]);
+
     try {
-        const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
-        if (!response.ok) throw new Error('Network response was not ok - is the location valid? ' + response.status);
-        const data = await response.json();
+        const response = resp1;
+        // if (!response.ok) throw new Error('Network response was not ok - is the location valid? ' + response.status);
+        const data = response; // await response.json();
         document.getElementById('sunrise') .innerHTML = data.times.sunrise;
         document.getElementById('sunset')  .innerHTML = data.times.sunset;
         document.getElementById('foundLoc').innerHTML = data.location.title;
@@ -70,12 +86,10 @@ async function calc() {
         alert("Error fetching zmanim data " + error);
     }
 
-    //
-    const url2 = `https://www.hebcal.com/shabbat?cfg=json&` + postfix + useElevationParam;
     try {
-        const response = await fetch(url2, { headers: { 'Accept': 'application/json' } });
-        if (! response.ok) throw new Error('Network response was not ok - is the location valid? ' + response.status);
-        const data = await response.json();
+        const response = resp2;
+        // if (! response.ok) throw new Error('Network response was not ok - is the location valid? ' + response.status);
+        const data = response; // await response.json();
         for (let i = 0; i < data.items.length; i++) {
             if (data.items[i].category === 'havdalah') {
                 document.getElementById('havdala').innerHTML = data.items[i].title;
@@ -98,16 +112,10 @@ async function calc() {
         alert("Error fetching Shabbat data " + error);
     }
 
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
-    const day = date.getDate().toString().padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
-    const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&start=` + formattedDate + `&end=` + formattedDate;
     try {
-        const response = await fetch(url3, { headers: { 'Accept': 'application/json' } });
-        if (! response.ok) throw new Error('Network response was not ok - ' + response.status);
-        const data = await response.json();
+        const response = resp3;
+        // if (! response.ok) throw new Error('Network response was not ok - ' + response.status);
+        const data = response; // await response.json();
         document.getElementById('dafYomi').innerHTML = data.items[0].hebrew;
         document.getElementById('dafYomiUrl').href = data.items[0].link;
     } catch (error) {
