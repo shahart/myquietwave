@@ -69,59 +69,64 @@ async function calc() {
     const formattedDate = `${year}-${month}-${day}`;
     const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&start=` + formattedDate + `&end=` + formattedDate;
 
-    const [resp1, resp2, resp3] = await Promise.all([
-        (await fetch(url,  { headers: { 'Accept': 'application/json' } })).json(),
-        (await fetch(url2, { headers: { 'Accept': 'application/json' } })).json(),
-        (await fetch(url3, { headers: { 'Accept': 'application/json' } })).json()
-    ]);
-
     try {
-        const response = resp1;
-        // if (!response.ok) throw new Error('Network response was not ok - is the location valid? ' + response.status);
-        const data = response; // await response.json();
-        document.getElementById('sunrise') .innerHTML = data.times.sunrise;
-        document.getElementById('sunset')  .innerHTML = data.times.sunset;
-        document.getElementById('foundLoc').innerHTML = data.location.title;
-    } catch (error) {
-        alert("Error fetching zmanim data " + error);
-    }
+        const [resp1, resp2, resp3] = await Promise.all([
+            (await fetch(url,  { headers: { 'Accept': 'application/json' } })).json(),
+            (await fetch(url2, { headers: { 'Accept': 'application/json' } })).json(),
+            (await fetch(url3, { headers: { 'Accept': 'application/json' } })).json()
+        ]);
 
-    try {
-        const response = resp2;
-        // if (! response.ok) throw new Error('Network response was not ok - is the location valid? ' + response.status);
-        const data = response; // await response.json();
-        for (let i = 0; i < data.items.length; i++) {
-            if (data.items[i].category === 'havdalah') {
-                document.getElementById('havdala').innerHTML = data.items[i].title;
+        try {
+            const data = resp1;
+            if (data.error) {
+                alert("Error in zmanim data: " + data.error);
+                return;
             }
-            else if (data.items[i].category === 'parashat') {
-                document.getElementById('parasha').innerHTML = data.items[i].hebrew;
-                document.getElementById('haftarahUrl').innerHTML = 'הפטרה: ';
-                document.getElementById('haftarah').innerHTML = data.items[i].leyning.haftarah;
-                document.getElementById('haftarahUrl').href = "https://shahart.github.io/heb-bible/index.html?b=" + data.items[i].leyning.haftarah.split(':')[0];
-                document.getElementById('parashaUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew;
-            }
-            else if (data.items[i].category === 'candles') {
-                document.getElementById('lighting').innerHTML = data.items[i].title;
-            } 
-            else if (data.items[i].category === 'mevarchim') {
-                document.getElementById('lighting').innerHTML = document.getElementById('lighting').innerHTML + "<br>" + data.items[i].hebrew + "<br>" + data.items[i].memo;
-            } 
+            document.getElementById('sunrise') .innerHTML = data.times.sunrise;
+            document.getElementById('sunset')  .innerHTML = data.times.sunset;
+            document.getElementById('foundLoc').innerHTML = data.location.title;
+        } catch (error) {
+            alert("Error fetching zmanim data " + error);
         }
-    } catch (error) {
-        alert("Error fetching Shabbat data " + error);
-    }
 
-    try {
-        const response = resp3;
-        // if (! response.ok) throw new Error('Network response was not ok - ' + response.status);
-        const data = response; // await response.json();
-        document.getElementById('dafYomi').innerHTML = data.items[0].hebrew;
-        document.getElementById('dafYomiUrl').href = data.items[0].link;
-    } catch (error) {
-        alert("Error fetching DafYomi data " + error);
+        try {
+            const data = resp2;
+            if (data.error) {
+                alert("Error in Shabbat data: " + data.error);
+                return;
+            }
+            for (let i = 0; i < data.items.length; i++) {
+                if (data.items[i].category === 'havdalah') {
+                    document.getElementById('havdala').innerHTML = data.items[i].title;
+                }
+                else if (data.items[i].category === 'parashat') {
+                    document.getElementById('parasha').innerHTML = data.items[i].hebrew;
+                    document.getElementById('haftarahUrl').innerHTML = 'הפטרה: ';
+                    document.getElementById('haftarah').innerHTML = data.items[i].leyning.haftarah.replaceAll('|', ' <br>');
+                    document.getElementById('haftarahUrl').href = "https://shahart.github.io/heb-bible/index.html?b=" + data.items[i].leyning.haftarah.split(':')[0];
+                    document.getElementById('parashaUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew;
+                }
+                else if (data.items[i].category === 'candles') {
+                    document.getElementById('lighting').innerHTML = data.items[i].title;
+                } 
+                else if (data.items[i].category === 'mevarchim') {
+                    document.getElementById('lighting').innerHTML = document.getElementById('lighting').innerHTML + "<br>" + data.items[i].hebrew + "<br>" + data.items[i].memo;
+                } 
+            }
+        } catch (error) {
+            alert("Error fetching Shabbat data " + error);
+        }
+
+        try {
+            document.getElementById('dafYomi').innerHTML = resp3.items[0].hebrew;
+            document.getElementById('dafYomiUrl').href = resp3.items[0].link;
+        } catch (error) {
+            alert("Error fetching DafYomi data " + error);
+        }
+    }    
+    catch (error) {
+        alert("General error fetching data from " + url + " >> " + error);
     }
-    
 }
 
 function getLoc() {

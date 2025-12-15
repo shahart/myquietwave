@@ -41,7 +41,7 @@
 
     <string name="location">Lieu 📍</string>
 
-    <string name="ue_usage">ajoutez \',ue\' pour utiliser l'élévation dans les calculs</string>
+    <string name="ue_usage">ajoutez ue pour utiliser lelevation dans les calculs</string>
 
     <!-- notifications -->
 
