@@ -113,7 +113,7 @@ async function calc() {
                     document.getElementById('lighting').innerHTML = document.getElementById('lighting').innerHTML + "<br>" + data.items[i].hebrew + "<br>" + data.items[i].memo;
                 }
                 else if (data.items[i].title == 'Fast begins') {
-                    document.getElementById('special').innerHTML += " עלות השחר " + data.items[i].date.split('T')[1].substring(0,5);
+                    document.getElementById('special').innerHTML = " עלות השחר " + data.items[i].date.split('T')[1].substring(0,5);
                 } 
                 else if (data.items[i].title == 'Fast ends') {
                     document.getElementById('special').innerHTML += " צאת הכוכבים " + data.items[i].date.split('T')[1].substring(0,5) + "<br><br>";
