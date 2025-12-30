@@ -82,8 +82,8 @@ async function calc() {
                 alert("Error in zmanim data: " + data.error);
                 return;
             }
-            document.getElementById('sunrise') .innerHTML = data.times.sunrise;
-            document.getElementById('sunset')  .innerHTML = data.times.sunset;
+            document.getElementById('sunrise') .innerHTML = data.times.sunrise.split('T')[1].substring(0,5);
+            document.getElementById('sunset')  .innerHTML = data.times.sunset.split('T')[1].substring(0,5);
             document.getElementById('foundLoc').innerHTML = data.location.title;
         } catch (error) {
             alert("Error fetching zmanim data " + error);
@@ -96,21 +96,30 @@ async function calc() {
                 return;
             }
             for (let i = 0; i < data.items.length; i++) {
-                if (data.items[i].category === 'havdalah') {
-                    document.getElementById('havdala').innerHTML = data.items[i].title;
-                }
-                else if (data.items[i].category === 'parashat') {
+                if (data.items[i].category === 'parashat') {
                     document.getElementById('parasha').innerHTML = data.items[i].hebrew;
                     document.getElementById('haftarahUrl').innerHTML = 'הפטרה: ';
                     document.getElementById('haftarah').innerHTML = data.items[i].leyning.haftarah.replaceAll('|', ' <br>');
                     document.getElementById('haftarahUrl').href = "https://shahart.github.io/heb-bible/index.html?b=" + data.items[i].leyning.haftarah.split(':')[0];
                     document.getElementById('parashaUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew;
                 }
+                else if (data.items[i].category === 'havdalah') {
+                    document.getElementById('havdala').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
+                }
                 else if (data.items[i].category === 'candles') {
-                    document.getElementById('lighting').innerHTML = data.items[i].title;
+                    document.getElementById('lighting').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
                 } 
                 else if (data.items[i].category === 'mevarchim') {
                     document.getElementById('lighting').innerHTML = document.getElementById('lighting').innerHTML + "<br>" + data.items[i].hebrew + "<br>" + data.items[i].memo;
+                }
+                else if (data.items[i].title == 'Fast begins') {
+                    document.getElementById('special').innerHTML += " עלות השחר " + data.items[i].date.split('T')[1].substring(0,5);
+                } 
+                else if (data.items[i].title == 'Fast ends') {
+                    document.getElementById('special').innerHTML += " צאת הכוכבים " + data.items[i].date.split('T')[1].substring(0,5) + "<br><br>";
+                } 
+                else if (data.items[i].category == 'holiday' && data.items[i].subcat && data.items[i].subcat == 'fast') {
+                    document.getElementById('special').innerHTML += " <b><u>" + data.items[i].hebrew + "</u></b> ";
                 } 
             }
         } catch (error) {
