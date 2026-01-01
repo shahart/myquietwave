@@ -117,9 +117,16 @@ async function calc() {
                 } 
                 else if (data.items[i].title == 'Fast ends') {
                     document.getElementById('special').innerHTML += " צאת הכוכבים " + data.items[i].date.split('T')[1].substring(0,5) + "<br><br>";
+                    // Caching on Safari seems to keep old data sometimes
+                    fastDate = data.items[i].date.split('T')[0];
+                    let today = new Date().toISOString().split('T')[0];
+                    if (today > fastDate) {
+                        document.getElementById('special').innerHTML = "";
+                    }
                 } 
                 else if (data.items[i].category == 'holiday' && data.items[i].subcat && data.items[i].subcat == 'fast') {
-                    document.getElementById('special').innerHTML += " <b><u>" + data.items[i].hebrew + "</u></b> ";
+                    document.getElementById('special').innerHTML += " <b><u>" + data.items[i].hebrew + " " + 
+                        ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'][new Date(data.items[i].date.split('T')[0]).getDay()] + "</u></b> ";
                 } 
             }
         } catch (error) {
