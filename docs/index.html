@@ -23,8 +23,10 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
 <br>
 <hr>
 <br>
-<label id="clock"></label><br><br>
-
+<label id="clock"></label><br>
+<label id="hdat"></label><br>
+<!-- <label id="dat"></label><br> -->
+<br>
 🕯🕯 שבת <a id="parashaUrl" href=""> 
 <label id="parasha"></label></a><br>
 <a id="haftarahUrl" href="" target="_blank" ></a>
@@ -281,6 +283,12 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
     updateClock();
 
     setInterval(updateClock, 1000);
+
+    let hdat = (new Date).toLocaleString('he',{calendar:"hebrew"}).split(',')[0];
+    hdat = hdat.substr(0, hdat.lastIndexOf(' '))
+    document.getElementById('hdat').innerHTML = 'היום ' + hdat.split(' ')[0] + ' ' + hdat.split(' ')[1];
+
+    // document.getElementById('dat').innerHTML = new Date().toISOString().split('T')[0]
 
 </script>
 </body>
