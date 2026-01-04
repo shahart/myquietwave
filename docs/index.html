@@ -280,13 +280,37 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
         document.getElementById('clock').innerHTML = formattedTime;
     }
 
+    function no2gim(input) {
+       const letters = ["ל\"","כ\"","י\"","ט","ח","ז","ו","ה","ד","ג","ב","א"];
+       const values = [30,20,10,9,8,7,6,5,4,3,2,1];
+       let output = "";
+       while (input > 0) {
+           for (let i = 0; i < letters.length; ++i) {
+               if (input == 16) {
+                   return output + "ט\"ז";
+               }
+               if (input == 15) {
+                   return output + "ט\"ו";
+               }
+               if (input >= values[i]) {
+                   input -= values[i];
+                   output += letters[i];
+                   break;
+               }
+           }
+       }
+       if (output.endsWith("\""))
+           output = output.slice(0, -1);
+       return output;
+    }
+
     updateClock();
 
     setInterval(updateClock, 1000);
 
     let hdat = (new Date).toLocaleString('he',{calendar:"hebrew"}).split(',')[0];
-    hdat = hdat.substr(0, hdat.lastIndexOf(' '))
-    document.getElementById('hdat').innerHTML = 'היום ' + hdat.split(' ')[0] + ' ' + hdat.split(' ')[1];
+    hdat = hdat.substr(0, hdat.lastIndexOf(' '));
+    document.getElementById('hdat').innerHTML = 'היום ' + no2gim(parseInt(hdat.split(' ')[0])) + ' ' + hdat.split(' ')[1];
 
     // document.getElementById('dat').innerHTML = new Date().toISOString().split('T')[0]
 
