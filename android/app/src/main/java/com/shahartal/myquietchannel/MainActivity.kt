@@ -10,7 +10,7 @@ package com.shahartal.myquietchannel
 //import android.media.session.PlaybackState
 import android.Manifest
 import android.app.AlertDialog
-import android.app.Notification
+//import android.app.Notification
 import android.app.NotificationManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -26,15 +26,14 @@ import android.media.AudioManager
 //import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.text.Selection.setSelection
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.UnderlineSpan
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.Spinner
 //import android.widget.ImageView
 import android.widget.TextView
@@ -45,7 +44,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
+//import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 //import com.google.android.play.core.review.ReviewException
@@ -59,7 +58,7 @@ import com.google.firebase.analytics.logEvent
 
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.shahartal.myquietchannel.VolumeCycleService.Companion.CHANNEL_ID
+//import com.shahartal.myquietchannel.VolumeCycleService.Companion.CHANNEL_ID
 import com.shahartal.myquietchannel.parasha.HebCal
 import com.shahartal.myquietchannel.parasha.HebCalZmanimModel
 import com.shahartal.myquietchannel.parasha.RetrofitInstance
@@ -551,7 +550,12 @@ class MainActivity : ComponentActivity() {
                         hebcal?.items?.forEach {
                             if (it.category == "parashat") {
                                 // return it.hebrew;
-                                textViewClock2.text = " שבת " + it.hebrew
+
+                                val fullText =  " שבת " + it.hebrew
+                                val spannableString = SpannableString(fullText)
+                                spannableString.setSpan(UnderlineSpan(), " שבת ".length, fullText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                textViewClock2.text = spannableString
+
                                 editor.putString("parashat", " שבת " + it.hebrew)
                                 editor.apply()
 
@@ -747,6 +751,7 @@ class MainActivity : ComponentActivity() {
                                         Utils.roundToDecimalPlaces(location.longitude).toString()
                                 editTextLocation.text = locStr
                                 spinner.setSelection(locations.indexOf("Geo/ GPS-Lat, Lon"))
+
                                 fetchShabatZmanim(locStr)
 
                                 val alertDialogBuilder = AlertDialog.Builder(this)
@@ -756,7 +761,7 @@ class MainActivity : ComponentActivity() {
                                         dialog!!.cancel()
                                     }
                                 }
-				val alertDialog = alertDialogBuilder.create()
+                                val alertDialog = alertDialogBuilder.create()
                                 alertDialog.show()
 
                             }
@@ -1065,6 +1070,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
     }
 
     fun alertMediaIsPlaying(from: String): Boolean {

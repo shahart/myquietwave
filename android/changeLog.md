@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.22
+
+Underline around the Parasha
+
 ## 1.21
 
 Expose UE to the user
