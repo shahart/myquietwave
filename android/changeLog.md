@@ -2,7 +2,7 @@
 
 ## 1.22
 
-Underline around the Parasha
+Add link to the weekly haftarah
 
 ## 1.21
 

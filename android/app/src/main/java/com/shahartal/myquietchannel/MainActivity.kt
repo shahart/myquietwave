@@ -99,6 +99,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var textViewClock : TextView
     private lateinit var textViewClock2 : TextView
+    private lateinit var textViewClockH : TextView
     private lateinit var textViewClock3 : TextView
     private lateinit var textViewClock4dafYomi : TextView
     private lateinit var textViewClock5suns : TextView
@@ -532,6 +533,7 @@ class MainActivity : ComponentActivity() {
 
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         textViewClock2 = findViewById(R.id.textViewClock2)
+        textViewClockH = findViewById(R.id.textViewClockH)
 
         try {
 //            if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
@@ -568,22 +570,43 @@ class MainActivity : ComponentActivity() {
                                     startActivity(browserIntent)
                                 }
 
+
+                                val fullTextH =  " הפטרה " + it.leyning.haftarah
+                                val spannableStringH = SpannableString(fullTextH)
+                                spannableStringH.setSpan(UnderlineSpan(), " הפטרה ".length, fullTextH.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                textViewClockH.text = spannableStringH
+
+                                editor.putString("haftarah", " הפטרה " + it.leyning.haftarah)
+                                editor.apply()
+
+                                val strH: String = it.leyning.haftarah.split(':')[0]
+                                textViewClockH.setOnClickListener {
+                                    val browserIntent = Intent(
+                                        Intent.ACTION_VIEW,
+                                        ("https://shahart.github.io/heb-bible/index.html?b=" + strH).toUri()
+                                    )
+                                    startActivity(browserIntent)
+                                }
+
                             }
                         }
                     } else {
                         Log.w("", "MainActivity fetchParasha Error: ${response.code()}")
                         textViewClock2.text = sharedPreferences.getString("parashat", "")
+                        textViewClockH.text = sharedPreferences.getString("haftarah", "")
                     }
                 }
 
                 override fun onFailure(call: Call<HebCal>, t: Throwable) {
                     Log.w("", "MainActivity fetchParasha unable to fetch hebCal $t", t)
                     textViewClock2.text = sharedPreferences.getString("parashat", "")
+                    textViewClockH.text = sharedPreferences.getString("haftarah", "")
                 }
             })
         } catch (e: Exception) {
             Log.e("", "MainActivity fetchParasha Exception $e", e)
             textViewClock2.text = sharedPreferences.getString("parashat", "")
+            textViewClockH.text = sharedPreferences.getString("haftarah", "")
         }
     }
 
