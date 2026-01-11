@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.23
+
+Add haftarah_sephardic, and Shabbat Mevarchim
+
 ## 1.22
 
 Add link to the weekly haftarah

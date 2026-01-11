@@ -46,9 +46,9 @@ async function calc() {
         saveInput("zmanim-location-other", document.getElementById('otherLocation').value.trim());
     }
 
-    var useElevationParam = "&ue=off"; 
+    var useElevationParam = "&ue=on"; 
     if (postfix.indexOf(",ue") >= 1 ) {
-        useElevationParam = "&ue=on";
+        useElevationParam = "&ue=off";
         postfix = postfix.replace(",ue", "");
     }
     if (postfix.indexOf(',') > 0) {
@@ -101,6 +101,11 @@ async function calc() {
                     document.getElementById('haftarahUrl').innerHTML = 'הפטרה: ';
                     document.getElementById('haftarah').innerHTML = data.items[i].leyning.haftarah.replaceAll('|', ' <br>');
                     document.getElementById('haftarahUrl').href = "https://shahart.github.io/heb-bible/index.html?b=" + data.items[i].leyning.haftarah.split(':')[0];
+                    if (data.items[i].leyning.haftarah_sephardic) {
+                        document.getElementById('haftarahSUrl').innerHTML = 'הפטרה ספרדים: ';
+                        document.getElementById('haftarahS').innerHTML = data.items[i].leyning.haftarah_sephardic.replaceAll('|', ' <br>');
+                        document.getElementById('haftarahSUrl').href = "https://shahart.github.io/heb-bible/index.html?b=" + data.items[i].leyning.haftarah_sephardic.split(':')[0];
+                    }
                     document.getElementById('parashaUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew;
                 }
                 else if (data.items[i].category === 'havdalah') {
@@ -147,7 +152,7 @@ async function calc() {
 
 function getLoc() {
     if (navigator.geolocation) {
-        alert('הוסף ue, עבור use elevation בחישובים - כלומר שקיעה הנראית. אחרת, תוצג השקיעה המישורית');
+        alert('הוסף ue, עבור do not use elevation בחישובים - כלומר שקיעה המישורית. אחרת, תוצג השקיעה הנראית');
         navigator.geolocation.getCurrentPosition(function(position) {
             document.getElementById('otherLocation').value = 
                 position.coords.latitude.toFixed(2) + ", " + 
@@ -167,7 +172,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     dropdown.addEventListener('change', function() {
         if (this.value === 'other') {
-            alert('הוסף ue, עבור use elevation בחישובים - כלומר שקיעה הנראית. אחרת, תוצג השקיעה המישורית');
+            alert('הוסף ue, עבור do not use elevation בחישובים - כלומר שקיעה המישורית. אחרת, תוצג השקיעה הנראית');
             otherInput.style.display = 'block';
             otherInput.focus(); 
         } else {

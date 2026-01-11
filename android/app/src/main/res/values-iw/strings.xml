@@ -41,7 +41,7 @@
 
     <string name="location">מיקום 📍</string>
 
-    <string name="ue_usage">הוסף ue, עבור use elevation בחישובים - כלומר שקיעה הנראית. אחרת, תוצג השקיעה המישורית</string>
+    <string name="ue_usage">הוסף ue, עבור use elevation בחישובים - כלומר שקיעה המישורית. אחרת, תוצג השקיעה הנראית</string>
 
     <!-- notifications -->
 

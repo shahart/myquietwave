@@ -14,10 +14,10 @@ object Utils {
 
     fun getUe(loc: String): String {
         if (loc.lowercase(getDefault()).contains(", ue") || loc.lowercase(getDefault()).contains(",ue")) {
-            return "on"
+            return "off"
         }
         else {
-            return "off"
+            return "on"
         }
     }
 

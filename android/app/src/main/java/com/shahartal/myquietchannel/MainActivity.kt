@@ -100,6 +100,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var textViewClock : TextView
     private lateinit var textViewClock2 : TextView
     private lateinit var textViewClockH : TextView
+    private lateinit var textViewClockHS : TextView
+
     private lateinit var textViewClock3 : TextView
     private lateinit var textViewClock4dafYomi : TextView
     private lateinit var textViewClock5suns : TextView
@@ -402,6 +404,10 @@ class MainActivity : ComponentActivity() {
                                 editor.putString("havdalah", getString(R.string.havdalah) + " " +  truncDate(it.date))
                                 editor.apply()
                             }
+                            else if (it.category == "mevarchim") {
+                                res += " " + it.hebrew + " " +  it.memo
+                                textViewClock3.text = res
+                            }
                         }
                         // textViewClock3.text = res
                     } else {
@@ -534,6 +540,7 @@ class MainActivity : ComponentActivity() {
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         textViewClock2 = findViewById(R.id.textViewClock2)
         textViewClockH = findViewById(R.id.textViewClockH)
+        textViewClockHS = findViewById(R.id.textViewClockHS)
 
         try {
 //            if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
@@ -588,12 +595,34 @@ class MainActivity : ComponentActivity() {
                                     startActivity(browserIntent)
                                 }
 
+                                // it.leyning.haftarah_sephardic = "Ezekiel 8:25-29:21"
+                                if (it.leyning.haftarah_sephardic != null) {
+
+                                    val fullTextHS =  " הפטרה ספרדים " + it.leyning.haftarah_sephardic
+                                    val spannableStringHS = SpannableString(fullTextHS)
+                                    spannableStringHS.setSpan(UnderlineSpan(), " הפטרה ספרדים ".length, fullTextHS.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                    textViewClockHS.text = spannableStringHS
+
+                                    editor.putString("haftarah_sephardic", " הפטרה ספרדים " + it.leyning.haftarah_sephardic)
+                                    editor.apply()
+
+                                    val strHS: String = it.leyning.haftarah_sephardic.split(':')[0]
+                                    textViewClockHS.setOnClickListener {
+                                        val browserIntent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            ("https://shahart.github.io/heb-bible/index.html?b=" + strHS).toUri()
+                                        )
+                                        startActivity(browserIntent)
+                                    }
+                                }
+
                             }
                         }
                     } else {
                         Log.w("", "MainActivity fetchParasha Error: ${response.code()}")
                         textViewClock2.text = sharedPreferences.getString("parashat", "")
                         textViewClockH.text = sharedPreferences.getString("haftarah", "")
+                        textViewClockHS.text = sharedPreferences.getString("haftarah_sephardic", "")
                     }
                 }
 
@@ -601,12 +630,14 @@ class MainActivity : ComponentActivity() {
                     Log.w("", "MainActivity fetchParasha unable to fetch hebCal $t", t)
                     textViewClock2.text = sharedPreferences.getString("parashat", "")
                     textViewClockH.text = sharedPreferences.getString("haftarah", "")
+                    textViewClockHS.text = sharedPreferences.getString("haftarah_sephardic", "")
                 }
             })
         } catch (e: Exception) {
             Log.e("", "MainActivity fetchParasha Exception $e", e)
             textViewClock2.text = sharedPreferences.getString("parashat", "")
             textViewClockH.text = sharedPreferences.getString("haftarah", "")
+            textViewClockHS.text = sharedPreferences.getString("haftarah_sephardic", "")
         }
     }
 

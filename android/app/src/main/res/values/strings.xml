@@ -61,7 +61,7 @@
     <string name="notif_text_radio_stopped">The radio app is not playing anymore, you should replay it</string>
 <!--    <string name="notif_text_6">Playing the current news</string>-->
 
-    <string name="ue_usage">Add \',ue\' for use elevation in the calculations</string>
+    <string name="ue_usage">Add \',ue\' for do not use elevation in the calculations</string>
 
     <string-array name="locations">
         <item>IL-ירושלים</item>

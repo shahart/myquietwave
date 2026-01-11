@@ -151,6 +151,14 @@
           android:textSize="20sp" />
 
       <TextView
+          android:id="@+id/textViewClockHS"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text=""
+          android:textAlignment="center"
+          android:textSize="20sp" />
+
+      <TextView
         android:id="@+id/textViewClock3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
