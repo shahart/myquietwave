@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.24
+
+Add link to the Wiki on the new upcoming month
+
 ## 1.23
 
 Add haftarah_sephardic, and Shabbat Mevarchim

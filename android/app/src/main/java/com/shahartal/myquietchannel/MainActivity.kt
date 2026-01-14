@@ -295,7 +295,7 @@ class MainActivity : ComponentActivity() {
         textViewClock4dafYomi = findViewById(R.id.textViewClock4dafYomi)
         textViewClock4dafYomi.text = ""
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
-        var res: String = ""
+        var res = ""
         try {
             val start = SimpleDateFormat("yyyy-MM-dd").format(Date())
             RetrofitInstance.api.getDafYomi(start, start).enqueue(object : Callback<HebCal> {
@@ -303,9 +303,14 @@ class MainActivity : ComponentActivity() {
                 override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
                     if (response.isSuccessful) {
                         val hebcal = response.body()
-                        hebcal?.items?.forEach { it ->
+                        hebcal?.items?.forEach {
                             if (it.category == "dafyomi") {
-                                textViewClock4dafYomi.text = " הדף היומי " + it.hebrew
+
+                                val fullTextYomi = " הדף היומי " + it.hebrew
+                                val spannableStringYomi = SpannableString(fullTextYomi)
+                                spannableStringYomi.setSpan(UnderlineSpan(), " הדף היומי ".length, fullTextYomi.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                                textViewClock4dafYomi.text = spannableStringYomi
                                 res = it.link
                             }
                         }
@@ -346,9 +351,6 @@ class MainActivity : ComponentActivity() {
             val firstItem = editTextLocation.text.toString().trim()
             fetchShabatZmanim(firstItem)
         }
-        else {
-        }
-
 
     }
 
@@ -405,8 +407,34 @@ class MainActivity : ComponentActivity() {
                                 editor.apply()
                             }
                             else if (it.category == "mevarchim") {
-                                res += " " + it.hebrew + " " +  it.memo
-                                textViewClock3.text = res
+                                // hebrew = מברכים חודש שבט
+                                res += " " + it.hebrew + " " +  "\nהמולד: " + it.memo.
+                                    substring(it.memo.indexOf(": ") + 2).
+                                        replace("chalakim", "חלקים").
+                                    replace("and", "ו-").
+                                        // replace("Molad", "מולד").
+                                        replace("Sunday", "ראשון").
+                                        replace("Monday", "שני").
+                                        replace("Tuesday", "שלישי").
+                                        replace("Wednesday", "רביעי").
+                                        replace("Thursday", "חמישי").
+                                        replace("Friday", "שישי").
+                                        replace("Saturday", "שבת") + "\n"
+
+                                // todo this doesn't work, maybe because the string is too long for the mobile screen?!
+                                val spannableStringYomi = SpannableString(res)
+                                spannableStringYomi.setSpan(UnderlineSpan(), res.indexOf(it.hebrew), res.indexOf(it.hebrew) + it.hebrew.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                                textViewClock3.text = spannableStringYomi
+
+                                val str: String = it.hebrew
+                                textViewClock3.setOnClickListener {
+                                    val browserIntent = Intent(
+                                        Intent.ACTION_VIEW,
+                                        ("https://he.wikipedia.org/wiki/" + str.substring(" מברכים חודש ".length-1) + "_(חודש)").toUri()
+                                    )
+                                    startActivity(browserIntent)
+                                }
                             }
                         }
                         // textViewClock3.text = res
@@ -784,8 +812,8 @@ class MainActivity : ComponentActivity() {
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-                val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                var isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+                val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                         locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
                 if (! isGpsEnabled) {
@@ -809,8 +837,8 @@ class MainActivity : ComponentActivity() {
                                 fetchShabatZmanim(locStr)
 
                                 val alertDialogBuilder = AlertDialog.Builder(this)
-                                alertDialogBuilder.setMessage(getString(R.string.ue_usage) + " -- Version: " + BuildConfig.VERSION_NAME)
-                                alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, which: Int ->
+                                alertDialogBuilder.setMessage(getString(R.string.ue_usage) /* + " -- Version: " + BuildConfig.VERSION_NAME */ )
+                                alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
                                     if (! this.isFinishing) {
                                         dialog!!.cancel()
                                     }
@@ -1049,7 +1077,7 @@ class MainActivity : ComponentActivity() {
 
                     val alertDialogBuilder = AlertDialog.Builder(this)
                     alertDialogBuilder.setMessage(getString(R.string.next_30_sec))
-                    alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, which: Int ->
+                    alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
                         if (! this.isFinishing) {
                             dialog!!.cancel()
                         }
@@ -1150,7 +1178,7 @@ class MainActivity : ComponentActivity() {
             val alertDialog = AlertDialog.Builder(this)
             alertDialog.setTitle(getString(R.string.alert_title))
             alertDialog.setMessage(getString(R.string.alert_message))
-            alertDialog.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, which: Int ->
+            alertDialog.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
                 if (! this.isFinishing) {
                     dialog!!.cancel()
                 }

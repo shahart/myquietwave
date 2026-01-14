@@ -115,7 +115,22 @@ async function calc() {
                     document.getElementById('lighting').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
                 } 
                 else if (data.items[i].category === 'mevarchim') {
-                    document.getElementById('lighting').innerHTML = document.getElementById('lighting').innerHTML + "<br>" + data.items[i].hebrew + "<br>" + data.items[i].memo;
+                    document.getElementById('lightingM').innerHTML = 
+                        // document.getElementById('lighting').innerHTML + "<br>" + 
+                        data.items[i].hebrew + "<br> המולד: " + 
+                        data.items[i].memo.
+                            substring(data.items[i].memo.indexOf(": ") + 2).
+                            replace("chalakim", "חלקים").
+                            replace("and", "ו-").
+                            // replace("Molad", "מולד").
+                            replace("Sunday", "ראשון").
+                            replace("Monday", "שני").
+                            replace("Tuesday", "שלישי").
+                            replace("Wednesday", "רביעי").
+                            replace("Thursday", "חמישי").
+                            replace("Friday", "שישי").
+                            replace("Saturday", "שבת") + "<br>";
+                    document.getElementById('lightingUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" מברכים חודש ".length-1) + "_(חודש)"
                 }
                 else if (data.items[i].title == 'Fast begins') {
                     document.getElementById('special').innerHTML = " עלות השחר " + data.items[i].date.split('T')[1].substring(0,5);
