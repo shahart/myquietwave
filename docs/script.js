@@ -114,6 +114,18 @@ async function calc() {
                 else if (data.items[i].category === 'candles') {
                     document.getElementById('lighting').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
                 } 
+                else if (data.items[i].category === 'roshchodesh') {
+                    let days = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת";
+                    document.getElementById('roshchodesh').innerHTML = data.items[i].hebrew + " - " + days.split(",")[new Date(data.items[i].date).getDay()] + " " + data.items[i].date + "<br><br>";
+                    roshchodeshDate = data.items[i].date;
+                    let today = new Date().toISOString().split('T')[0];
+                    if (today > roshchodeshDate) {
+                        document.getElementById('roshchodesh').innerHTML = "";
+                    }
+                    else {
+                        document.getElementById('roshchodeshUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" ראש חודש ".length-1) + "_(חודש)"
+                    }
+                }
                 else if (data.items[i].category === 'mevarchim') {
                     document.getElementById('lightingM').innerHTML = 
                         // document.getElementById('lighting').innerHTML + "<br>" + 
