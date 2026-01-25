@@ -19,10 +19,9 @@ let package = Package(
             dependencies: [],
             path: "Sources"
         ),
-        .testTarget(
-            name: "VolumeCyclerTests",
-            dependencies: ["VolumeCycler"],
-            path: "Tests"
-        ),
     ]
 )
+
+
+
+

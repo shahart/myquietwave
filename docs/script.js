@@ -156,9 +156,12 @@ async function calc() {
                         document.getElementById('special').innerHTML = "";
                     }
                 } 
-                else if (data.items[i].category == 'holiday' && data.items[i].subcat && data.items[i].subcat == 'fast') {
-                    document.getElementById('special').innerHTML += " <b><u>" + data.items[i].hebrew + " " + 
-                        ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'][new Date(data.items[i].date.split('T')[0]).getDay()] + "</u></b> ";
+                else if (data.items[i].category == 'holiday') {
+                    fastDate = data.items[i].date;
+                    let today = new Date().toISOString().split('T')[0];
+                    if (today <= fastDate) {
+                        document.getElementById('special').innerHTML += data.items[i].date + " " + data.items[i].hebrew + "<br><br>";
+                    }
                 } 
             }
         } catch (error) {

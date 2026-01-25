@@ -23,9 +23,9 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
 <br>
 <hr>
 <br>
-<label id="clock"></label><br>
-<label id="hdat"></label><br>
-<!-- <label id="dat"></label><br> -->
+🕰️ <label id="clock"></label><br>
+📅 <label id="hdat"></label><br>
+<label id="dat"></label><br>
 <br>
 🕯🕯 שבת <a id="parashaUrl" href=""> 
 <label id="parasha"></label></a><br>
@@ -318,7 +318,8 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
     hdat = hdat.substr(0, hdat.lastIndexOf(' '));
     document.getElementById('hdat').innerHTML = 'היום ' + no2gim(parseInt(hdat.split(' ')[0])) + ' ' + hdat.split(' ')[1];
 
-    // document.getElementById('dat').innerHTML = new Date().toISOString().split('T')[0]
+    let days = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת";
+    document.getElementById('dat').innerHTML = new Date().toISOString().split('T')[0]  + " - " + days.split(",")[new Date().getDay()];
 
 </script>
 </body>
