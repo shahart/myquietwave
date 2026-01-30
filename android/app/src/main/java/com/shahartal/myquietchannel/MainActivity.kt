@@ -47,32 +47,25 @@ import androidx.core.app.ActivityCompat
 //import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-//import com.google.android.play.core.review.ReviewException
-//import com.google.android.play.core.review.ReviewManagerFactory
-//import com.google.android.play.core.review.model.ReviewErrorCode
-
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.Firebase
-import com.google.firebase.analytics.analytics
-import com.google.firebase.analytics.logEvent
-
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-//import com.shahartal.myquietchannel.VolumeCycleService.Companion.CHANNEL_ID
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 import com.shahartal.myquietchannel.parasha.HebCal
 import com.shahartal.myquietchannel.parasha.HebCalZmanimModel
 import com.shahartal.myquietchannel.parasha.RetrofitInstance
-import java.time.DayOfWeek
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.lang.Character
 import java.text.SimpleDateFormat
+import java.time.DayOfWeek
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Timer
 import java.util.TimerTask
@@ -99,13 +92,16 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var textViewClock : TextView
     private lateinit var textViewClock2 : TextView
+    private lateinit var textViewDate : TextView
+
     private lateinit var textViewClockH : TextView
     private lateinit var textViewClockHS : TextView
 
     private lateinit var textViewClock3 : TextView
     private lateinit var textViewClock4dafYomi : TextView
     private lateinit var textViewClock5suns : TextView
-
+    private lateinit var textViewClock6rosh : TextView
+    private lateinit var textViewClock7special : TextView
 
     private lateinit var editTextTodo : TextView
     private lateinit var editTextLocation : TextView
@@ -522,7 +518,7 @@ class MainActivity : ComponentActivity() {
                                 "sunrise",
                                 getString(R.string.sunrise) + " " + truncDate(hebcal.times.sunrise)
                             )
-                            res += " " + getString(R.string.sunset) + " " + truncDate(hebcal.times.sunset)
+                            res += " " + getString(R.string.sunset) + " " + truncDate(hebcal.times.sunset) + " "
 
                             res = hebcal.location.title + " " + res
 
@@ -567,8 +563,17 @@ class MainActivity : ComponentActivity() {
 
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         textViewClock2 = findViewById(R.id.textViewClock2)
+        textViewDate = findViewById(R.id.textViewDate)
+        textViewDate.text = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת".split(
+            ","
+        )
+            .get(LocalDate.now().dayOfWeek.value) + " " + (LocalDate.now().toString())
+
+
         textViewClockH = findViewById(R.id.textViewClockH)
         textViewClockHS = findViewById(R.id.textViewClockHS)
+        textViewClock6rosh = findViewById(R.id.textViewClock6rosh)
+        textViewClock7special = findViewById(R.id.textViewClock7special)
 
         try {
 //            if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
@@ -585,7 +590,47 @@ class MainActivity : ComponentActivity() {
                         // Log.i("", "MainActivity fetchParasha " + str)
                         val hebcal = response.body()
                         hebcal?.items?.forEach {
-                            if (it.category == "parashat") {
+                            if (it.category == "roshchodesh") {
+                                textViewClock6rosh.text =
+                                    it.hebrew + " - " + "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת".split(
+                                        ","
+                                    )
+                                        .get(ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek.value) + " " + it.date;
+                                val roshchodeshDate = it.date;
+                                val today = LocalDate.now();
+                                if (today > LocalDate.parse(roshchodeshDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))) {
+                                    textViewClock6rosh.text = "";
+                                } else {
+                                    val str: String = it.hebrew
+                                    textViewClock6rosh.setOnClickListener {
+                                        val browserIntent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            ("https://he.wikipedia.org/wiki/" + str.substring(" ראש חודש ".length - 1) + "_(חודש)").toUri()
+                                        )
+                                        startActivity(browserIntent)
+                                    }
+                                    val fullTextH = textViewClock6rosh.text
+                                    val spannableStringH = SpannableString(fullTextH)
+                                    spannableStringH.setSpan(
+                                        UnderlineSpan(),
+                                        " ראש חודש ".length -1,
+                                        fullTextH.length,
+                                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                                    )
+                                    textViewClock6rosh.text = spannableStringH
+                                }
+                            }
+                            else if (it.category == "holiday") {
+                                val roshchodeshDate = it.date;
+                                val today = LocalDate.now();
+                                if (today <= LocalDate.parse(roshchodeshDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))) {
+
+                                    textViewClock7special.text = textViewClock7special.text.toString() + "\n" +
+                                        it.hebrew + " - " + it.date;
+
+                                }
+                            }
+                           else if (it.category == "parashat") {
                                 // return it.hebrew;
 
                                 val fullText =  " שבת " + it.hebrew
@@ -708,7 +753,10 @@ class MainActivity : ComponentActivity() {
                 AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>,
                                             view: View, position: Int, id: Long) {
-                    if (locations[position] != "Geo/ GPS-Lat, Lon" && locations[position].isNotEmpty()) {
+                    // locations != null
+                    editTextLocation.text = "IL-Jerusalem"
+                    // try/catch so the main functionality- the click on Start will work
+                    if (position >=0 && position < locations.size && locations[position].isNotEmpty() && locations[position] != "Geo/ GPS-Lat, Lon") {
                         editTextLocation.text = Utils.convertFromLocationIL(locations[position])
                     }
                     fetchShabatZmanim()
@@ -928,7 +976,7 @@ class MainActivity : ComponentActivity() {
                             LocalDateTime.now().format(DateTimeFormatter.ofPattern("H:mm:ss"))
                     textViewClock.text = txt
                 }
-                Thread.sleep(1000)
+                Thread.sleep(500)
             }
         }.start()
 

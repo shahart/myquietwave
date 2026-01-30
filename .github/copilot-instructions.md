@@ -1,8 +1,8 @@
-# AI Coding Agent Instructions for Automations
+# AI Coding Agent Instructions for myquietwave
 
 ## Project Overview
 
-**automations** is a multi-platform automation suite primarily for radio news automation, with implementations across:
+**myquietwave** is a multi-platform automation suite primarily for radio news automation, with implementations across:
 - **Android**: "My Quiet Channel" app (Kotlin/Compose) - automates media volume cycling
 - **iOS**: VolumeCycler app (SwiftUI) - background-based volume cycling
 - **Backend**: Java Selenium automation for headless browser-based radio streaming

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.25
+
+Support holiday event type, like Shabbat of Song
+
 ## 1.24
 
 Add link to the Wiki on the new upcoming month
@@ -140,7 +144,7 @@ Add Hebrew data and Parasha
 
 מגבלות שונות (כמו עוצמת השמע) חלות רק בערב שבת
 
-## 0.95 [0.95](https://github.com/shahart/automations/compare/v0.94...v0.95) (yyyy-mm-dd)
+## 0.95 [0.95](https://github.com/shahart/myquietwave/compare/v0.94...v0.95) (yyyy-mm-dd)
 
 ### Features
 

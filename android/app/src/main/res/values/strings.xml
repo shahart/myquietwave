@@ -257,6 +257,8 @@
         <item>IN-New Delhi</item>
         <item>IN-Pune</item>
         <item>IN-Surat</item>
+		<item> </item>
+        <item>CL-Santiago</item>
     </string-array>
 
 </resources>

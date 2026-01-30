@@ -17,7 +17,7 @@ Current approach: Pros: simplicity, Cons: not being cut at the end of the news
 
     DONE: See https://play.google.com/store/apps/details?id=com.shahartal.myquietchannel
 
-   [![Android CI](https://github.com/shahart/automations/actions/workflows/AndroidBuild.yml/badge.svg)](https://github.com/shahart/automations/actions/workflows/AndroidBuild.yml)
+   [![Android CI](https://github.com/shahart/myquietwave/actions/workflows/AndroidBuild.yml/badge.svg)](https://github.com/shahart/myquietwave/actions/workflows/AndroidBuild.yml)
 
 - `C:\Users\user\AppData\Local\Android\Sdk\platform-tools\adb connect 10.100.102.16:39569`
 
