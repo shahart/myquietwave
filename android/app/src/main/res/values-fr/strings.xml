@@ -54,7 +54,7 @@
     <string name="notif_text_4">Faible volume %2$d (sur 100) audio pour les %1$d prochaines minutes</string>
     <string name="notif_text_4_1">Faible volume %1$d (sur 100) audio pour la minute suivante</string>
 
-    <string name="notif_text_5">Silence, jusqu\'au prochain journal à %1$s</string>
+    <string name="notif_text_5">Silence, jusqu\'au prochain journal</string>
     <string name="notif_text_radio_stopped">L\'application radio ne fonctionne plus, vous devriez l\'écouter à nouveau</string>
     <!--    <string name="notif_text_6">Playing the current news</string>-->
 

@@ -87,7 +87,6 @@ CA-Ottawa
 CA-Quebec City
 CA-Regina
 CA-Saskatoon
-CA-St. John's-05
 CA-Toronto
 CA-Vancouver
 CA-Victoria

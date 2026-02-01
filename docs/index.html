@@ -319,7 +319,8 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
     document.getElementById('hdat').innerHTML = 'היום ' + no2gim(parseInt(hdat.split(' ')[0])) + ' ' + hdat.split(' ')[1];
 
     let days = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת";
-    document.getElementById('dat').innerHTML = new Date().toISOString().split('T')[0]  + " - " + days.split(",")[new Date().getDay()];
+    let d = new Date();
+    document.getElementById('dat').innerHTML = d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear()  + " - " + days.split(",")[d.getDay()];
 
 </script>
 </body>

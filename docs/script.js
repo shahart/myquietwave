@@ -160,7 +160,11 @@ async function calc() {
                     fastDate = data.items[i].date;
                     let today = new Date().toISOString().split('T')[0];
                     if (today <= fastDate) {
-                        document.getElementById('special').innerHTML += data.items[i].date + " " + data.items[i].hebrew + "<br><br>";
+                        let d = new Date(data.items[i].date);
+                        document.getElementById('special').innerHTML += d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear() + " " + data.items[i].hebrew + "<br><br>";
+                        document.getElementById('special').onclick = function() {
+                            alert(data.items[i].memo);
+                        }
                     }
                 } 
             }

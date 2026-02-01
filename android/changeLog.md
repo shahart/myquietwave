@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.26
+
+Allows edit of the next hours string
+Shows basic info on the upcoming holiday
+
 ## 1.25
 
 Support holiday event type, like Shabbat of Song

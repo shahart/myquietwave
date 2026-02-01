@@ -82,7 +82,6 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var editTextNumberNewsDuration: TextView
     // private lateinit var editTextNumberVolume: TextView
-    private lateinit var editTextNumberEveryHour: TextView
     private lateinit var textViewNextNews: TextView
 
     // private lateinit var textViewNewsGlz: TextView
@@ -169,30 +168,23 @@ class MainActivity : ComponentActivity() {
 
         var newsDuration = sharedPreferences.getInt("newsDuration", 4)
         if (newsDuration > VolumeCycleService.max_news_duration) newsDuration = VolumeCycleService.max_news_duration
-        if ("test5" == savedName && newsDuration > 5-1)
-            newsDuration = 4
         if (newsDuration < 1)
             newsDuration = 1
         editTextNumberNewsDuration.text = newsDuration.toString()
 
-        var everyHour = sharedPreferences.getInt("everyHour", 4)
-        if (everyHour > 12) everyHour = 12
-        if (everyHour < 1) everyHour = 1
-        editTextNumberEveryHour.text = everyHour.toString()
+        val nextHours = sharedPreferences.getString("nextHours", "17, 21, 7, 12, 15, 18")
+        textViewNextNews.text = nextHours
 
         val serviceIntent = Intent(this, VolumeCycleService::class.java)
         if (VolumeCycleService.isRunning) {
-            textViewNextNews.text = getEveryHourStr(VolumeCycleService.startHour)
             if (! alertMediaIsPlaying("onResume")) {
                 stopService(serviceIntent)
                 isServiceRunning = false
-                textViewNextNews.text = getEveryHourStr()
             }
         }
         else {
             stopService(serviceIntent)
             isServiceRunning = false
-            textViewNextNews.text = getEveryHourStr()
         }
 
         if (isServiceRunning) {
@@ -209,8 +201,8 @@ class MainActivity : ComponentActivity() {
         editTextNumberNewsDuration.isEnabled = ! isServiceRunning
         editTextNumberNewsDuration.isClickable = ! isServiceRunning
 
-        editTextNumberEveryHour.isEnabled = ! isServiceRunning
-        editTextNumberEveryHour.isClickable = ! isServiceRunning
+        textViewNextNews.isEnabled = ! isServiceRunning
+        textViewNextNews.isClickable = ! isServiceRunning
 
         getSystemService(NotificationManager::class.java).cancel(1)
 
@@ -228,63 +220,13 @@ class MainActivity : ComponentActivity() {
         val newsDurationStr = editTextNumberNewsDuration.text.toString()
         var newsDuration = if (newsDurationStr.isEmpty()) 4 else newsDurationStr.toInt()
         if (newsDuration > VolumeCycleService.max_news_duration) newsDuration = VolumeCycleService.max_news_duration
-        if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1)
-            newsDuration = 4
         if (newsDuration < 1)
             newsDuration = 1
         editor.putInt("newsDuration", newsDuration)
 
-        val everyHourStr = editTextNumberEveryHour.text.toString()
-        var everyHour = if (everyHourStr.isEmpty()) 4 else everyHourStr.toInt()
-        if (everyHour > 12) everyHour = 12
-        if (everyHour < 1) everyHour = 1
-        editor.putInt("everyHour", everyHour)
+        editor.putString("nextHours", textViewNextNews.text.toString())
 
         editor.apply()
-    }
-
-    fun getEveryHourStr(now: Int = -1): String {
-        var everyHoursStr = editTextNumberEveryHour.text.toString()
-        if (everyHoursStr == "") {
-            everyHoursStr = "4"
-            editTextNumberEveryHour.text = "4"
-        }
-        var everyHours = Integer.valueOf(everyHoursStr)
-        if (everyHours > 12) {
-            everyHours = 12
-            editTextNumberEveryHour.text = "12"
-        }
-        if (everyHours < 1) {
-            everyHours = 1
-            editTextNumberEveryHour.text = "1"
-        }
-
-        // @RequiresApi(8
-        var nextHour = if (now == -1) ZonedDateTime.now(ZoneId.systemDefault()).hour + 1 else now + 1 //  + everyHours
-        if (nextHour > 24) nextHour -= 24
-        // Log.d("", "MainActivity nextHour: " + nextHour)
-
-        var nextHoursStr = // "החדשות הבאות תהיינה בשעות " +
-            nextHour.toString()
-
-        var plusHours = everyHours
-
-        // the real code:
-
-        nextHour += everyHours
-        if (nextHour > 24) nextHour -= 24
-        nextHoursStr += ", $nextHour"
-
-        while (plusHours < 24) {
-            nextHour += everyHours
-            plusHours += everyHours
-            if (nextHour > 24) {
-                nextHour -= 24
-            }
-            nextHoursStr += ", $nextHour"
-        }
-
-        return nextHoursStr
     }
 
     fun fetchDafYomi() {
@@ -320,18 +262,18 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     } else {
-                        Log.w("", "MainActivity fetchDafYomi Error: ${response.code()}")
+                        Log.w("myquietwave", "MainActivity fetchDafYomi Error: ${response.code()}")
                         textViewClock4dafYomi.text = sharedPreferences.getString("dafYomi", "")
                     }
                 }
 
                 override fun onFailure(call: Call<HebCal>, t: Throwable) {
-                    Log.w("", "MainActivity fetchDafYomi unable to fetch hebCal $t", t)
+                    Log.w("myquietwave", "MainActivity fetchDafYomi unable to fetch hebCal $t", t)
                     textViewClock4dafYomi.text = sharedPreferences.getString("dafYomi", "")
                 }
             })
         } catch (e: Exception) {
-            Log.e("", "MainActivity fetchDafYomi Exception $e", e)
+            Log.e("myquietwave", "MainActivity fetchDafYomi Exception $e", e)
             textViewClock4dafYomi.text = sharedPreferences.getString("dafYomi", "")
         }
     }
@@ -366,7 +308,7 @@ class MainActivity : ComponentActivity() {
 
         try {
 //            if (ContextCompat.checkSelfPermission(this, Manifest.permission.LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                Log.w("","MainActivity fetchParasha no internet at all")
+//                Log.w("myquietwave","MainActivity fetchParasha no internet at all")
 //                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 112); // REQUEST_INTERNET_PERMISSION);
 //            }
 
@@ -435,7 +377,7 @@ class MainActivity : ComponentActivity() {
                         }
                         // textViewClock3.text = res
                     } else {
-                        Log.w("", "MainActivity fetchParasha Error: ${response.code()}")
+                        Log.w("myquietwave", "MainActivity fetchParasha Error: ${response.code()}")
                         // textViewClock3.text = "" // ""Not found " + response.code()
                         res += " " + sharedPreferences.getString("candles", "") + " " + sharedPreferences.getString("havdalah", "")
                         textViewClock3.text = res
@@ -443,14 +385,14 @@ class MainActivity : ComponentActivity() {
                 }
 
                 override fun onFailure(call: Call<HebCal>, t: Throwable) {
-                    Log.w("", "MainActivity fetchZmanim unable to fetch hebCal $t", t)
+                    Log.w("myquietwave", "MainActivity fetchZmanim unable to fetch hebCal $t", t)
                     // textViewClock3.text = "" // ""Failure. Not found " + t
                     res += " " + sharedPreferences.getString("candles", "") + " " + sharedPreferences.getString("havdalah", "")
                     textViewClock3.text = res
                 }
             })
         } catch (e: Exception) {
-            Log.e("", "MainActivity fetchZmanim Exception $e", e)
+            Log.e("myquietwave", "MainActivity fetchZmanim Exception $e", e)
             // textViewClock3.text = "" // ""Error. Not found " + e
             res += " " + sharedPreferences.getString("candles", "") + " " + sharedPreferences.getString("havdalah", "")
             textViewClock3.text = res
@@ -483,7 +425,7 @@ class MainActivity : ComponentActivity() {
 
         try {
 //            if (ContextCompat.checkSelfPermission(this, Manifest.permission.LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                Log.w("","MainActivity fetchParasha no internet at all")
+//                Log.w("myquietwave","MainActivity fetchParasha no internet at all")
 //                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 112); // REQUEST_INTERNET_PERMISSION);
 //            }
 
@@ -532,7 +474,7 @@ class MainActivity : ComponentActivity() {
                             // textViewClock3.text = res
                         }
                     } else {
-                        Log.w("", "MainActivity fetchSunsZmanim Error: ${response.code()}")
+                        Log.w("myquietwave", "MainActivity fetchSunsZmanim Error: ${response.code()}")
                         // textViewClock3.text = "" // ""Not found " + response.code()
                         res += " " + sharedPreferences.getString("sunrise", "") + " " + sharedPreferences.getString("sunset", "")
                         textViewClock5suns.text = res
@@ -540,14 +482,14 @@ class MainActivity : ComponentActivity() {
                 }
 
                 override fun onFailure(call: Call<HebCalZmanimModel>, t: Throwable) {
-                    Log.w("", "MainActivity fetchSunsZmanim unable to fetch hebCal $t", t)
+                    Log.w("myquietwave", "MainActivity fetchSunsZmanim unable to fetch hebCal $t", t)
                     // textViewClock3.text = "" // ""Failure. Not found " + t
                     res += " " + sharedPreferences.getString("sunrise", "") + " " + sharedPreferences.getString("sunset", "")
                     textViewClock5suns.text = res
                 }
             })
         } catch (e: Exception) {
-            Log.e("", "MainActivity fetchSunsZmanim Exception $e", e)
+            Log.e("myquietwave", "MainActivity fetchSunsZmanim Exception $e", e)
             // textViewClock3.text = "" // ""Error. Not found " + e
             res += " " + sharedPreferences.getString("sunrise", "") + " " + sharedPreferences.getString("sunset", "")
             textViewClock5suns.text = res
@@ -564,7 +506,7 @@ class MainActivity : ComponentActivity() {
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         textViewClock2 = findViewById(R.id.textViewClock2)
         textViewDate = findViewById(R.id.textViewDate)
-        textViewDate.text = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת".split(
+        textViewDate.text = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת,ראשון".split(
             ","
         )
             .get(LocalDate.now().dayOfWeek.value) + " " + (LocalDate.now().toString())
@@ -577,7 +519,7 @@ class MainActivity : ComponentActivity() {
 
         try {
 //            if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-//                Log.w("","MainActivity fetchParasha no internet at all")
+//                Log.w("myquietwave","MainActivity fetchParasha no internet at all")
 //                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 112); // REQUEST_INTERNET_PERMISSION);
 //            }
 
@@ -587,12 +529,12 @@ class MainActivity : ComponentActivity() {
                     if (response.isSuccessful) {
                         val editor = sharedPreferences.edit()
                         // val str = response.body()
-                        // Log.i("", "MainActivity fetchParasha " + str)
+                        // Log.i("myquietwave", "MainActivity fetchParasha " + str)
                         val hebcal = response.body()
                         hebcal?.items?.forEach {
                             if (it.category == "roshchodesh") {
                                 textViewClock6rosh.text =
-                                    it.hebrew + " - " + "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת".split(
+                                    it.hebrew + " - " + "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת,ראשון".split(
                                         ","
                                     )
                                         .get(ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek.value) + " " + it.date;
@@ -626,7 +568,15 @@ class MainActivity : ComponentActivity() {
                                 if (today <= LocalDate.parse(roshchodeshDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))) {
 
                                     textViewClock7special.text = textViewClock7special.text.toString() + "\n" +
-                                        it.hebrew + " - " + it.date;
+                                        it.hebrew + " - " + it.date ;
+
+                                    val memo = it.memo
+                                    textViewClock7special.setOnClickListener {
+                                        val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
+                                        alertDialogBuilder.setMessage(memo )
+                                        val alertDialog = alertDialogBuilder.create()
+                                        alertDialog.show()
+                                    }
 
                                 }
                             }
@@ -692,7 +642,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     } else {
-                        Log.w("", "MainActivity fetchParasha Error: ${response.code()}")
+                        Log.w("myquietwave", "MainActivity fetchParasha Error: ${response.code()}")
                         textViewClock2.text = sharedPreferences.getString("parashat", "")
                         textViewClockH.text = sharedPreferences.getString("haftarah", "")
                         textViewClockHS.text = sharedPreferences.getString("haftarah_sephardic", "")
@@ -700,14 +650,14 @@ class MainActivity : ComponentActivity() {
                 }
 
                 override fun onFailure(call: Call<HebCal>, t: Throwable) {
-                    Log.w("", "MainActivity fetchParasha unable to fetch hebCal $t", t)
+                    Log.w("myquietwave", "MainActivity fetchParasha unable to fetch hebCal $t", t)
                     textViewClock2.text = sharedPreferences.getString("parashat", "")
                     textViewClockH.text = sharedPreferences.getString("haftarah", "")
                     textViewClockHS.text = sharedPreferences.getString("haftarah_sephardic", "")
                 }
             })
         } catch (e: Exception) {
-            Log.e("", "MainActivity fetchParasha Exception $e", e)
+            Log.e("myquietwave", "MainActivity fetchParasha Exception $e", e)
             textViewClock2.text = sharedPreferences.getString("parashat", "")
             textViewClockH.text = sharedPreferences.getString("haftarah", "")
             textViewClockHS.text = sharedPreferences.getString("haftarah_sephardic", "")
@@ -721,7 +671,7 @@ class MainActivity : ComponentActivity() {
 
         firebaseAnalytics = Firebase.analytics
 
-        Log.i("", "MainActivity Version " + BuildConfig.VERSION_NAME)
+        Log.i("myquietwave", "MainActivity Version " + BuildConfig.VERSION_NAME)
 
         setContentView(R.layout.activity_main)
 
@@ -752,7 +702,7 @@ class MainActivity : ComponentActivity() {
             spinner.onItemSelectedListener = object :
                 AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>,
-                                            view: View, position: Int, id: Long) {
+                                            view: View?, position: Int, id: Long) {
                     // locations != null
                     editTextLocation.text = "IL-Jerusalem"
                     // try/catch so the main functionality- the click on Start will work
@@ -811,7 +761,7 @@ class MainActivity : ComponentActivity() {
 
                     val flow = manager.launchReviewFlow(this, reviewInfo)
                     flow.addOnCompleteListener { l ->
-                        Log.i("", "inapp review finished successfully")
+                        Log.i("myquietwave", "inapp review finished successfully")
                         // The flow has finished. The API does not indicate whether the user
                         // reviewed or not, or even whether the review dialog was shown. Thus, no
                         // matter the result, we continue our app flow.
@@ -821,7 +771,7 @@ class MainActivity : ComponentActivity() {
                     // There was some problem, log or handle the error code.
                     @ReviewErrorCode val reviewErrorCode = (task.getException() as ReviewException).errorCode
 
-                    Log.e("", "MainActivity reviewManager.requestReviewFlow error code: $reviewErrorCode")
+                    Log.e("myquietwave", "MainActivity reviewManager.requestReviewFlow error code: $reviewErrorCode")
 
                 }
             }
@@ -839,14 +789,13 @@ class MainActivity : ComponentActivity() {
         toggleButton = findViewById(R.id.toggleButton)
         editTextNumberNewsDuration = findViewById(R.id.editTextDuration)
         // editTextNumberVolume = findViewById(R.id.editTextNumberVolumePercentage)
-        editTextNumberEveryHour = findViewById(R.id.editTextEveryHour)
         textViewNextNews = findViewById(R.id.textViewNextNewsStr)
 
         textViewNewsLinks = findViewById(R.id.textView14)
         textViewNewsLinks.setOnClickListener {
             val browserIntent = Intent(
                 Intent.ACTION_VIEW,
-                "https://shahart.github.io/automations/links.html".toUri()
+                "https://shahart.github.io/myquietwave/links.html".toUri()
             )
             startActivity(browserIntent)
         }
@@ -865,7 +814,7 @@ class MainActivity : ComponentActivity() {
                         locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
                 if (! isGpsEnabled) {
-                    Log.w("", "MainActivity fetchZmanim location isGpsDisabled")
+                    Log.w("myquietwave", "MainActivity fetchZmanim location isGpsDisabled")
                 }
                 else {
                     fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -873,7 +822,7 @@ class MainActivity : ComponentActivity() {
                     fusedLocationClient.lastLocation
 
                         .addOnSuccessListener { location: Location? ->
-                            Log.i("", "MainActivity fetchZmanim location success " + location)
+                            Log.i("myquietwave", "MainActivity fetchZmanim location success " + location)
                             if (location != null) {
                                 // firebaseAnalytics.logEvent(FirebaseAnalytics.Param.LOCATION) {
                                 // }
@@ -897,7 +846,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         .addOnFailureListener { exception: Exception ->
-                            Log.w("", "MainActivity fetchZmanim location failure " + exception)
+                            Log.w("myquietwave", "MainActivity fetchZmanim location failure " + exception)
                         }
                 }
             }
@@ -910,31 +859,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        editTextNumberEveryHour.setOnFocusChangeListener { _, hasFocus ->
-            if (! hasFocus) {
-                textViewNextNews.text = getEveryHourStr()
-
-                var newsDurationStr = editTextNumberNewsDuration.text.toString()
-                if (newsDurationStr == "") {
-                    newsDurationStr = "4"
-                    editTextNumberNewsDuration.text = "4"
-                }
-                val newsDuration = Integer.valueOf(newsDurationStr)
-                if (newsDuration > VolumeCycleService.max_news_duration) {
-                    editTextNumberNewsDuration.text = VolumeCycleService.max_news_duration.toString()
-                }
-                if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1) {
-                    editTextNumberNewsDuration.text = "4"
-                }
-                if (newsDuration < 1) {
-                    editTextNumberNewsDuration.text = "1"
-                }
-
-            }
-        }
-
-        textViewNextNews.text = getEveryHourStr()
-
         editTextNumberNewsDuration.setOnFocusChangeListener { _, hasFocus ->
             if (! hasFocus) {
                 var newsDurationStr = editTextNumberNewsDuration.text.toString()
@@ -946,11 +870,11 @@ class MainActivity : ComponentActivity() {
                 if (newsDuration > VolumeCycleService.max_news_duration) {
                     editTextNumberNewsDuration.text = VolumeCycleService.max_news_duration.toString()
                 }
-                if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1) {
-                    editTextNumberNewsDuration.text = "4"
-                }
                 if (newsDuration < 1) {
                     editTextNumberNewsDuration.text = "1"
+                }
+                if (textViewNextNews.text.toString() == "") {
+                    textViewNextNews.text = "17, 21, 7, 12, 15, 18"
                 }
             }
         }
@@ -983,7 +907,7 @@ class MainActivity : ComponentActivity() {
         // align UI if needed
 
         isServiceRunning = VolumeCycleService.isRunning
-        Log.i("", "MainActivity isRunning: $isServiceRunning")
+        Log.i("myquietwave", "MainActivity isRunning: $isServiceRunning")
 
         if (! isServiceRunning) {
             toggleButton.text = getString(R.string.start)
@@ -991,8 +915,8 @@ class MainActivity : ComponentActivity() {
             editTextNumberNewsDuration.isEnabled = true
             editTextNumberNewsDuration.isClickable = true
 
-            editTextNumberEveryHour.isEnabled = true
-            editTextNumberEveryHour.isClickable = true
+            textViewNextNews.isEnabled = true
+            textViewNextNews.isClickable = true
 
             toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
         }
@@ -1002,8 +926,8 @@ class MainActivity : ComponentActivity() {
             editTextNumberNewsDuration.isEnabled = false
             editTextNumberNewsDuration.isClickable = false
 
-            editTextNumberEveryHour.isEnabled = false
-            editTextNumberEveryHour.isClickable = false
+            textViewNextNews.isEnabled = false
+            textViewNextNews.isClickable = false
 
             toggleButton.setBackgroundColor(Color.Green.toArgb())
         }
@@ -1012,50 +936,34 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (! shouldShowRequestPermissionRationale("112")){ // PERMISSION_REQUEST_CODE
                 try {
-                    Log.i("", "request notifications permission")
+                    Log.i("myquietwave", "request notifications permission")
                     ActivityCompat.requestPermissions(
                         this,
                         arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                         112
                     )
-                    Log.i("", "MainActivity Done. request notifications permission")
+                    Log.i("myquietwave", "MainActivity Done. request notifications permission")
                 } catch (e: Exception) {
-                    Log.e("", "MainActivity failed request notifications permission $e")
+                    Log.e("myquietwave", "MainActivity failed request notifications permission $e")
                 }
             }
         }
 
         toggleButton.setOnClickListener {
-            // Log.d("", "MainActivity isServiceRunning: " + isServiceRunning)
-
-            var everyHoursStr = editTextNumberEveryHour.text.toString()
-            if (everyHoursStr == "") {
-                everyHoursStr = "4"
-                editTextNumberEveryHour.text = "4"
-            }
-            var everyHours = Integer.valueOf(everyHoursStr)
-            if (everyHours > 12) {
-                everyHours = 12
-                editTextNumberEveryHour.text = "12"
-            }
-            if (everyHours < 1) {
-                everyHours = 1
-                editTextNumberEveryHour.text = "1"
-            }
+            // Log.d("myquietwave", "MainActivity isServiceRunning: " + isServiceRunning)
 
             if (isServiceRunning) {
 
                 val serviceIntent = Intent(this, VolumeCycleService::class.java)
                 stopService(serviceIntent)
-                textViewNextNews.text = getEveryHourStr()
                 statusText.text = getString(R.string.title_name_disabled, "" /*BuildConfig.VERSION_NAME*/)
                 toggleButton.text = getString(R.string.start)
 
                 editTextNumberNewsDuration.isEnabled = true
                 editTextNumberNewsDuration.isClickable = true
 
-                editTextNumberEveryHour.isEnabled = true
-                editTextNumberEveryHour.isClickable = true
+                textViewNextNews.isEnabled = true
+                textViewNextNews.isClickable = true
 
                 toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
 
@@ -1077,18 +985,17 @@ class MainActivity : ComponentActivity() {
                     newsDuration = VolumeCycleService.max_news_duration
                     editTextNumberNewsDuration.text = VolumeCycleService.max_news_duration.toString()
                 }
-                if ("test5" == editTextTodo.text.toString() && newsDuration > 5-1) {
-                    newsDuration = 4
-                    editTextNumberNewsDuration.text = "4"
-                }
                 if (newsDuration < 1) {
                     newsDuration = 1
                     editTextNumberNewsDuration.text = "1"
                 }
+                if (textViewNextNews.text.toString() == "") {
+                    textViewNextNews.text = "17, 21, 7, 12, 15, 18"
+                }
 
                 serviceIntent.putExtra("newsDuration", newsDuration)
 
-                serviceIntent.putExtra("hours", Integer.valueOf(everyHours))
+                serviceIntent.putExtra("nextHours", textViewNextNews.text.toString())
 
                 // for testing
                 serviceIntent.putExtra("todoList", editTextTodo.text.toString())
@@ -1116,7 +1023,7 @@ class MainActivity : ComponentActivity() {
                     // TODO add the current media that is being used
 //                    }
 //                    catch (e: Exception) {
-//                        Log.w("", "MainActivity Unable to get the active media session " + e)
+//                        Log.w("myquietwave", "MainActivity Unable to get the active media session " + e)
 //                    }
 
 //                    alertDialog.setMessage(getString(R.string.next_30_sec))
@@ -1172,8 +1079,8 @@ class MainActivity : ComponentActivity() {
                     editTextNumberNewsDuration.isEnabled = false
                     editTextNumberNewsDuration.isClickable = false
 
-                    editTextNumberEveryHour.isEnabled = false
-                    editTextNumberEveryHour.isClickable = false
+                    textViewNextNews.isEnabled = false
+                    textViewNextNews.isClickable = false
 
                     isServiceRunning = true
                 }
@@ -1187,8 +1094,8 @@ class MainActivity : ComponentActivity() {
                     editTextNumberNewsDuration.isEnabled = true
                     editTextNumberNewsDuration.isClickable = true
 
-                    editTextNumberEveryHour.isEnabled = true
-                    editTextNumberEveryHour.isClickable = true
+                    textViewNextNews.isEnabled = true
+                    textViewNextNews.isClickable = true
 
                     toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
 
@@ -1207,7 +1114,7 @@ class MainActivity : ComponentActivity() {
         val audioManager = this.getSystemService(AUDIO_SERVICE) as AudioManager
         val isPlaying = audioManager.isMusicActive()
 
-        Log.i("", "MainActivity isPlaying:$isPlaying from $from")
+        Log.i("myquietwave", "MainActivity isPlaying:$isPlaying from $from")
 
         var volumeZero = false
         if (from == "onClick to turn on" || (from == "onCreate" && ! VolumeCycleService.isRunning) || from == "onResume") {
@@ -1217,7 +1124,7 @@ class MainActivity : ComponentActivity() {
 
             if (from != "onResume" && 0 == audioManager.getStreamVolume(stream)) {
                 volumeZero = true
-                Log.w("", "MainActivity from $from and volume is zero")
+                Log.w("myquietwave", "MainActivity from $from and volume is zero")
             }
         }
 
@@ -1246,7 +1153,7 @@ class MainActivity : ComponentActivity() {
             }, 10_000)
 
             if (from == "onResume") {
-                Log.w("", "MainActivity Not disabling the app, might be a network glitch")
+                Log.w("myquietwave", "MainActivity Not disabling the app, might be a network glitch")
                 return true
             }
 

@@ -54,7 +54,7 @@
     <string name="notif_text_4">משמיע אודיו בווליום %2$d (מתוך 100) ב %1$d דקות הקרובות</string>
     <string name="notif_text_4_1">משמיע אודיו בווליום %1$d (מתוך 100) בדקה הקרובה</string>
 
-    <string name="notif_text_5">ממתין בשקט לחדשות הבאות בשעה %1$s</string>
+    <string name="notif_text_5">ממתין בשקט לחדשות הבאות</string>
     <string name="notif_text_radio_stopped">הרדיו כבר לא מנגן, יש להפעילו שוב</string>
     <!--    <string name="notif_text_6">מנגן את החדשות הנוכחיות</string>-->
 

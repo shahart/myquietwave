@@ -32,7 +32,7 @@ class VolumeCycleService : Service() {
 
     private var job: Job? = null
 
-    private var minutesPerHours = 60
+
 
     private var settedVolume = 0
     private var origVolume = 0
@@ -79,23 +79,22 @@ class VolumeCycleService : Service() {
             origVolume = audioManager.getStreamVolume(stream)
 
             val maxVolume = audioManager.getStreamMaxVolume(stream) // usually 15
-            Log.i("", "VolumeCycleService init volume $origVolume out of $maxVolume")
+            Log.i("myquietwave", "VolumeCycleService init volume $origVolume out of $maxVolume")
             // val currentVolume = audioManager.getStreamVolume(stream)
 
 //            var isTest5 = false
             var newsDuration = 4
-            var hours = 4
+            var nextHours: String? = "17, 21, 7, 12, 15, 18"
             if (intent == null) {
-                Log.e("", "VolumeCycleService intent is null")
+                Log.e("myquietwave", "VolumeCycleService intent is null")
             }
             else {
-//                isTest5 = ("test5" == intent.getStringExtra("todoList"))
                 newsDuration = intent.getIntExtra("newsDuration", 4)
-                hours = intent.getIntExtra("hours", 4)
-                Log.i("", "VolumeCycleService Initial input: NewsDuration $newsDuration everyHours $hours") // isTest5 $isTest5")
+                nextHours = intent.getStringExtra("nextHours")
+                Log.i("myquietwave", "VolumeCycleService Initial input: NewsDuration $newsDuration nextHours $nextHours currentHour " + ZonedDateTime.now(ZoneId.systemDefault()).hour)
             }
 
-            val isNearShabbath = // isTest5
+            val isNearShabbath =
                 // || (
                 ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY &&
                     ZonedDateTime.now(ZoneId.systemDefault()).hour >= 12 // )
@@ -110,26 +109,11 @@ class VolumeCycleService : Service() {
                 newsDuration = 1
             }
 
-//            if (isTest5) {
-//                minutesPerHours = 5
-//                Log.w("", "VolumeCycleService test mode 5 minutes")
-//                if (newsDuration > minutesPerHours-1) {
-//                    Log.w("", "VolumeCycleService newsDuration > 5")
-//                }
-//            }
-
 //            var volume = intent.getIntExtra("volume", 2)
 //            if (volume > audioManager.getStreamMaxVolume(stream)) volume = 2
 //            if (volume < 1) volume = 1
 
-            if (hours > 12) {
-                hours = 12
-            }
-            if (hours < 1) {
-                hours = 1
-            }
-
-            Log.i("", "VolumeCycleService settings: NewsDuration $newsDuration everyHours $hours")
+            Log.i("myquietwave", "VolumeCycleService settings: NewsDuration $newsDuration nextHours $nextHours currentHour " + ZonedDateTime.now(ZoneId.systemDefault()).hour)
 
             val initSeconds = ZonedDateTime.now(ZoneId.systemDefault()).second
 
@@ -138,14 +122,14 @@ class VolumeCycleService : Service() {
                 var volume50 = settedVolume //  (maxVolume * volume / 100).coerceAtLeast(1)
                 if (isNearShabbath && volume50 > (maxVolume * maxPercentage / 100).coerceAtLeast(1) + 1) { // 0..15
                     volume50 = (maxVolume * maxPercentage / 100).coerceAtLeast(1) + 1
-                    Log.w("", "VolumeCycleService Volume crossed threshold")
+                    Log.w("myquietwave", "VolumeCycleService Volume crossed threshold")
                 }
                 if (volume50 == 0) {
                     volume50 = 3 // 2 out of 15 = 13% (maxVolume * 20 / 100).coerceAtLeast(1)
                 }
 
                 // Set to 20%
-                Log.i("",
+                Log.i("myquietwave",
                     "VolumeCycleService started positive volume: $volume50 out of $maxVolume, news duration [minutes] $newsDuration, is near shabbath $isNearShabbath"
                 )
 
@@ -187,12 +171,12 @@ class VolumeCycleService : Service() {
                         var currVolume = audioManager.getStreamVolume(stream)
                         if (isNearShabbath && currVolume > (maxVolume * maxPercentage / 100).coerceAtLeast(1)) { // 0..15
                             currVolume = (maxVolume * maxPercentage / 100).coerceAtLeast(1)
-                            Log.d("", "VolumeCycleService Limit the max volume")
+                            Log.d("myquiloetwave", "VolumeCycleService Limit the max volume")
                             audioManager.setStreamVolume(stream, currVolume, 0)
                         }
                         else if (currVolume == 0) {
                             currVolume = 1
-                            Log.d("", "VolumeCycleService No use to put the volume on zero")
+                            Log.d("myquietwave", "VolumeCycleService No use to put the volume on zero")
                             audioManager.setStreamVolume(stream, currVolume, 0)
                         }
 
@@ -247,7 +231,7 @@ class VolumeCycleService : Service() {
                 var now = ZonedDateTime.now(ZoneId.systemDefault()).minute
                 // continue the current news
                 if (now < newsDuration) {
-                    Log.d("", "VolumeCycleService continue positive volume, more delay (as part of news duration) [minutes] " + (newsDuration - now))
+                    Log.d("myquietwave", "VolumeCycleService continue positive volume, more delay (as part of news duration) [minutes] " + (newsDuration - now))
 
                     for (i in 1..newsDuration - now) {
                         val notification: Notification =
@@ -273,7 +257,7 @@ class VolumeCycleService : Service() {
                 // this happens only in the Init
                 if (settedVolume == 0) {
                     settedVolume = audioManager.getStreamVolume(stream)
-                    Log.i("", "VolumeCycleService setted volume $settedVolume out of $maxVolume")
+                    Log.i("myquietwave", "VolumeCycleService setted volume $settedVolume out of $maxVolume")
                     if (settedVolume == 0) {
                         settedVolume = 3 // (maxVolume * 15 / 100).coerceAtLeast(1) // let's start with 1 or 2
                     }
@@ -284,19 +268,11 @@ class VolumeCycleService : Service() {
 //                        nextDelay = minutesPerHours - now % minutesPerHours
 //                    }
 
-                    nextHour += 1
-                }
-                else {
-                    nextHour += hours
-                }
-
-                if (nextHour > 24) {
-                    nextHour -= 24
                 }
 
                 val notification: Notification = NotificationCompat.Builder(thisService, CHANNEL_ID)
                     .setContentTitle(getString(R.string.notif_title_1))
-                    .setContentText(getString(R.string.notif_text_5, "" + nextHour + ":00:" + (if (initSeconds < 10) "0$initSeconds" else initSeconds)))
+                    .setContentText(getString(R.string.notif_text_5))
                     .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
                     .setOngoing(true)
                     .setOnlyAlertOnce(true)
@@ -306,13 +282,13 @@ class VolumeCycleService : Service() {
 
                 val currVolume = audioManager.getStreamVolume(stream)
                 if (currVolume != settedVolume) {
-                    Log.w("", "VolumeCycleService User has changed the volume manually during the news from $settedVolume to $currVolume")
+                    Log.w("myquietwave", "VolumeCycleService User has changed the volume manually during the news from $settedVolume to $currVolume")
                     settedVolume = currVolume
                 }
 
                 // infoText.text = "6"
                 // Mute
-                Log.d("","VolumeCycleService started zero volume") // , delay till the next news [minutes] $nextDelay") //  + currentVolume)
+                Log.d("myquietwave","VolumeCycleService started zero volume") // , delay till the next news [minutes] $nextDelay") //  + currentVolume)
                 audioManager.setStreamVolume(stream, 0, 0)
 
                 var oldText = ""
@@ -323,7 +299,8 @@ class VolumeCycleService : Service() {
                 while ( true)
                 {
                     if (ZonedDateTime.now(ZoneId.systemDefault()).minute == 0 &&
-                        ZonedDateTime.now(ZoneId.systemDefault()).hour == nextHour &&
+                        (("," + nextHours?.replace(" ", "") + ",").contains("," + ZonedDateTime.now(ZoneId.systemDefault()).hour + ","))
+			                &&
                         (ZonedDateTime.now(ZoneId.systemDefault()).second >= startSeconds-1 // ||
                         // ZonedDateTime.now(ZoneId.systemDefault()).second >= 30
                                 )) {
@@ -331,12 +308,13 @@ class VolumeCycleService : Service() {
                     }
                     delay(1 * 1000L) // 54 minutes
                     var text: String
-                    text = if (! alertMediaIsPlaying("waiting for news")) {
+                    var alertMediaIsPlaying = alertMediaIsPlaying("waiting for news")
+                    text = if (! alertMediaIsPlaying) {
                         // cancel("VolumeCycleService media was stopped, cancelling", null)
                         // break
                         getString(R.string.notif_text_radio_stopped)
                     } else {
-                        getString(R.string.notif_text_5, "" + nextHour + ":00:" + (if (initSeconds < 10) "0$initSeconds" else initSeconds))
+                        getString(R.string.notif_text_5)
                     }
 
                     if (oldText != text) {
@@ -358,7 +336,7 @@ class VolumeCycleService : Service() {
                     // infoText.text = "54"
                 }
             }
-            Log.w("", "VolumeCycleService not active any more")
+            Log.w("myquietwave", "VolumeCycleService not active any more")
         }
         return START_STICKY // TODO? START_REDELIVER_INTENT
     }
@@ -366,7 +344,7 @@ class VolumeCycleService : Service() {
     override fun onDestroy() {
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         val stream = AudioManager.STREAM_MUSIC
-        Log.d("", "VolumeCycleService on destroy, volume back to " + origVolume + " from " + audioManager.getStreamVolume(stream) + " out of " +  audioManager.getStreamMaxVolume(stream))
+        Log.d("myquietwave", "VolumeCycleService on destroy, volume back to " + origVolume + " from " + audioManager.getStreamVolume(stream) + " out of " +  audioManager.getStreamMaxVolume(stream))
         audioManager.setStreamVolume(stream, origVolume, 0)
 
         job?.cancel()
@@ -395,7 +373,7 @@ class VolumeCycleService : Service() {
         val audioManager = this.getSystemService(AUDIO_SERVICE) as AudioManager
         val isPlaying = audioManager.isMusicActive()
         if (! isPlaying) {
-            Log.w("", "VolumeCycleService isPlaying: $isPlaying from $from")
+            Log.w("myquietwave", "VolumeCycleService isPlaying: $isPlaying from $from")
 //
 //            val alertDialog = AlertDialog.Builder(this).create()
 //            alertDialog.setTitle("האם רדיו מנוגן?" + isPlaying)
