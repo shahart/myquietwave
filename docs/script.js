@@ -159,7 +159,7 @@ async function calc() {
                 else if (data.items[i].category == 'holiday') {
                     fastDate = data.items[i].date;
                     let today = new Date().toISOString().split('T')[0];
-                    if (today <= fastDate) {
+                    if (today <= fastDate && ! document.getElementById('special').innerHTML.includes( data.items[i].hebrew)) {
                         let d = new Date(data.items[i].date);
                         document.getElementById('special').innerHTML += d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear() + " " + data.items[i].hebrew + "<br><br>";
                         document.getElementById('special').onclick = function() {
