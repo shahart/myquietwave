@@ -95,6 +95,7 @@ async function calc() {
                 alert("Error in Shabbat data: " + data.error);
                 return;
             }
+            let ttip = '';
             for (let i = 0; i < data.items.length; i++) {
                 if (data.items[i].category === 'parashat') {
                     document.getElementById('parasha').innerHTML = data.items[i].hebrew;
@@ -162,12 +163,16 @@ async function calc() {
                     if (today <= fastDate && ! document.getElementById('special').innerHTML.includes( data.items[i].hebrew)) {
                         let d = new Date(data.items[i].date);
                         document.getElementById('special').innerHTML += d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear() + " " + data.items[i].hebrew + "<br><br>";
-                        document.getElementById('special').onclick = function() {
-                            alert(data.items[i].memo);
-                        }
+                        ttip += data.items[i].memo + "\n\n";
                     }
                 } 
             }
+            if (ttip != '') {
+                document.getElementById('special').onclick = function() {
+                    alert(ttip);
+                }
+            }
+                
         } catch (error) {
             alert("Error fetching Shabbat data " + error);
         }
