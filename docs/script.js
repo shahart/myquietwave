@@ -117,7 +117,7 @@ async function calc() {
                 } 
                 else if (data.items[i].category === 'roshchodesh') {
                     let days = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת";
-                    document.getElementById('roshchodesh').innerHTML = data.items[i].hebrew + " - " + days.split(",")[new Date(data.items[i].date).getDay()] + " " + data.items[i].date + "<br><br>";
+                    document.getElementById('roshchodesh').innerHTML += data.items[i].hebrew + " - " + days.split(",")[new Date(data.items[i].date).getDay()] + " " + data.items[i].date + "<br><br>";
                     roshchodeshDate = data.items[i].date;
                     let today = new Date().toISOString().split('T')[0];
                     if (today > roshchodeshDate) {
