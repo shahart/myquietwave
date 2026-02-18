@@ -96,6 +96,8 @@ async function calc() {
                 return;
             }
             let ttip = '';
+            document.getElementById('special').innerHTML = '';
+            document.getElementById('roshchodesh').innerHTML = '';
             for (let i = 0; i < data.items.length; i++) {
                 if (data.items[i].category === 'parashat') {
                     document.getElementById('parasha').innerHTML = data.items[i].hebrew;
