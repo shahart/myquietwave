@@ -283,7 +283,9 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
         const minutes = now.getMinutes();
         const seconds = now.getSeconds();
         const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        document.getElementById('clock').innerHTML = formattedTime;
+        document.getElementById('clock').innerHTML = formattedTime + "<br>" +
+            Intl.DateTimeFormat().resolvedOptions().timeZone + "<br>Offset in minutes: " + 
+            new Date().getTimezoneOffset();
     }
 
     function no2gim(input) {
