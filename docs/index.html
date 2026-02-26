@@ -23,7 +23,7 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
 <br>
 <hr>
 <br>
-🕰️ <label id="clock"></label><br>
+🕰️ <label id="clock"></label><br><br>
 📅 <label id="hdat"></label><br>
 <label id="dat"></label><br>
 <br>
@@ -40,6 +40,7 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
 🔆 זריחה היום <label id="sunrise"></label><br>
 🌅 שקיעה <label id="sunset"></label><br><br>
 <label id="special"></label>
+<label id="fast"></label>
 <a id="roshchodeshUrl" href="">
 <label id="roshchodesh"></label></a>
 <a id="dafYomiUrl" href="">הדף היומי</a><br><label id="dafYomi"></label><br><br>
@@ -284,8 +285,8 @@ Android App: <a href="https://play.google.com/store/apps/details?id=com.shaharta
         const seconds = now.getSeconds();
         const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         document.getElementById('clock').innerHTML = formattedTime + "<br>" +
-            Intl.DateTimeFormat().resolvedOptions().timeZone + "<br>Offset in minutes: " + 
-            new Date().getTimezoneOffset();
+            Intl.DateTimeFormat().resolvedOptions().timeZone + "<br>offset (Hours) " + 
+            new Date().getTimezoneOffset() / -60;
     }
 
     function no2gim(input) {

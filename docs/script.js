@@ -98,6 +98,8 @@ async function calc() {
             let ttip = '';
             document.getElementById('special').innerHTML = '';
             document.getElementById('roshchodesh').innerHTML = '';
+            document.getElementById('fast').innerHTML = '';
+            let days = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת";
             for (let i = 0; i < data.items.length; i++) {
                 if (data.items[i].category === 'parashat') {
                     document.getElementById('parasha').innerHTML = data.items[i].hebrew;
@@ -118,7 +120,6 @@ async function calc() {
                     document.getElementById('lighting').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
                 } 
                 else if (data.items[i].category === 'roshchodesh') {
-                    let days = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת";
                     document.getElementById('roshchodesh').innerHTML += data.items[i].hebrew + " - " + days.split(",")[new Date(data.items[i].date).getDay()] + " " + data.items[i].date + "<br><br>";
                     roshchodeshDate = data.items[i].date;
                     let today = new Date().toISOString().split('T')[0];
@@ -148,30 +149,38 @@ async function calc() {
                     document.getElementById('lightingUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" מברכים חודש ".length-1) + "_(חודש)"
                 }
                 else if (data.items[i].title == 'Fast begins') {
-                    document.getElementById('special').innerHTML = " עלות השחר " + data.items[i].date.split('T')[1].substring(0,5);
+                    document.getElementById('fast').innerHTML += " עלות השחר " + data.items[i].date.split('T')[1].substring(0,5) + "<br>";
                 } 
                 else if (data.items[i].title == 'Fast ends') {
-                    document.getElementById('special').innerHTML += " צאת הכוכבים " + data.items[i].date.split('T')[1].substring(0,5) + "<br><br>";
-                    // Caching on Safari seems to keep old data sometimes
+                    document.getElementById('fast').innerHTML += " צאת הכוכבים " + data.items[i].date.split('T')[1].substring(0,5) + " <br><br> ";
                     fastDate = data.items[i].date.split('T')[0];
                     let today = new Date().toISOString().split('T')[0];
                     if (today > fastDate) {
-                        document.getElementById('special').innerHTML = "";
+                        document.getElementById('fast').innerHTML = "";
                     }
                 } 
                 else if (data.items[i].category == 'holiday') {
                     fastDate = data.items[i].date;
                     let today = new Date().toISOString().split('T')[0];
-                    if (today <= fastDate && ! document.getElementById('special').innerHTML.includes( data.items[i].hebrew)) {
+                    if (today <= fastDate) {
                         let d = new Date(data.items[i].date);
-                        document.getElementById('special').innerHTML += d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear() + " " + data.items[i].hebrew + "<br><br>";
-                        ttip += data.items[i].memo + "\n\n";
+                        if (data.items[i].subcat == 'fast') {
+                            document.getElementById('fast').innerHTML = d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear() + " " + data.items[i].hebrew + " - " + days.split(",")[new Date(data.items[i].date).getDay()] + "<br>" + document.getElementById('fast').innerHTML;
+                        }
+                        else {
+                            document.getElementById('special').innerHTML += d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear() + " " + data.items[i].hebrew + " - " + days.split(",")[new Date(data.items[i].date).getDay()] + "<br><br>";
+                        }
+                        ttip += data.items[i].hebrew + ": " + data.items[i].memo + "\n\n";
                     }
                 } 
             }
             if (ttip != '') {
                 document.getElementById('special').onclick = function() {
                     alert(ttip);
+                }
+            }
+            else {
+                document.getElementById('special').onclick = function() {
                 }
             }
                 
