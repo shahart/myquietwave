@@ -85,6 +85,18 @@ async function calc() {
             document.getElementById('sunrise') .innerHTML = data.times.sunrise.split('T')[1].substring(0,5);
             document.getElementById('sunset')  .innerHTML = data.times.sunset.split('T')[1].substring(0,5);
             document.getElementById('foundLoc').innerHTML = data.location.title;
+
+            document.getElementById('sunrise').onclick = function() {
+                alert("chatzotNight - חצות הלילה: " + data.times.chatzotNight.split('T')[1].substring(0,5) + "\n" +
+                      "alotHaShachar - עלות השחר: " + data.times.alotHaShachar.split('T')[1].substring(0,5) + "\n" +
+                      "dawn: " + data.times.dawn.split('T')[1].substring(0,5) + "\n" +
+                      "chatzot - חצות היום : " + data.times.chatzot.split('T')[1].substring(0,5));
+            }
+            document.getElementById('sunset').onclick = function() {
+                alert("beinHaShmashos - בין השמשות : " + data.times.beinHaShmashos.split('T')[1].substring(0,5) + "\n" +
+                      "Dusk -  חשיכה: " + data.times.dusk.split('T')[1].substring(0,5) + "\n" +
+                      "Tzeit - צאת הכוכבים: " + data.times.tzeit7083deg.split('T')[1].substring(0,5));
+            }
         } catch (error) {
             alert("Error fetching zmanim data " + error);
         }

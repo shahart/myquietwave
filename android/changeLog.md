@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.27
+
+Add more Zmanim (click on the sunrise/set)
+Add Fast times
+Fixed bug: tooltip for multiple holidays
+
 ## 1.26
 
 Allows edit of the next hours string
