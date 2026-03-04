@@ -37,6 +37,34 @@ function loadInput(cname) {
     }
 }
 
+function no2gim(input) {
+    const letters = ["ל\"","כ\"","י\"","ט","ח","ז","ו","ה","ד","ג","ב","א"];
+    const values = [30,20,10,9,8,7,6,5,4,3,2,1];
+    let output = "";
+    while (input > 0) {
+        for (let i = 0; i < letters.length; ++i) {
+            if (input == 16) {
+                return output + "ט\"ז";
+            }
+            if (input == 15) {
+                return output + "ט\"ו";
+            }
+            if (input >= values[i]) {
+                input -= values[i];
+                output += letters[i];
+                break;
+            }
+        }
+    }
+    if (output.endsWith("\""))
+        output = output.slice(0, -1);
+    return output;
+}
+
+let hdat = (new Date).toLocaleString('he',{calendar:"hebrew"}).split(',')[0];
+hdat = hdat.substr(0, hdat.lastIndexOf(' '));
+document.getElementById('hdat').innerHTML = 'היום ' + no2gim(parseInt(hdat.split(' ')[0])) + ' ' + hdat.split(' ')[1];
+
 async function calc() {
     var postfix = document.getElementById('locationSelect').value;
     saveInput("zmanim-location", postfix);
@@ -90,13 +118,25 @@ async function calc() {
                 alert("chatzotNight - חצות הלילה: " + data.times.chatzotNight.split('T')[1].substring(0,5) + "\n" +
                       "alotHaShachar - עלות השחר: " + data.times.alotHaShachar.split('T')[1].substring(0,5) + "\n" +
                       "dawn: " + data.times.dawn.split('T')[1].substring(0,5) + "\n" +
-                      "chatzot - חצות היום : " + data.times.chatzot.split('T')[1].substring(0,5));
+                      "chatzot - חצות היום: " + data.times.chatzot.split('T')[1].substring(0,5));
             }
             document.getElementById('sunset').onclick = function() {
                 alert("beinHaShmashos - בין השמשות : " + data.times.beinHaShmashos.split('T')[1].substring(0,5) + "\n" +
                       "Dusk -  חשיכה: " + data.times.dusk.split('T')[1].substring(0,5) + "\n" +
                       "Tzeit - צאת הכוכבים: " + data.times.tzeit7083deg.split('T')[1].substring(0,5));
             }
+
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+
+            let hhmm = data.times.sunset.split('T')[1].substring(0,5).split(':');
+            if (hours > parseInt(hhmm[0]) || (hours === parseInt(hhmm[0]) && minutes >= parseInt(hhmm[1]))) {
+                let hdat = (new Date(Date.now()+ 86400000)).toLocaleString('he',{calendar:"hebrew"}).split(',')[0];
+                hdat = hdat.substr(0, hdat.lastIndexOf(' '));
+                document.getElementById('hdat').innerHTML = ' היום אור ל- ' + no2gim(parseInt(hdat.split(' ')[0])) + ' ' + hdat.split(' ')[1];
+            }
+
         } catch (error) {
             alert("Error fetching zmanim data " + error);
         }
@@ -247,3 +287,42 @@ document.addEventListener('DOMContentLoaded', (event) => {
         saveInput("todo", document.getElementById('todo').value);
 }   );
 })
+
+let cookieInput = this.loadInput("zmanim-location");
+if (cookieInput !== "") {
+    document.getElementById('locationSelect').value = cookieInput;
+    if (cookieInput === 'other') {
+        document.getElementById('otherLocation').style.display = 'block';
+        document.getElementById('otherLocation').value = this.loadInput("zmanim-location-other");
+    }
+    else {
+        document.getElementById('otherLocation').style.display = 'none';
+        document.getElementById('otherLocation').value = '';
+    }
+}
+
+let todocookieInput = this.loadInput("todo");
+if (todocookieInput !== "") {
+    document.getElementById('todo').value = todocookieInput;
+}
+
+calc();
+    
+function updateClock() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    document.getElementById('clock').innerHTML = formattedTime + "<br>" +
+        Intl.DateTimeFormat().resolvedOptions().timeZone + "<br>offset (Hours) " + 
+        new Date().getTimezoneOffset() / -60;
+}
+
+updateClock();
+
+setInterval(updateClock, 500);
+
+let days = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת";
+let d = new Date();
+document.getElementById('dat').innerHTML = d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear()  + " - " + days.split(",")[d.getDay()];
