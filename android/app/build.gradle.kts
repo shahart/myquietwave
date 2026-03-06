@@ -4,8 +4,12 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+    // id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    id("com.google.firebase.crashlytics")
+
 }
 
+//fun Project.android(configure: Action<BaseAppModuleExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.ApplicationExtension
 android {
     namespace = "com.shahartal.myquietchannel"
     compileSdk = 36
@@ -19,8 +23,8 @@ android {
         minSdk = 26
         targetSdk = 36
 
-        versionCode = 38
-        versionName = "1.26"
+        versionCode = 40
+        versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -39,6 +43,9 @@ android {
             signingConfig = signingConfigs.getByName("debug")
             ndk {
                 debugSymbolLevel = "FULL"
+            }
+            firebaseCrashlytics {
+                nativeSymbolUploadEnabled = true
             }
         }
         debug {
@@ -97,10 +104,18 @@ dependencies {
 
     implementation(libs.firebase.analytics)
 
+    // Import the BoM for the Firebase platform
     implementation(platform(libs.firebase.bom))
 
 //    implementation(libs.androidx.leanback)
     // implementation("com.google.android.play:review:2.0.2")
     // implementation("com.google.android.play:review-ktx:2.0.2")
+
+
+    // Add the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-crashlytics")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
 }

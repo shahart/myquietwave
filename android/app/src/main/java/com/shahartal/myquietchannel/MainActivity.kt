@@ -19,6 +19,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.icu.util.Calendar
 import android.icu.util.HebrewCalendar
 import android.location.Location
 import android.location.LocationManager
@@ -26,6 +27,8 @@ import android.media.AudioManager
 //import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.UnderlineSpan
@@ -47,32 +50,41 @@ import androidx.core.app.ActivityCompat
 //import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
+import com.google.firebase.crashlytics.crashlytics
 import com.shahartal.myquietchannel.parasha.HebCal
 import com.shahartal.myquietchannel.parasha.HebCalZmanimModel
 import com.shahartal.myquietchannel.parasha.RetrofitInstance
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.time.DayOfWeek
+import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Date
+import java.util.TimeZone
 import java.util.Timer
 import java.util.TimerTask
 
 class MainActivity : ComponentActivity() {
 
     private var isServiceRunning = false
+
+    private var dialog: AlertDialog? = null
 
     private lateinit var statusText: TextView
     private lateinit var shabesText: TextView
@@ -90,6 +102,9 @@ class MainActivity : ComponentActivity() {
     // private lateinit var textViewNewsKan: TextView
 
     private lateinit var textViewClock : TextView
+    private lateinit var textViewHebDate : TextView
+    private lateinit var textViewClock_2nd : TextView
+    private lateinit var textViewClock_3rd : TextView
     private lateinit var textViewClock2 : TextView
     private lateinit var textViewDate : TextView
 
@@ -98,11 +113,15 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var textViewClock3 : TextView
     private lateinit var textViewClock4dafYomi : TextView
+    private lateinit var textViewClock4dafYomiTitle : TextView
     private lateinit var textViewClock5suns : TextView
     private lateinit var textViewClock6rosh : TextView
     private lateinit var textViewClock7special : TextView
+    private lateinit var textViewClock8fast : TextView
 
     private lateinit var editTextTodo : TextView
+
+    private lateinit var spinner : Spinner
     private lateinit var editTextLocation : TextView
 
 
@@ -153,7 +172,7 @@ class MainActivity : ComponentActivity() {
         editTextLocation.text = savedLocation
 
         val locations = resources.getStringArray(R.array.locations)
-        val spinner = findViewById<Spinner>(R.id.editTextLocationSpinner)
+        spinner = findViewById<Spinner>(R.id.editTextLocationSpinner)
 
         if (savedLocation != null && locations.contains(Utils.convertLocationIL(savedLocation))) {
                 spinner.setSelection(locations.indexOf(Utils.convertLocationIL(savedLocation)))
@@ -231,6 +250,7 @@ class MainActivity : ComponentActivity() {
 
     fun fetchDafYomi() {
         textViewClock4dafYomi = findViewById(R.id.textViewClock4dafYomi)
+        textViewClock4dafYomiTitle = findViewById(R.id.textViewClock4dafYomiTitle)
         textViewClock4dafYomi.text = ""
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         var res = ""
@@ -244,15 +264,29 @@ class MainActivity : ComponentActivity() {
                         hebcal?.items?.forEach {
                             if (it.category == "dafyomi") {
 
-                                val fullTextYomi = " הדף היומי " + it.hebrew
+                                val fullTextYomi = it.hebrew
                                 val spannableStringYomi = SpannableString(fullTextYomi)
-                                spannableStringYomi.setSpan(UnderlineSpan(), " הדף היומי ".length, fullTextYomi.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                spannableStringYomi.setSpan(UnderlineSpan(), 0, fullTextYomi.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
                                 textViewClock4dafYomi.text = spannableStringYomi
                                 res = it.link
                             }
                         }
                         if (res.isNotEmpty()) {
+                            val ttip = "משנה יומית: " + hebcal?.items[1]?.hebrew + "\n" +
+                                    "נ'ך יומי: " + hebcal?.items[2]?.hebrew +
+                                    "\n" + "תנ'ך יומי: " + hebcal?.items[3]?.hebrew +
+                                    "\n" + "תהלים יומי: " + hebcal?.items[4]?.hebrew
+
+                            textViewClock4dafYomiTitle.setOnClickListener {
+                                val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
+                                alertDialogBuilder.setMessage(
+                                    ttip
+                                )
+                                val alertDialog = alertDialogBuilder.create()
+                                alertDialog.show()
+                            }
+
                             textViewClock4dafYomi.setOnClickListener {
                                 val browserIntent = Intent(
                                     Intent.ACTION_VIEW,
@@ -275,6 +309,8 @@ class MainActivity : ComponentActivity() {
         } catch (e: Exception) {
             Log.e("myquietwave", "MainActivity fetchDafYomi Exception $e", e)
             textViewClock4dafYomi.text = sharedPreferences.getString("dafYomi", "")
+            Firebase.crashlytics.log("MainActivity fetchDafYomi Exception")
+            Firebase.crashlytics.recordException(e)
         }
     }
 
@@ -396,6 +432,8 @@ class MainActivity : ComponentActivity() {
             // textViewClock3.text = "" // ""Error. Not found " + e
             res += " " + sharedPreferences.getString("candles", "") + " " + sharedPreferences.getString("havdalah", "")
             textViewClock3.text = res
+            Firebase.crashlytics.log("MainActivity fetchZmanim Exception")
+            Firebase.crashlytics.recordException(e)
         }
     }
 
@@ -462,6 +500,26 @@ class MainActivity : ComponentActivity() {
                             )
                             res += " " + getString(R.string.sunset) + " " + truncDate(hebcal.times.sunset) + " "
 
+                            val now = Date()
+                            val hours = now.getHours()
+                            val minutes = now.getMinutes()
+
+                            val hhmm = hebcal.times.sunset.split('T')[1].substring(0,5).split(':')
+
+                            if (hours > hhmm[0].toInt() || (hours == hhmm[0].toInt() && minutes >= hhmm[1].toInt())) {
+                                val hebrewCalendar = HebrewCalendar()
+                                hebrewCalendar.add(Calendar.HOUR_OF_DAY, 24)
+                                val hebrewYear = Utils.getYY(hebrewCalendar.get(HebrewCalendar.YEAR))
+                                val hebrewMonth = hebrewCalendar.get(HebrewCalendar.MONTH)
+                                val hebrewDay = hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH) // switches at midnight by-design
+                                val hebrewDays = arrayOf("א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ", "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל")
+                                val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר שני", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
+                                val hebrewMonthName = hebrewMonths[hebrewMonth]
+                                val hebrewDayName = hebrewDays[hebrewDay-1]
+                                textViewHebDate.text = " הערב אור ל- $hebrewDayName/$hebrewMonthName/$hebrewYear"
+                            }
+
+
                             res = hebcal.location.title + " " + res
 
                             textViewClock5suns.text = res
@@ -469,6 +527,21 @@ class MainActivity : ComponentActivity() {
                                 "sunset",
                                 getString(R.string.sunset) + " " + truncDate(hebcal.times.sunset)
                             )
+
+                            textViewClock5suns.setOnClickListener {
+                                val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
+                                alertDialogBuilder.setMessage(
+                                    "chatzot Night חצות הלילה: " + truncDate(hebcal.times.chatzotNight) + "\n" +
+                                    "alot HaShahar עלות השחר: " + truncDate(hebcal.times.alotHaShachar) + "\n" +
+                                    "dawn: " + truncDate(hebcal.times.dawn) + "\n" +
+                                    "chatzot חצות היום: " + truncDate(hebcal.times.chatzot) + "\n" +
+                                    "bein HaShmashos בין השמשות: " + truncDate(hebcal.times.beinHaShmashos) + "\n" +
+                                    "Dusk חשיכה: " + truncDate(hebcal.times.dusk) + "\n" +
+                                    "Tzeit צאת הכוכבים: " + truncDate(hebcal.times.tzeit7083deg)
+                                )
+                                val alertDialog = alertDialogBuilder.create()
+                                alertDialog.show()
+                            }
 
                             editor.apply()
                             // textViewClock3.text = res
@@ -493,6 +566,8 @@ class MainActivity : ComponentActivity() {
             // textViewClock3.text = "" // ""Error. Not found " + e
             res += " " + sharedPreferences.getString("sunrise", "") + " " + sharedPreferences.getString("sunset", "")
             textViewClock5suns.text = res
+            Firebase.crashlytics.log("MainActivity fetchSunsZmanim Exception")
+            Firebase.crashlytics.recordException(e)
         }
     }
 
@@ -509,13 +584,15 @@ class MainActivity : ComponentActivity() {
         textViewDate.text = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת,ראשון".split(
             ","
         )
-            .get(LocalDate.now().dayOfWeek.value) + " " + (LocalDate.now().toString())
+            .get(LocalDate.now().dayOfWeek.value) + " " + SimpleDateFormat("dd-MM-yyyy").format(Date()) // Cannot format given Object as a Date
 
 
         textViewClockH = findViewById(R.id.textViewClockH)
         textViewClockHS = findViewById(R.id.textViewClockHS)
         textViewClock6rosh = findViewById(R.id.textViewClock6rosh)
         textViewClock7special = findViewById(R.id.textViewClock7special)
+        textViewClock8fast = findViewById(R.id.textViewClock8fast)
+
 
         try {
 //            if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
@@ -531,16 +608,16 @@ class MainActivity : ComponentActivity() {
                         // val str = response.body()
                         // Log.i("myquietwave", "MainActivity fetchParasha " + str)
                         val hebcal = response.body()
+                        var memo = ""
                         hebcal?.items?.forEach {
                             if (it.category == "roshchodesh") {
-                                textViewClock6rosh.text =
+                                textViewClock6rosh.text = textViewClock6rosh.text.toString() +
                                     it.hebrew + " - " + "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת,ראשון".split(
                                         ","
                                     )
                                         .get(ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek.value) + " " + it.date;
                                 val roshchodeshDate = it.date;
-                                val today = LocalDate.now();
-                                if (today > LocalDate.parse(roshchodeshDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))) {
+                                if (Utils.isBefore(roshchodeshDate)) {
                                     textViewClock6rosh.text = "";
                                 } else {
                                     val str: String = it.hebrew
@@ -563,21 +640,30 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                             else if (it.category == "holiday") {
-                                val roshchodeshDate = it.date;
-                                val today = LocalDate.now();
-                                if (today <= LocalDate.parse(roshchodeshDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))) {
+                                val roshchodeshDate = it.date
+                                if (! Utils.isBefore(roshchodeshDate)) {
 
                                     textViewClock7special.text = textViewClock7special.text.toString() + "\n" +
-                                        it.hebrew + " - " + it.date ;
+                                        it.hebrew + " - " + Utils.switchDate(it.date) ;
 
-                                    val memo = it.memo
-                                    textViewClock7special.setOnClickListener {
-                                        val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
-                                        alertDialogBuilder.setMessage(memo )
-                                        val alertDialog = alertDialogBuilder.create()
-                                        alertDialog.show()
-                                    }
+                                    memo += "\n\n" + it.hebrew + ": " + it.memo
 
+                                }
+                            }
+                            else if (it.title == "Fast begins") {
+
+                                textViewClock8fast.text = textViewClock8fast.text.toString() + "  זמני התענית: עלות השחר " +
+                                        (it.date.split('T')[1].substring(0,5))
+
+                            }
+                            else if (it.title == "Fast ends") {
+
+                                textViewClock8fast.text =
+                                    textViewClock8fast.text.toString() + " צאת הכוכבים " +
+                                            (it.date.split('T')[1].substring(0,5))
+
+                                if (Utils.isBefore(it.date.split('T')[0])) {
+                                    textViewClock8fast.text = ""
                                 }
                             }
                            else if (it.category == "parashat") {
@@ -641,6 +727,18 @@ class MainActivity : ComponentActivity() {
 
                             }
                         }
+                        if (memo.length > 0) {
+                            textViewClock7special.setOnClickListener {
+                                val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
+                                alertDialogBuilder.setMessage(memo )
+                                val alertDialog = alertDialogBuilder.create()
+                                alertDialog.show()
+                            }
+                        }
+                        else {
+                            textViewClock7special.setOnClickListener {
+                            }
+                        }
                     } else {
                         Log.w("myquietwave", "MainActivity fetchParasha Error: ${response.code()}")
                         textViewClock2.text = sharedPreferences.getString("parashat", "")
@@ -661,6 +759,8 @@ class MainActivity : ComponentActivity() {
             textViewClock2.text = sharedPreferences.getString("parashat", "")
             textViewClockH.text = sharedPreferences.getString("haftarah", "")
             textViewClockHS.text = sharedPreferences.getString("haftarah_sephardic", "")
+            Firebase.crashlytics.log("MainActivity fetchParasha Exception")
+            Firebase.crashlytics.recordException(e)
         }
     }
 
@@ -694,27 +794,40 @@ class MainActivity : ComponentActivity() {
         }
 
         if (spinner != null) {
+
+            val locations = resources.getStringArray(R.array.locations)
+
             val adapter = ArrayAdapter(this,
                 android.R.layout.simple_spinner_item, locations)
 
             spinner.adapter = adapter
+            
+            lifecycleScope.launch {
+                delay(200)
 
             spinner.onItemSelectedListener = object :
                 AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>,
                                             view: View?, position: Int, id: Long) {
                     // locations != null
-                    editTextLocation.text = "IL-Jerusalem"
-                    // try/catch so the main functionality- the click on Start will work
-                    if (position >=0 && position < locations.size && locations[position].isNotEmpty() && locations[position] != "Geo/ GPS-Lat, Lon") {
-                        editTextLocation.text = Utils.convertFromLocationIL(locations[position])
+                    try {
+                        editTextLocation.text = "IL-Jerusalem"
+                        // try/catch so the main functionality- the click on Start will work
+                        if (position != null && id != null && position >= 0 && position < locations.size && locations[position].isNotEmpty() && locations[position] != "Geo/ GPS-Lat, Lon") {
+                            editTextLocation.text = Utils.convertFromLocationIL(locations[position])
+                        }
+                        fetchShabatZmanim()
+                        fetchSunsZmanim()
                     }
-                    fetchShabatZmanim()
-                    fetchSunsZmanim()
+                    catch (e: Exception) {
+                        Log.e("myquietwave", "MainActivity onCreate Exception $e", e)
+                        Firebase.crashlytics.recordException(e)
+                    }
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
                     // TODO?
+		    }
                 }
             }
         }
@@ -725,7 +838,14 @@ class MainActivity : ComponentActivity() {
             shabesText.text = getString(R.string.shabbath)
         }
 
-        fetchParasha()
+        try {
+            fetchParasha()
+        }
+        catch (e: Exception) {
+            Firebase.crashlytics.log("WARN. fetchParasha. Cannot format given Object as a Date " + e.toString()) // saw length=1; index=2
+            Firebase.crashlytics.recordException(e)
+        }
+
         fetchDafYomi()
 
         editTextTodo = findViewById(R.id.editTextTodo)
@@ -740,7 +860,7 @@ class MainActivity : ComponentActivity() {
         alertMediaIsPlaying("onCreate")
 
         shareButton = findViewById(R.id.shareButton)
-        rateButton = findViewById(R.id.rateButton)
+        // rateButton = findViewById(R.id.rateButton)
 
         shareButton.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND)
@@ -750,7 +870,7 @@ class MainActivity : ComponentActivity() {
             startActivity(Intent.createChooser(shareIntent, "Share this app"))
         }
 
-        rateButton.setOnClickListener {
+//        rateButton.setOnClickListener {
 /*
             val manager = ReviewManagerFactory.create(applicationContext )
             val request = manager.requestReviewFlow()
@@ -776,14 +896,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
 */
-            try {
-                startActivity(Intent(Intent.ACTION_VIEW,
-                    ("market://details?id=$packageName").toUri()))
-            } catch (_: ActivityNotFoundException) {
-                startActivity(Intent(Intent.ACTION_VIEW,
-                    ("https://play.google.com/store/apps/details?id=$packageName").toUri()))
-            }
-        }
+//            try {
+//                startActivity(Intent(Intent.ACTION_VIEW,
+//                    ("market://details?id=$packageName").toUri()))
+//            } catch (_: ActivityNotFoundException) {
+//                startActivity(Intent(Intent.ACTION_VIEW,
+//                    ("https://play.google.com/store/apps/details?id=$packageName").toUri()))
+//            }
+//        }
 
         statusText = findViewById(R.id.statusText)
         toggleButton = findViewById(R.id.toggleButton)
@@ -882,23 +1002,26 @@ class MainActivity : ComponentActivity() {
         // seconds
 
         textViewClock = findViewById(R.id.textViewClock)
+        textViewHebDate = findViewById(R.id.textViewHebDate)
+        textViewClock_2nd = findViewById(R.id.textViewClock_2nd)
+        textViewClock_3rd = findViewById(R.id.textViewClock_3rd)
+
+        textViewClock_2nd.text = kotlinx.datetime.TimeZone.currentSystemDefault().id
+
+        val hebrewCalendar = HebrewCalendar()
+        val hebrewYear = Utils.getYY(hebrewCalendar.get(HebrewCalendar.YEAR))
+        val hebrewMonth = hebrewCalendar.get(HebrewCalendar.MONTH)
+        val hebrewDay = hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH) // switches at midnight by-design
+        val hebrewDays = arrayOf("א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ", "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל")
+        val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר שני", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
+        val hebrewMonthName = hebrewMonths[hebrewMonth]
+        val hebrewDayName = hebrewDays[hebrewDay-1]
+        textViewHebDate.text = "$hebrewDayName/$hebrewMonthName/$hebrewYear"
 
         Thread {
             while (true) {
                 runOnUiThread {
-                    val hebrewCalendar = HebrewCalendar()
-                    val hebrewYear = Utils.getYY(hebrewCalendar.get(HebrewCalendar.YEAR))
-                    val hebrewMonth = hebrewCalendar.get(HebrewCalendar.MONTH)
-                    val hebrewDay = hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH) // switches at midnight by-design
-                    val hebrewDays = arrayOf("א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ", "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל")
-                    val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר שני", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
-                    val hebrewMonthName = hebrewMonths[hebrewMonth]
-                    val hebrewDayName = hebrewDays[hebrewDay-1]
-                    var txt = "$hebrewDayName/$hebrewMonthName/$hebrewYear"
-                    // @RequiresApi(8
-                    txt += " - " +
-                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("H:mm:ss"))
-                    textViewClock.text = txt
+                    textViewClock.text = LocalDateTime.now().format(DateTimeFormatter.ofPattern("H:mm:ss"))
                 }
                 Thread.sleep(500)
             }
@@ -1007,13 +1130,11 @@ class MainActivity : ComponentActivity() {
                     startForegroundService(serviceIntent)
 
                     firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
-                        param("everyHours", everyHours.toLong())
                         param("newsDuration", newsDuration.toLong())
                         // @RequiresApi(8
                         param("isFriday", if (ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY) 1L else 0L)
                     }
 
-                    textViewNextNews.text = getEveryHourStr(ZonedDateTime.now(ZoneId.systemDefault()).hour)
 
 //                    val alertDialog = AlertDialog.Builder(this).create()
 
@@ -1102,7 +1223,6 @@ class MainActivity : ComponentActivity() {
                     isServiceRunning = false
 
                     getSystemService(NotificationManager::class.java).cancel(1)
-                    textViewNextNews.text = getEveryHourStr()
 
                 }
             }
@@ -1128,7 +1248,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        if (! isPlaying || volumeZero) {
+        if ((! isPlaying || volumeZero) && (dialog == null || ! dialog!!.isShowing)) {
 
             val alertDialog = AlertDialog.Builder(this)
             alertDialog.setTitle(getString(R.string.alert_title))
@@ -1139,15 +1259,22 @@ class MainActivity : ComponentActivity() {
                 }
             }
             // alertDialog.setIcon(R.drawable.icon)
-            val dialog = alertDialog.create()
+            dialog = alertDialog.create()
 //            alertDialog.create().show()
 
-            dialog.show()
+            try {
+                dialog?.show()
+
+            } catch (e: Exception) {
+                Log.w("myquietwave", "MainActivity skipped dialog Exception $e", e)
+                Firebase.crashlytics.log("MainActivity skipped dialog Exception")
+                Firebase.crashlytics.recordException(e)
+            }
 
             val timer = Timer()
             timer.schedule(object : TimerTask() {
                 override fun run() {
-                    dialog.dismiss()
+                    dialog?.dismiss()
                     timer.cancel()
                 }
             }, 10_000)
@@ -1160,6 +1287,45 @@ class MainActivity : ComponentActivity() {
             return false
         }
         return isPlaying
+    }
+
+    fun initAdapter()
+    {
+        val locations = resources.getStringArray(R.array.locations)
+
+        val adapter = ArrayAdapter(this,
+            android.R.layout.simple_spinner_item, locations)
+
+        spinner.adapter = adapter
+
+        spinner.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>,
+                                        view: View?, position: Int, id: Long) {
+                // locations != null
+                if (view != null) {
+                    try {
+                        editTextLocation.text = "IL-Jerusalem"
+                        // try/catch so the main functionality- the click on Start will work
+                        if (position != null && id != null && position >= 0 && position < locations.size && locations[position].isNotEmpty() && locations[position] != "Geo/ GPS-Lat, Lon") {
+                            editTextLocation.text =
+                                Utils.convertFromLocationIL(locations[position])
+                        }
+                        fetchShabatZmanim()
+                        fetchSunsZmanim()
+                    } catch (e: Exception) {
+                        Log.e("myquietwave", "MainActivity onCreate Exception $e", e)
+                        Firebase.crashlytics.log("MainActivity onCreate Exception")
+                        Firebase.crashlytics.recordException(e)
+                    }
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // TODO?
+            }
+        }
+
     }
 
 }

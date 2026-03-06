@@ -15,6 +15,8 @@ import android.util.Log
 //import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import kotlinx.coroutines.*
 import java.time.DayOfWeek
 import java.time.ZoneId
@@ -87,6 +89,7 @@ class VolumeCycleService : Service() {
             var nextHours: String? = "17, 21, 7, 12, 15, 18"
             if (intent == null) {
                 Log.e("myquietwave", "VolumeCycleService intent is null")
+                Firebase.crashlytics.log("VolumeCycleService intent is null")
             }
             else {
                 newsDuration = intent.getIntExtra("newsDuration", 4)
@@ -114,8 +117,6 @@ class VolumeCycleService : Service() {
 //            if (volume < 1) volume = 1
 
             Log.i("myquietwave", "VolumeCycleService settings: NewsDuration $newsDuration nextHours $nextHours currentHour " + ZonedDateTime.now(ZoneId.systemDefault()).hour)
-
-            val initSeconds = ZonedDateTime.now(ZoneId.systemDefault()).second
 
             while (isActive) {
 
@@ -228,7 +229,7 @@ class VolumeCycleService : Service() {
                         delay(60 * 1000L) // 6 minutes
                     }
                 }
-                var now = ZonedDateTime.now(ZoneId.systemDefault()).minute
+                val now = ZonedDateTime.now(ZoneId.systemDefault()).minute
                 // continue the current news
                 if (now < newsDuration) {
                     Log.d("myquietwave", "VolumeCycleService continue positive volume, more delay (as part of news duration) [minutes] " + (newsDuration - now))
@@ -251,9 +252,6 @@ class VolumeCycleService : Service() {
 
 //                var nextDelay = (minutesPerHours * hours - newsDuration)
 
-                now = ZonedDateTime.now(ZoneId.systemDefault()).hour
-                var nextHour = now
-
                 // this happens only in the Init
                 if (settedVolume == 0) {
                     settedVolume = audioManager.getStreamVolume(stream)
@@ -261,12 +259,7 @@ class VolumeCycleService : Service() {
                     if (settedVolume == 0) {
                         settedVolume = 3 // (maxVolume * 15 / 100).coerceAtLeast(1) // let's start with 1 or 2
                     }
-                    now = ZonedDateTime.now(ZoneId.systemDefault()).minute
-//                    nextDelay = minutesPerHours - now
 
-//                    if (minutesPerHours != 60) {
-//                        nextDelay = minutesPerHours - now % minutesPerHours
-//                    }
 
                 }
 
@@ -307,8 +300,9 @@ class VolumeCycleService : Service() {
                         break
                     }
                     delay(1 * 1000L) // 54 minutes
+				if (	ZonedDateTime.now(ZoneId.systemDefault()).second % 2 == 0) {
                     var text: String
-                    var alertMediaIsPlaying = alertMediaIsPlaying("waiting for news")
+                    val alertMediaIsPlaying = alertMediaIsPlaying("waiting for news")
                     text = if (! alertMediaIsPlaying) {
                         // cancel("VolumeCycleService media was stopped, cancelling", null)
                         // break
@@ -332,6 +326,7 @@ class VolumeCycleService : Service() {
                     }
 
                     oldText = text
+				}
 
                     // infoText.text = "54"
                 }

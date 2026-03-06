@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3
+
+Add more Daily Learning
+Add הערב אור ל- after sunSet
+
 ## 1.27
 
 Add more Zmanim (click on the sunrise/set)

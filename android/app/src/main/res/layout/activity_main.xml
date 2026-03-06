@@ -75,6 +75,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
+        android:maxLines="1"
+        android:inputType="text"
 		android:background="@android:color/transparent"
 		android:text="17, 21, 7, 12, 15, 18"
         android:textDirection="ltr" />
@@ -125,12 +127,36 @@
         android:layout_height="wrap_content" />
 
     <TextView
+        android:id="@+id/textViewHebDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAlignment="center"
+        android:textSize="20sp" />
+		
+    <TextView
         android:id="@+id/textViewClock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text=""
         android:textAlignment="center"
         android:textSize="20sp" />
+
+      <TextView
+          android:id="@+id/textViewClock_2nd"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="Asia/Jerusalem"
+          android:textAlignment="center"
+          android:textSize="20sp" />
+
+      <TextView
+          android:id="@+id/textViewClock_3rd"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="+02:00"
+          android:textAlignment="center"
+          android:textSize="20sp" />
 
 
     <TextView
@@ -209,6 +235,14 @@
         android:textDirection="ltr" />
 
     <TextView
+        android:id="@+id/textViewClock4dafYomiTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="הדף היומי"
+        android:textAlignment="center"
+        android:textSize="20sp" />
+		
+    <TextView
         android:id="@+id/textViewClock4dafYomi"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -253,6 +287,19 @@
         android:id="@+id/textViewPad7"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+      <TextView
+          android:id="@+id/textViewClock8fast"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text=""
+          android:textAlignment="center"
+          android:textSize="20sp" />
+
+      <TextView
+          android:id="@+id/textViewPad9"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/textViewDurationLabel"
@@ -300,7 +347,8 @@
           android:layout_height="wrap_content"
           android:background="@android:color/transparent"
           android:ems="10"
-          android:singleLine="false"
+          android:inputType="text"
+          android:singleLine="true"
           android:text="IL-ירושלים"
           android:textAlignment="center" />
 
@@ -331,6 +379,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:ems="10"
+        android:inputType="text"
         android:singleLine="false"
         android:text="פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן"
         android:textAlignment="center" />
@@ -348,12 +397,12 @@
         android:text="@string/share"
         android:textAlignment="center" />
 
-    <Button
+    <!--Button
         android:id="@+id/rateButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/rate"
-        android:textAlignment="center" />
+        android:textAlignment="center" /-->
 
   </LinearLayout>
 

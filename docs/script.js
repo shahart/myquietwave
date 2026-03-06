@@ -95,7 +95,7 @@ async function calc() {
     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
     const day = date.getDate().toString().padStart(2, '0');
     const formattedDate = `${year}-${month}-${day}`;
-    const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&start=` + formattedDate + `&end=` + formattedDate;
+    const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&start=` + formattedDate + `&end=` + formattedDate;
 
     try {
         const [resp1, resp2, resp3] = await Promise.all([
@@ -134,7 +134,7 @@ async function calc() {
             if (hours > parseInt(hhmm[0]) || (hours === parseInt(hhmm[0]) && minutes >= parseInt(hhmm[1]))) {
                 let hdat = (new Date(Date.now()+ 86400000)).toLocaleString('he',{calendar:"hebrew"}).split(',')[0];
                 hdat = hdat.substr(0, hdat.lastIndexOf(' '));
-                document.getElementById('hdat').innerHTML = ' היום אור ל- ' + no2gim(parseInt(hdat.split(' ')[0])) + ' ' + hdat.split(' ')[1];
+                document.getElementById('hdat').innerHTML = ' הערב אור ל- ' + no2gim(parseInt(hdat.split(' ')[0])) + ' ' + hdat.split(' ')[1];
             }
 
         } catch (error) {
@@ -243,7 +243,10 @@ async function calc() {
         try {
             document.getElementById('dafYomi').innerHTML = resp3.items[0].hebrew;
             document.getElementById('dafYomiUrl').href = resp3.items[0].link;
-            ttip = "משנה יומית: " + resp3.items[1].hebrew + "\n" + "נ'ך יומי : " + resp3.items[2].hebrew + "\n" + "תנ'ך יומי : " + resp3.items[3].hebrew;
+            ttip = "משנה יומית: " + resp3.items[1].hebrew + "\n" + 
+                "נ'ך יומי: " + resp3.items[2].hebrew + "\n" +
+                "תנ'ך יומי: " + resp3.items[3].hebrew + "\n" +
+                "תהלים יומי: " + resp3.items[4].hebrew;
             document.getElementById('dafYomi').onclick = function() {
                 alert(ttip);
             }

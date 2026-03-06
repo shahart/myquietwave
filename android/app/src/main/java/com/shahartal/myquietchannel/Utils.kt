@@ -1,10 +1,45 @@
 package com.shahartal.myquietchannel
 
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import java.util.Locale.getDefault
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
 object Utils {
+    
+    fun switchDate(date: String): String {
+        try {
+            val splits = date.split("-").toTypedArray()
+            return splits[2] + "-" + splits[1] + "-" + splits[0]
+        }
+        catch (e: Exception) {
+            Firebase.crashlytics.log("WARN. switchDate. Date " + date + " is not in the correct format " + e.toString()) // saw length=1; index=2
+            Firebase.crashlytics.recordException(e)
+            return date
+        }
+    }
+
+    fun isBefore(date: String): Boolean {
+        val today = LocalDate.now()
+        try {
+            if (today <= LocalDate.parse(
+                    date,
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                )
+            ) {
+                return false
+            }
+        }
+        catch (e: Exception) {
+            Firebase.crashlytics.log("WARN. isBefore. Date " + date + " is not in the correct format " + e.toString()) // saw length=1; index=2
+            Firebase.crashlytics.recordException(e)
+            return true
+        }
+        return true
+    }
 
     fun roundToDecimalPlaces(number: Double): Double {
         val decimalPlaces = 2
