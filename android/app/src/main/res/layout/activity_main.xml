@@ -379,7 +379,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:ems="10"
-        android:inputType="text"
+        
         android:singleLine="false"
         android:text="פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן"
         android:textAlignment="center" />
