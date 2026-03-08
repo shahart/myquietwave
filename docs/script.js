@@ -179,7 +179,7 @@ async function calc() {
                         document.getElementById('roshchodesh').innerHTML = "";
                     }
                     else {
-                        document.getElementById('roshchodeshUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" ראש חודש ".length-1) + "_(חודש)"
+                        document.getElementById('roshchodeshUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" ראש חודש ".length-1) + (data.items[i].hebrew.includes("שבט") ? "_(חודש)" : "");
                     }
                 }
                 else if (data.items[i].category === 'mevarchim') {
@@ -198,7 +198,7 @@ async function calc() {
                             replace("Thursday", "חמישי").
                             replace("Friday", "שישי").
                             replace("Saturday", "שבת") + "<br>";
-                    document.getElementById('lightingUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" מברכים חודש ".length-1) + "_(חודש)"
+                    document.getElementById('lightingUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" מברכים חודש ".length-1) + (data.items[i].hebrew.includes("שבט") ? "_(חודש)" : "");
                 }
                 else if (data.items[i].title == 'Fast begins') {
                     document.getElementById('fast').innerHTML += " עלות השחר " + data.items[i].date.split('T')[1].substring(0,5) + "<br>";
