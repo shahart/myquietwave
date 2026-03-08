@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.33
+
+Add in-app update 
+
+## 1.32
+
+Fix No Tanakh Yomi on Saturday
+
+## 1.31
+
+Fix one line of Shabbath todo list
+
 ## 1.3
 
 Add more Daily Learning

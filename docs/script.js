@@ -243,12 +243,9 @@ async function calc() {
         try {
             document.getElementById('dafYomi').innerHTML = resp3.items[0].hebrew;
             document.getElementById('dafYomiUrl').href = resp3.items[0].link;
-            ttip = '';
+            ttip = 'עוד לימודים יומיים:\n\n';
             for (let i = 0; i < resp3.items.length; i++) {
-                if (resp3.items[i].category === 'dafyomi') {
-                    ttip += "דף יומי: " + resp3.items[i].hebrew + "\n";
-                }
-                else if (resp3.items[i].category === 'mishnayomi') {
+                if (resp3.items[i].category === 'mishnayomi') {
                     ttip += "משנה יומית: " + resp3.items[i].hebrew + "\n";
                 }
                 else if (resp3.items[i].category === 'nachyomi') {
@@ -257,7 +254,7 @@ async function calc() {
                 else if (resp3.items[i].category === 'dailyPsalms') {
                     ttip += "תהלים יומי: " + resp3.items[i].hebrew + "\n";
                 }
-                else { // if (resp3.items[i].category === 'tanakhYomi') {
+                else if (resp3.items[i].category === 'tanakhYomi') {
                     ttip += "תנ'ך יומי: " + resp3.items[i].hebrew + "\n";
                 }
             }

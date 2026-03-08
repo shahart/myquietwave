@@ -23,8 +23,8 @@ android {
         minSdk = 26
         targetSdk = 36
 
-        versionCode = 40
-        versionName = "1.3"
+        versionCode = 43
+        versionName = "1.33"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -73,6 +73,7 @@ kotlin {
 dependencies {
 
     implementation(libs.androidx.core.ktx)
+    implementation(libs.app.update.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))

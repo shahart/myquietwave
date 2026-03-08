@@ -9,6 +9,7 @@ package com.shahartal.myquietchannel
 //import android.media.session.MediaSessionManager
 //import android.media.session.PlaybackState
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
 //import android.app.Notification
 import android.app.NotificationManager
@@ -79,6 +80,11 @@ import java.util.Date
 import java.util.TimeZone
 import java.util.Timer
 import java.util.TimerTask
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 
 class MainActivity : ComponentActivity() {
 
@@ -273,10 +279,23 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         if (res.isNotEmpty()) {
-                            val ttip = "משנה יומית: " + hebcal?.items[1]?.hebrew + "\n" +
-                                    "נ'ך יומי: " + hebcal?.items[2]?.hebrew +
-                                    "\n" + "תנ'ך יומי: " + hebcal?.items[3]?.hebrew +
-                                    "\n" + "תהלים יומי: " + hebcal?.items[4]?.hebrew
+
+                            var ttip = "עוד לימודים יומיים:\n\n"
+
+                            hebcal?.items?.forEach {
+                                if (it.category == "mishnayomi") {
+                                    ttip +=  "משנה יומית: " + it.hebrew + "\n"
+                                }
+                                else if (it.category == "nachyomi") {
+                                    ttip +=  "נ'ך יומי: " + it.hebrew + "\n"
+                                }
+                                else if (it.category == "dailyPsalms") {
+                                    ttip +=  "תהלים יומי: " + it.hebrew + "\n"
+                                }
+                                else if (it.category == "tanakhYomi") {
+                                    ttip +=  "תנ'ך יומי: " + it.hebrew + "\n"
+                                }
+                            }
 
                             textViewClock4dafYomiTitle.setOnClickListener {
                                 val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
@@ -624,7 +643,7 @@ class MainActivity : ComponentActivity() {
                                     textViewClock6rosh.setOnClickListener {
                                         val browserIntent = Intent(
                                             Intent.ACTION_VIEW,
-                                            ("https://he.wikipedia.org/wiki/" + str.substring(" ראש חודש ".length - 1) + "_(חודש)").toUri()
+                                            ("https://he.wikipedia.org/wiki/" + str.substring(" ראש חודש ".length - 1) + (if (str.contains("שבט"))  "_(חודש)" else "")).toUri()
                                         )
                                         startActivity(browserIntent)
                                     }
@@ -1228,6 +1247,46 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        checkForAppUpdate()
+    }
+
+    private lateinit var appUpdateManager: AppUpdateManager
+    private val RC_APP_UPDATE = 100 // Request code for the update flow
+
+    private fun checkForAppUpdate() {
+        appUpdateManager = AppUpdateManagerFactory.create(this)
+        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) // Or AppUpdateType.FLEXIBLE
+            ) {
+                startUpdateFlow(appUpdateInfo)
+            }
+        }
+
+        appUpdateInfoTask.addOnFailureListener { exception ->
+            Log.w("myquietwave", "checkForAppUpdate. Error checking for app update: $exception")
+            Firebase.crashlytics.log("WARN checkForAppUpdate Exception. " + exception.toString())
+        }
+    }
+
+    private fun startUpdateFlow(appUpdateInfo: AppUpdateInfo) {
+        appUpdateManager.startUpdateFlowForResult(
+            appUpdateInfo,
+            AppUpdateType.IMMEDIATE, // Change to AppUpdateType.FLEXIBLE for flexible updates
+            this,
+            RC_APP_UPDATE
+        )
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_APP_UPDATE) { //
+            if (resultCode != RESULT_OK) {
+                Log.e("myquietwave", "Update flow failed! Result code: $resultCode")
+                Firebase.crashlytics.log("ERROR. Update flow failed. Result code: " + resultCode.toString())
+            }
+        }
     }
 
     fun alertMediaIsPlaying(from: String): Boolean {

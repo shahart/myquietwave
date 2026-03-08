@@ -16,6 +16,9 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 import com.google.firebase.crashlytics.crashlytics
 import kotlinx.coroutines.*
 import java.time.DayOfWeek
@@ -172,7 +175,7 @@ class VolumeCycleService : Service() {
                         var currVolume = audioManager.getStreamVolume(stream)
                         if (isNearShabbath && currVolume > (maxVolume * maxPercentage / 100).coerceAtLeast(1)) { // 0..15
                             currVolume = (maxVolume * maxPercentage / 100).coerceAtLeast(1)
-                            Log.d("myquiloetwave", "VolumeCycleService Limit the max volume")
+                            Log.d("myquietwave", "VolumeCycleService Limit the max volume")
                             audioManager.setStreamVolume(stream, currVolume, 0)
                         }
                         else if (currVolume == 0) {
@@ -212,6 +215,10 @@ class VolumeCycleService : Service() {
                 else {
 
                     alertMediaIsPlaying("playing news")
+
+                    Firebase.analytics.logEvent("PlayingNews") {
+                        param("currentHour", ZonedDateTime.now(ZoneId.systemDefault()).hour.toString())
+                    }
 
                     for (i in 1..newsDuration) {
 
