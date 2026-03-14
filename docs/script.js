@@ -163,7 +163,12 @@ async function calc() {
                         document.getElementById('haftarahS').innerHTML = data.items[i].leyning.haftarah_sephardic.replaceAll('|', ' <br>');
                         document.getElementById('haftarahSUrl').href = "https://shahart.github.io/heb-bible/index.html?b=" + data.items[i].leyning.haftarah_sephardic.split(':')[0];
                     }
-                    document.getElementById('parashaUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew;
+                    let parashaUrl = "https://he.wikipedia.org/wiki/";
+                    if (data.items[i].hebrew.includes("-"))
+                        parashaUrl += data.items[i].hebrew.split("-")[0];
+                    else 
+                        parashaUrl += data.items[i].hebrew;
+                    document.getElementById('parashaUrl').href = parashaUrl;
                 }
                 else if (data.items[i].category === 'havdalah') {
                     document.getElementById('havdala').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
