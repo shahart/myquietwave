@@ -260,12 +260,28 @@
         android:textDirection="ltr" />
 
     <TextView
+        android:id="@+id/textViewClock5locTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAlignment="center"
+        android:textSize="20sp" />
+		
+    <TextView
         android:id="@+id/textViewClock5suns"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text=""
         android:textAlignment="center"
         android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/textViewPad15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAlignment="center"
+        android:textDirection="ltr" />
 
     <TextView
         android:id="@+id/textViewClock6rosh"

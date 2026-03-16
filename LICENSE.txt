@@ -1,0 +1,7 @@
+The Android app uses licenses from:
+
+- Kotlin. License: Apache 2.0
+- Junit. Eclipse Public License 2.0. See https://github.com/junit-team/junit-framework/blob/main/LICENSE.md
+- Retrofit. Apache 2.0. See https://github.com/square/retrofit?tab=Apache-2.0-1-ov-file#readme
+- AndroidX. Apache 2.0
+ 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.34
+
+תיקוני באגים ושיפורי ביצועים בלוח השנה
+Bug fixes and performance improvements in the HebCal rendering
+
+Adar 2, Rosh Chodesh's day of week, portrait orientation, info split to two lines, פרשיות מחוברות.
+
 ## 1.33
 
 Add in-app update 

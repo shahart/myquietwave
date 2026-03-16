@@ -120,6 +120,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var textViewClock3 : TextView
     private lateinit var textViewClock4dafYomi : TextView
     private lateinit var textViewClock4dafYomiTitle : TextView
+    private lateinit var textViewClock5locTitle : TextView
     private lateinit var textViewClock5suns : TextView
     private lateinit var textViewClock6rosh : TextView
     private lateinit var textViewClock7special : TextView
@@ -276,6 +277,10 @@ class MainActivity : ComponentActivity() {
 
                                 textViewClock4dafYomi.text = spannableStringYomi
                                 res = it.link
+
+                                val editor = sharedPreferences.edit()
+                                editor.putString("dafYomi", it.hebrew)
+                                editor.apply()
                             }
                         }
                         if (res.isNotEmpty()) {
@@ -356,7 +361,7 @@ class MainActivity : ComponentActivity() {
         var res: String
 
         if ((loc.trim().get(0).isLetter())) {
-            res = loc + " "
+            res = loc + "\n"
         } else {
             res = " "
         }
@@ -394,14 +399,14 @@ class MainActivity : ComponentActivity() {
                                 editor.apply()
                             }
                             else if (it.category == "havdalah" && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat"))) {
-                                res += " " + getString(R.string.havdalah) + " " +  truncDate(it.date)
+                                res += "\n" + getString(R.string.havdalah) + " " +  truncDate(it.date)
                                 textViewClock3.text = res
                                 editor.putString("havdalah", getString(R.string.havdalah) + " " +  truncDate(it.date))
                                 editor.apply()
                             }
                             else if (it.category == "mevarchim") {
                                 // hebrew = מברכים חודש שבט
-                                res += " " + it.hebrew + " " +  "\nהמולד: " + it.memo.
+                                res += "\n" + it.hebrew + " " +  "\nהמולד: " + it.memo.
                                     substring(it.memo.indexOf(": ") + 2).
                                         replace("chalakim", "חלקים").
                                     replace("and", "ו-").
@@ -424,7 +429,7 @@ class MainActivity : ComponentActivity() {
                                 textViewClock3.setOnClickListener {
                                     val browserIntent = Intent(
                                         Intent.ACTION_VIEW,
-                                        ("https://he.wikipedia.org/wiki/" + str.substring(" מברכים חודש ".length-1) + "_(חודש)").toUri()
+                                        ("https://he.wikipedia.org/wiki/" + str.substring(" מברכים חודש ".length-1) + (if (str.contains("שבט"))  "_(חודש)" else "")).toUri()
                                     )
                                     startActivity(browserIntent)
                                 }
@@ -458,6 +463,7 @@ class MainActivity : ComponentActivity() {
 
     fun fetchSunsZmanim() {
         textViewClock5suns = findViewById(R.id.textViewClock5suns)
+        textViewClock5locTitle = findViewById(R.id.textViewClock5locTitle)
         textViewClock5suns.text = ""
 
         // val dow = ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek
@@ -473,6 +479,7 @@ class MainActivity : ComponentActivity() {
     fun fetchSunsZmanim(loc: String) { // }: String {
 
         textViewClock5suns = findViewById(R.id.textViewClock5suns)
+        textViewClock5locTitle = findViewById(R.id.textViewClock5locTitle)
 
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
 
@@ -517,7 +524,7 @@ class MainActivity : ComponentActivity() {
                                 "sunrise",
                                 getString(R.string.sunrise) + " " + truncDate(hebcal.times.sunrise)
                             )
-                            res += " " + getString(R.string.sunset) + " " + truncDate(hebcal.times.sunset) + " "
+                            res += "\n" + getString(R.string.sunset) + " " + truncDate(hebcal.times.sunset) + " "
 
                             val now = Date()
                             val hours = now.getHours()
@@ -527,19 +534,31 @@ class MainActivity : ComponentActivity() {
 
                             if (hours > hhmm[0].toInt() || (hours == hhmm[0].toInt() && minutes >= hhmm[1].toInt())) {
                                 val hebrewCalendar = HebrewCalendar()
-                                hebrewCalendar.add(Calendar.HOUR_OF_DAY, 24)
-                                val hebrewYear = Utils.getYY(hebrewCalendar.get(HebrewCalendar.YEAR))
+                                hebrewCalendar.add(Calendar.HOUR_OF_DAY, 12)
+                                val hebY = hebrewCalendar.get(HebrewCalendar.YEAR)
+                                val hebrewYear = Utils.getYY(hebY)
                                 val hebrewMonth = hebrewCalendar.get(HebrewCalendar.MONTH)
                                 val hebrewDay = hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH) // switches at midnight by-design
                                 val hebrewDays = arrayOf("א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ", "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל")
-                                val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר שני", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
-                                val hebrewMonthName = hebrewMonths[hebrewMonth]
+                                val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
+                                var hebrewMonthName = hebrewMonths[hebrewMonth]
+
+                                //return (year * 12 + 17) % 19 >= 12;
+                                val x: Int = (hebY * 12 + 17) % 19 // HebrewCalendar.YEARS_IN_CYCLE
+                                val isLeapYear = x >= (if (x < 0) -7 else 12)
+
+                                if (isLeapYear) {
+                                    if (hebrewMonth == 5)
+                                        hebrewMonthName = "אדר א"
+                                    else if (hebrewMonth == 6)
+                                        hebrewMonthName = "אדר ב"
+                                }
                                 val hebrewDayName = hebrewDays[hebrewDay-1]
                                 textViewHebDate.text = " הערב אור ל- $hebrewDayName/$hebrewMonthName/$hebrewYear"
                             }
 
 
-                            res = hebcal.location.title + " " + res
+                            textViewClock5locTitle.text = hebcal.location.title
 
                             textViewClock5suns.text = res
                             editor.putString(
@@ -634,7 +653,7 @@ class MainActivity : ComponentActivity() {
                                     it.hebrew + " - " + "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת,ראשון".split(
                                         ","
                                     )
-                                        .get(ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek.value) + " " + it.date;
+                                        .get(SimpleDateFormat("yyyy-MM-dd").parse(it.date).day) + " " + it.date;
                                 val roshchodeshDate = it.date;
                                 if (Utils.isBefore(roshchodeshDate)) {
                                     textViewClock6rosh.text = "";
@@ -696,7 +715,11 @@ class MainActivity : ComponentActivity() {
                                 editor.putString("parashat", " שבת " + it.hebrew)
                                 editor.apply()
 
-                                val str: String = it.hebrew
+                                var str: String = it.hebrew
+								
+				if (str.contains("-"))
+					str = str.split("-")[0]
+								
                                 textViewClock2.setOnClickListener {
                                     val browserIntent = Intent(
                                         Intent.ACTION_VIEW,
@@ -1028,12 +1051,24 @@ class MainActivity : ComponentActivity() {
         textViewClock_2nd.text = kotlinx.datetime.TimeZone.currentSystemDefault().id
 
         val hebrewCalendar = HebrewCalendar()
-        val hebrewYear = Utils.getYY(hebrewCalendar.get(HebrewCalendar.YEAR))
+        val hebY = hebrewCalendar.get(HebrewCalendar.YEAR)
+        val hebrewYear = Utils.getYY(hebY)
         val hebrewMonth = hebrewCalendar.get(HebrewCalendar.MONTH)
         val hebrewDay = hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH) // switches at midnight by-design
         val hebrewDays = arrayOf("א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ", "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל")
-        val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר שני", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
-        val hebrewMonthName = hebrewMonths[hebrewMonth]
+        val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
+        var hebrewMonthName = hebrewMonths[hebrewMonth]
+
+        //return (year * 12 + 17) % 19 >= 12;
+        val x: Int = (hebY * 12 + 17) % 19 // HebrewCalendar.YEARS_IN_CYCLE
+        val isLeapYear = x >= (if (x < 0) -7 else 12)
+
+        if (isLeapYear) {
+            if (hebrewMonth == 5)
+                hebrewMonthName = "אדר א"
+            else if (hebrewMonth == 6)
+                hebrewMonthName = "אדר ב"
+        }
         val hebrewDayName = hebrewDays[hebrewDay-1]
         textViewHebDate.text = "$hebrewDayName/$hebrewMonthName/$hebrewYear"
 
@@ -1333,7 +1368,9 @@ class MainActivity : ComponentActivity() {
             val timer = Timer()
             timer.schedule(object : TimerTask() {
                 override fun run() {
-                    dialog?.dismiss()
+					if (dialog != null && dialog!!.isShowing() && !isFinishing()) {
+						dialog?.dismiss()
+					}
                     timer.cancel()
                 }
             }, 10_000)
