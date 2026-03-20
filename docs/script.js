@@ -61,9 +61,34 @@ function no2gim(input) {
     return output;
 }
 
-let hdat = (new Date).toLocaleString('he',{calendar:"hebrew"}).split(',')[0];
+function getYY(no) {
+    let input = no
+    const letters = ["ה'","ד'","ג'","ב'","א'","ת","ש","ר","ק","צ","פ","ע","ס","נ","מ","ל","כ","י","ט","ח","ז","ו","ה","ד","ג","ב","א"]
+    const values = [5000,4000,3000,2000,1000,400,300,200,100,90,80,70,60,50,40,30,20,10,9,8,7,6,5,4,3,2,1]
+    let output = "";
+    while (input > 0) {
+        for (let i = 0; i < letters.length; i++) {
+            if (input == 16) {
+                return output + "טז"
+            }
+            if (input == 15) {
+                return output + "טו"
+            }
+            if (input >= values[i]) {
+                input -= values[i]
+                output += letters[i]
+                break
+            }
+        }
+    }
+    return output
+}
+
+let hdateStr = (new Date).toLocaleString('he',{calendar:"hebrew"});
+let hdat = hdateStr.split(',')[0];
+let hebyy = parseInt(hdateStr.split(" ")[2]);
 hdat = hdat.substr(0, hdat.lastIndexOf(' '));
-document.getElementById('hdat').innerHTML = 'היום ' + no2gim(parseInt(hdat.split(' ')[0])) + ' ' + hdat.split(' ')[1];
+document.getElementById('hdat').innerHTML = 'היום ' + no2gim(parseInt(hdat.split(' ')[0])) + ' ' + hdat.split(' ')[1] + ' ' + getYY(hebyy);
 
 async function calc() {
     var postfix = document.getElementById('locationSelect').value;
@@ -177,10 +202,12 @@ async function calc() {
                     document.getElementById('lighting').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
                 } 
                 else if (data.items[i].category === 'roshchodesh') {
-                    document.getElementById('roshchodesh').innerHTML += data.items[i].hebrew + " - " + days.split(",")[new Date(data.items[i].date).getDay()] + " " + data.items[i].date + "<br><br>";
+                    let parts = data.items[i].date.split('-');
+                    let reverseYMD = parts[2] + "/" + parts[1] + "/" + parts[0];
+                    document.getElementById('roshchodesh').innerHTML += data.items[i].hebrew + " - " + days.split(",")[new Date(data.items[i].date).getDay()] + " " + reverseYMD + "<br><br>";
                     roshchodeshDate = data.items[i].date;
                     let today = new Date().toISOString().split('T')[0];
-                    if (today > roshchodeshDate) {
+                    if (today > roshchodeshDate || new Date().getDate() > reverseYMD.split('/')[0]) {
                         document.getElementById('roshchodesh').innerHTML = "";
                     }
                     else {
