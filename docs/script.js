@@ -157,9 +157,11 @@ async function calc() {
 
             let hhmm = data.times.sunset.split('T')[1].substring(0,5).split(':');
             if (hours > parseInt(hhmm[0]) || (hours === parseInt(hhmm[0]) && minutes >= parseInt(hhmm[1]))) {
-                let hdat = (new Date(Date.now()+ 86400000)).toLocaleString('he',{calendar:"hebrew"}).split(',')[0];
+                let hdateStr = (new Date(Date.now()+ 86400000)).toLocaleString('he',{calendar:"hebrew"});
+                let hdat = hdateStr.split(',')[0];
+                let hebyy = parseInt(hdateStr.split(" ")[2]);
                 hdat = hdat.substr(0, hdat.lastIndexOf(' '));
-                document.getElementById('hdat').innerHTML = ' הערב אור ל- ' + no2gim(parseInt(hdat.split(' ')[0])) + ' ' + hdat.split(' ')[1];
+                document.getElementById('hdat').innerHTML = ' הערב אור ל- ' + no2gim(parseInt(hdat.split(' ')[0])) + ' ' + hdat.split(' ')[1] + ' ' + getYY(hebyy);
             }
 
         } catch (error) {
@@ -274,7 +276,7 @@ async function calc() {
 
         try {
             document.getElementById('dafYomi').innerHTML = resp3.items[0].hebrew;
-            document.getElementById('dafYomiUrl').href = resp3.items[0].link;
+            document.getElementById('dafYomiUrl').href = "https://www.daf.today/"; // resp3.items[0].link;
             ttip = 'עוד לימודים יומיים:\n\n';
             for (let i = 0; i < resp3.items.length; i++) {
                 if (resp3.items[i].category === 'mishnayomi') {
