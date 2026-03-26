@@ -311,6 +311,15 @@
           android:text=""
           android:textAlignment="center"
           android:textSize="20sp" />
+	  
+	  
+      <TextView
+          android:id="@+id/textViewOmer"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="הדף היומי"
+          android:textAlignment="center"
+          android:textSize="20sp" />
 
       <TextView
           android:id="@+id/textViewPad9"

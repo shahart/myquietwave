@@ -9,4 +9,6 @@ data class Item(
     val title: String,
     // val title_orig: String,
     val link: String // https://www.sefaria.org/Zevachim.36a?lang=bi&utm_source=hebcal.com&utm_medium=api
+
+    // omer { count: {he, en }, sefira: {he, en, translit} }
 )

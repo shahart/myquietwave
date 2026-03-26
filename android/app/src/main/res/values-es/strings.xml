@@ -1,0 +1,60 @@
+<resources>
+
+    <string name="app_name">Mi ola silenciosa</string>
+    <string name="appName">Mi ola silenciosa</string>
+    <string name="title_name">Mi ola silenciosa 馃摶</string>
+
+    <string name="title_name_enabled">Mi ola silenciosa %1$s 馃摶 Habilitado</string>
+    <string name="title_name_disabled">Mi ola silenciosa %1$s 馃摶 Deshabilitado</string>
+
+    <string name="start">Iniciar</string>
+    <string name="stop">Parada</string>
+
+    <string name="instructions">Inicia manualmente tu aplicaci贸n de radio. Haz clic en *Iniciar* en la parte superior. A partir de ahora, cuando terminen las noticias, el audio se silenciar谩.</string>
+    <string name="nextNews">Pr贸ximas noticias</string>
+    <string name="newsLink">Enlaces 煤tiles</string>
+    <string name="shabbath">馃暞馃暞 Shabbat Shalom 馃暞馃暞</string>
+    <string name="justListen">Disfruta</string>
+    <string name="todoList">Lista de tareas 馃摑</string>
+
+    <string name="newsLength">Duraci贸n de las noticias en minutos (1..6) 鈴憋笍</string>
+    <string name="newsFreq">Frecuencia de noticias en horas (1..12)</string>
+
+    <string name="next_30_sec">Ahora, durante los pr贸ximos 30 segundos, ajusta el volumen al que deseas escuchar las noticias. La radio se silenciar谩 y se activar谩 autom谩ticamente en los momentos apropiados.</string>
+    <string name="next_30_sec_with_sec">Ahora, durante los pr贸ximos %1$d segundos, ajusta el volumen a %2$d (de 100) al que deseas escuchar las noticias. La radio se silenciar谩 y se activar谩 autom谩ticamente en los momentos apropiados.</string>
+
+    <string name="alert_title">驴Est谩 reproduciendo la aplicaci贸n de radio? 驴Quiz谩s el volumen est谩 en cero?!</string>
+    <string name="alert_message">La aplicaci贸n no enciende la radio por s铆 sola, primero debes activar la aplicaci贸n correspondiente.</string>
+
+    <string name="close_alert">Cerrar</string>
+
+    <string name="share">Compartir</string>
+    <string name="rate">Calificar</string>
+    <string name="share_text">Echa un vistazo a esta excelente aplicaci贸n:</string>
+
+    <string name="candleLighting">Encendido de velas</string>
+    <string name="havdalah">Havdalah 馃尃</string>
+
+    <string name="sunrise">Amanecer 馃攩</string>
+    <string name="sunset">Atardecer 馃寘</string>
+
+    <string name="location">Ubicaci贸n 馃搷</string>
+
+    <!-- notificaciones -->
+
+    <string name="notif_title_1">Mi ola silenciosa - En acci贸n</string>
+    <string name="notif_text_1">Ciclando el volumen cada X horas</string>
+
+    <string name="notif_title_2">Mi ola silenciosa - ajusta el volumen</string>
+    <string name="notif_text_2">%1$d segundos restantes para ajustar el volumen. El valor actual es %2$d (de 100)</string>
+
+    <string name="notif_text_4">Volumen bajo %2$d (de 100) de audio para los pr贸ximos %1$d minutos</string>
+    <string name="notif_text_4_1">Volumen bajo %1$d (de 100) de audio para el pr贸ximo minuto</string>
+
+    <string name="notif_text_5">Silenciado hasta la pr贸xima noticia</string>
+    <string name="notif_text_radio_stopped">La aplicaci贸n de radio ya no est谩 reproduciendo, deber铆as reproducirla de nuevo</string>
+    <!--    <string name="notif_text_6">Reproduciendo las noticias actuales</string>-->
+
+    <string name="ue_usage">A帽ade ,ue para no usar elevaci贸n en los c谩lculos</string>
+
+</resources>

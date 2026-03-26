@@ -120,6 +120,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var textViewClock3 : TextView
     private lateinit var textViewClock4dafYomi : TextView
     private lateinit var textViewClock4dafYomiTitle : TextView
+    private lateinit var textViewOmer : TextView
     private lateinit var textViewClock5locTitle : TextView
     private lateinit var textViewClock5suns : TextView
     private lateinit var textViewClock6rosh : TextView
@@ -258,6 +259,8 @@ class MainActivity : ComponentActivity() {
     fun fetchDafYomi() {
         textViewClock4dafYomi = findViewById(R.id.textViewClock4dafYomi)
         textViewClock4dafYomiTitle = findViewById(R.id.textViewClock4dafYomiTitle)
+        textViewOmer = findViewById(R.id.textViewOmer)
+        textViewOmer.text = ""
         textViewClock4dafYomi.text = ""
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         var res = ""
@@ -286,6 +289,7 @@ class MainActivity : ComponentActivity() {
                         if (res.isNotEmpty()) {
 
                             var ttip = "עוד לימודים יומיים:\n\n"
+                            var omerLink = ""
 
                             hebcal?.items?.forEach {
                                 if (it.category == "mishnayomi") {
@@ -299,6 +303,26 @@ class MainActivity : ComponentActivity() {
                                 }
                                 else if (it.category == "tanakhYomi") {
                                     ttip +=  "תנ'ך יומי: " + it.hebrew + "\n"
+                                }
+                                else if (it.category == "omer") {
+                                    // ttip +=  "ספירת העומר: " + it.hebrew.replace("עומר", "") + "\n"
+
+                                    val fullTextYomi = "ספירת העומר (בבוקר): " + "\n" + it.hebrew.replace("עומר", "")
+                                    textViewOmer.text = fullTextYomi
+
+//                                    val spannableStringYomi = SpannableString(fullTextYomi)
+//                                    spannableStringYomi.setSpan(UnderlineSpan(), 0, "ספירת העומר (בבוקר): ".length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+//                                    textViewOmer.text = spannableStringYomi
+
+                                    omerLink = it.link
+                                    textViewOmer.setOnClickListener {
+
+                                        val browserIntent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            omerLink.toUri()
+                                        )
+                                        startActivity(browserIntent)
+                                    }
                                 }
                             }
 

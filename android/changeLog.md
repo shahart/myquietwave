@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.35
+
+Passover is approaching - Add the Omer count.
+After French, add Russian and Spanish support
+
 ## 1.34
 
 תיקוני באגים ושיפורי ביצועים בלוח השנה

@@ -1,0 +1,60 @@
+<resources>
+
+    <string name="app_name">Моя тихая волна</string>
+    <string name="appName">Моя тихая волна</string>
+    <string name="title_name">Моя тихая волна 📻</string>
+
+    <string name="title_name_enabled">Моя тихая волна %1$s 📻 Включено</string>
+    <string name="title_name_disabled">Моя тихая волна %1$s 📻 Отключено</string>
+	
+    <string name="start">Начать</string>
+    <string name="stop">Остановить</string>
+ 
+    <string name="instructions">Запустите приложение радио вручную. Нажмите на кнопку *Начать* вверху. С этого момента, когда новости закончатся, звук будет отключен.</string>
+    <string name="nextNews">Предстоящие новости</string>
+    <string name="newsLink">Полезные ссылки</string>
+    <string name="shabbath">🕯🕯 Шаббат Шалом 🕯🕯</string>
+    <string name="justListen">Наслаждайтесь</string>
+    <string name="todoList">Список задач 📝</string>
+ 
+    <string name="newsLength">Длительность новостей в минутах (1..6) ⏱️</string>
+    <string name="newsFreq">Частота новостей в часах (1..12)</string>
+ 
+    <string name="next_30_sec">Сейчас, в течение следующих 30 секунд, установите громкость, на которой вы хотите слышать новости. Радио затем отключится и автоматически включится в нужное время.</string>
+    <string name="next_30_sec_with_sec">Сейчас, в течение следующих %1$d секунд, установите громкость на %2$d (из 100), на которой вы хотите слышать новости. Радио затем отключится и автоматически включится в нужное время.</string>
+ 
+    <string name="alert_title">Воспроизводит ли приложение радио? Может быть, громкость установлена на ноль?!</string>
+    <string name="alert_message">Приложение не включает радио само по себе, сначала вы должны включить соответствующее приложение.</string>
+ 
+    <string name="close_alert">Закрыть</string>
+ 
+    <string name="share">Поделиться</string>
+    <string name="rate">Оценить</string>
+    <string name="share_text">Посмотрите это отличное приложение:</string>
+ 
+    <string name="candleLighting">Зажжение свечей</string>
+    <string name="havdalah">Havdalah 🌠</string>
+ 
+    <string name="sunrise">Восход 🔆</string>
+    <string name="sunset">Закат 🌅</string>
+ 
+    <string name="location">Местоположение 📍</string>
+ 
+    <!-- уведомления -->
+ 
+    <string name="notif_title_1">Моя тихая волна - В действии</string>
+    <string name="notif_text_1">Циклическое изменение громкости каждые X часов</string>
+ 
+    <string name="notif_title_2">Моя тихая волна - установите громкость</string>
+    <string name="notif_text_2">Осталось %1$d секунд для установки громкости. Текущее значение: %2$d (из 100)</string>
+ 
+    <string name="notif_text_4">Низкая громкость %2$d (из 100) для предстоящих %1$d минут</string>
+    <string name="notif_text_4_1">Низкая громкость %1$d (из 100) для следующей минуты</string>
+ 
+    <string name="notif_text_5">Без звука до следующих новостей</string>
+    <string name="notif_text_radio_stopped">Приложение радио больше не воспроизводится, вам нужно его перезапустить</string>
+<!--    <string name="notif_text_6">Воспроизведение текущих новостей</string>-->
+ 
+    <string name="ue_usage">Добавьте ,ue чтобы не использовать высоту в расчётах</string>
+ 
+</resources>
