@@ -109,7 +109,12 @@ async function calc() {
     } else if (postfix.charAt(0) >= '0' && postfix.charAt(0) <= '9') {
         postfix = "geonameid=" + postfix;
     } else {
-        postfix = "city=" + postfix;
+        if (postfix.toLowerCase() === "il-yavne") {
+            postfix = "geonameid=293222";
+        }
+        else {
+            postfix = "city=" + postfix;
+        }
     }
     const url = `https://www.hebcal.com/zmanim?cfg=json&` + postfix + useElevationParam; 
 
@@ -120,7 +125,7 @@ async function calc() {
     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
     const day = date.getDate().toString().padStart(2, '0');
     const formattedDate = `${year}-${month}-${day}`;
-    const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&start=` + formattedDate + `&end=` + formattedDate;
+    const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&o=on&start=` + formattedDate + `&end=` + formattedDate;
 
     try {
         const [resp1, resp2, resp3] = await Promise.all([
@@ -178,6 +183,8 @@ async function calc() {
             document.getElementById('special').innerHTML = '';
             document.getElementById('roshchodesh').innerHTML = '';
             document.getElementById('fast').innerHTML = '';
+            let shabbatExists = false;
+            let yomTovExists = false;
             let days = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת";
             for (let i = 0; i < data.items.length; i++) {
                 if (data.items[i].category === 'parashat') {
@@ -196,6 +203,7 @@ async function calc() {
                     else 
                         parashaUrl += data.items[i].hebrew;
                     document.getElementById('parashaUrl').href = parashaUrl;
+                    shabbatExists = true;
                 }
                 else if (data.items[i].category === 'havdalah') {
                     document.getElementById('havdala').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
@@ -256,9 +264,20 @@ async function calc() {
                         else {
                             document.getElementById('special').innerHTML += d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear() + " " + data.items[i].hebrew + " - " + days.split(",")[new Date(data.items[i].date).getDay()] + "<br><br>";
                         }
-                        ttip += data.items[i].hebrew + ": " + data.items[i].memo + "\n\n";
+                        if (ttip.indexOf(data.items[i].memo) < 0) {
+                            ttip += data.items[i].hebrew + ": " + data.items[i].memo + "\n\n";
+                        }
+                    }
+                    if (data.items[i].yomtov && data.items[i].yomtov === true) {
+                        yomTovExists = true;
                     }
                 } 
+            }
+            if (! shabbatExists) {
+                document.getElementById('shabbathExists').innerText = '';
+                if (yomTovExists) {
+                    // document.getElementById('shabbathExists').innerText = '🕯🕯 יום טוב';
+                }
             }
             if (ttip != '') {
                 document.getElementById('special').onclick = function() {
@@ -290,6 +309,9 @@ async function calc() {
                 }
                 else if (resp3.items[i].category === 'tanakhYomi') {
                     ttip += "תנ'ך יומי: " + resp3.items[i].hebrew + "\n";
+                }
+                else if (resp3.items[i].category === 'omer') {
+                    ttip += "ספירת העומר: " + resp3.items[i].hebrew.replace("עומר", "") + "\n";
                 }
             }
             document.getElementById('dafYomi').onclick = function() {
