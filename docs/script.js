@@ -127,6 +127,10 @@ async function calc() {
     const formattedDate = `${year}-${month}-${day}`;
     const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&o=on&start=` + formattedDate + `&end=` + formattedDate;
 
+    document.getElementById('fast').innerHTML = '';
+    document.getElementById('special').innerHTML = '';
+    document.getElementById('roshchodesh').innerHTML = '';
+
     try {
         const [resp1, resp2, resp3] = await Promise.all([
             (await fetch(url,  { headers: { 'Accept': 'application/json' } })).json(),
@@ -180,9 +184,6 @@ async function calc() {
                 return;
             }
             let ttip = '';
-            document.getElementById('special').innerHTML = '';
-            document.getElementById('roshchodesh').innerHTML = '';
-            document.getElementById('fast').innerHTML = '';
             let shabbatExists = false;
             let yomTovExists = false;
             let days = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת";
@@ -243,7 +244,9 @@ async function calc() {
                     document.getElementById('lightingUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" מברכים חודש ".length-1) + (data.items[i].hebrew.includes("שבט") ? "_(חודש)" : "");
                 }
                 else if (data.items[i].title == 'Fast begins') {
-                    document.getElementById('fast').innerHTML += " עלות השחר " + data.items[i].date.split('T')[1].substring(0,5) + "<br>";
+                    if (document.getElementById('fast').innerHTML.indexOf("ספירת העומר") < 0) {
+                        document.getElementById('fast').innerHTML += " עלות השחר " + data.items[i].date.split('T')[1].substring(0,5) + "<br>";
+                    }
                 } 
                 else if (data.items[i].title == 'Fast ends') {
                     document.getElementById('fast').innerHTML += " צאת הכוכבים " + data.items[i].date.split('T')[1].substring(0,5) + " <br><br> ";
