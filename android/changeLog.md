@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.36
+
+UX improvements
+
 ## 1.35
 
 Passover is approaching - Add the Omer count.

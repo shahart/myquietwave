@@ -295,7 +295,7 @@ async function calc() {
 
         try {
             document.getElementById('dafYomi').innerHTML = resp3.items[0].hebrew;
-            document.getElementById('dafYomiUrl').href = "https://www.daf.today/"; // resp3.items[0].link;
+            document.getElementById('dafYomiUrl').href = "https://daf-yomi.com/Dafyomi_Page.aspx"; // resp3.items[0].link;
             ttip = 'עוד לימודים יומיים:\n\n';
             for (let i = 0; i < resp3.items.length; i++) {
                 if (resp3.items[i].category === 'mishnayomi') {
@@ -311,7 +311,11 @@ async function calc() {
                     ttip += "תנ'ך יומי: " + resp3.items[i].hebrew + "\n";
                 }
                 else if (resp3.items[i].category === 'omer') {
-                    ttip += "ספירת העומר: " + resp3.items[i].hebrew.replace("עומר", "") + "\n";
+                    // ttip += "ספירת העומר (בבוקר): " + resp3.items[i].hebrew.replace("עומר", "") + "\n";
+                    document.getElementById('fast').innerHTML = " ספירת העומר (בבוקר): " + resp3.items[i].hebrew.replace("עומר", "") + "<br>" + document.getElementById('fast').innerHTML;
+                    document.getElementById('fast').onclick = function() {
+                        window.open(resp3.items[i].link, "_blank");
+                    }   
                 }
             }
             document.getElementById('dafYomi').onclick = function() {

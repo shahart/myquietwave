@@ -116,7 +116,10 @@ object Utils {
         if (loc.startsWith("IL-Ramat Gan")) return "IL-רמת גן";
         if (loc.startsWith("IL-Ramla")) return "IL-רמלה";
         if (loc.startsWith("IL-Rishon LeZion")) return "IL-ראשון לציון";
-        if (loc.startsWith("IL-Tiberias")) return "IL-טבריה";		
+        if (loc.startsWith("IL-Tiberias")) return "IL-טבריה";
+        
+       	// special treatment
+        if (loc.startsWith("IL-Yavne")) return "IL-יבנה";
 
         return loc;
     }
@@ -150,6 +153,9 @@ object Utils {
         if (loc == "IL-רמלה") return "IL-Ramla";
         if (loc == "IL-ראשון לציון") return "IL-Rishon LeZion";
         if (loc == "IL-טבריה") return "IL-Tiberias";
+
+	    // special treatment
+        if (loc == "IL-יבנה") return "IL-Yavne";
 
         return loc;
     }

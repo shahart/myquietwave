@@ -23,8 +23,8 @@ android {
         minSdk = 26
         targetSdk = 36
 
-        versionCode = 45
-        versionName = "1.35"
+        versionCode = 46
+        versionName = "1.36"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -97,7 +97,7 @@ dependencies {
     implementation(libs.converter.scalars)
 
 //    androidTestImplementation("com.android.support.test:rules:1.0.2")
-    androidTestImplementation("androidx.test:rules:1.6.1")
+    androidTestImplementation("androidx.test:rules:1.7.0")
 
 //    implementation("com.google.android.gms:play-services-location:21.3.0")
 

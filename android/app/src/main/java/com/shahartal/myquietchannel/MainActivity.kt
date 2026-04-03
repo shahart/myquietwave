@@ -404,8 +404,14 @@ class MainActivity : ComponentActivity() {
                     else
                         RetrofitInstance.api.getShabbatPerGeoNameId(Utils.getCity(loc), Utils.getUe(loc))
                 }
-                else
-                    RetrofitInstance.api.getShabbatPerCity(Utils.getCity(loc), Utils.getUe(loc))
+                else {
+                    if (loc.lowercase(getDefault()).contains("il-yavne")) {
+                        RetrofitInstance.api.getShabbatPerGeoNameId("293222", Utils.getUe(loc))
+                    }
+                    else {
+                        RetrofitInstance.api.getShabbatPerCity(Utils.getCity(loc), Utils.getUe(loc))
+                    }
+                }
 
             call.enqueue(object : Callback<HebCal> {
 
@@ -527,11 +533,21 @@ class MainActivity : ComponentActivity() {
                             loc.split(",")[1].trim(),
                             Utils.getUe(loc)
                         )
-                    else
-                        RetrofitInstance.api.getZmanimPerGeoNameId(Utils.getCity(loc), Utils.getUe(loc))
+                    else {
+                        RetrofitInstance.api.getZmanimPerGeoNameId(
+                            Utils.getCity(loc),
+                            Utils.getUe(loc)
+                        )
+                    }
                 }
-            else
-                RetrofitInstance.api.getZmanimPerCity(Utils.getCity(loc), Utils.getUe(loc))
+            else {
+                if (loc.lowercase(getDefault()).contains("il-yavne")) {
+                    RetrofitInstance.api.getZmanimPerGeoNameId("293222", Utils.getUe(loc))
+                }
+                else {
+                    RetrofitInstance.api.getZmanimPerCity(Utils.getCity(loc), Utils.getUe(loc))
+                }
+            }
 
             call.enqueue(object : Callback<HebCalZmanimModel> {
 
@@ -708,7 +724,9 @@ class MainActivity : ComponentActivity() {
                                     textViewClock7special.text = textViewClock7special.text.toString() + "\n" +
                                         it.hebrew + " - " + Utils.switchDate(it.date) ;
 
-                                    memo += "\n\n" + it.hebrew + ": " + it.memo
+                                    if (! memo.contains(it.memo)) {
+                                        memo += "\n\n" + it.hebrew + ": " + it.memo
+                                    }
 
                                 }
                             }
