@@ -27,7 +27,7 @@ class ShabbathApiUnitTest {
 //            override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
                 if (/*! */response.isSuccessful) {
                     // val str = response.body()
-                    // Log.i("", "MainActivity fetchParasha " + str)
+                    // Log.i("myquietwave", "MainActivity fetchParasha " + str)
                     val hebcal = response.body()
                     hebcal?.items?.forEach {
                         if (it.category == "parashat") {

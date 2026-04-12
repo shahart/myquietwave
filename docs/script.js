@@ -112,6 +112,12 @@ async function calc() {
         if (postfix.toLowerCase() === "il-yavne") {
             postfix = "geonameid=293222";
         }
+        else if (postfix.toLowerCase() === "il-modiin ilit") {
+            postfix = "geonameid=8199378";
+        }
+        else if (postfix.toLowerCase() === "il-betar ilit") {
+            postfix = "geonameid=284375";
+        }
         else {
             postfix = "city=" + postfix;
         }
@@ -149,16 +155,25 @@ async function calc() {
             document.getElementById('foundLoc').innerHTML = data.location.title;
 
             document.getElementById('sunrise').onclick = function() {
-                alert("chatzotNight - חצות הלילה: " + data.times.chatzotNight.split('T')[1].substring(0,5) + "\n" +
-                      "alotHaShachar - עלות השחר: " + data.times.alotHaShachar.split('T')[1].substring(0,5) + "\n" +
+                alert("chatzot Night - חצות הלילה: " + data.times.chatzotNight.split('T')[1].substring(0,5) + "\n" +
+                      "alot HaShachar - עלות השחר: " + data.times.alotHaShachar.split('T')[1].substring(0,5) + "\n" +
                       "dawn: " + data.times.dawn.split('T')[1].substring(0,5) + "\n" +
+                      "sof Zman Shma MGA: " + data.times.sofZmanShmaMGA.split('T')[1].substring(0,5) + "\n" +
+                      "sof Zman Shma: " + data.times.sofZmanShma.split('T')[1].substring(0,5) + "\n" +
+                      "sof Zman Tfilla MGA: " + data.times.sofZmanTfillaMGA.split('T')[1].substring(0,5) + "\n" +
+                      "sof Zman Tfilla: " + data.times.sofZmanTfilla.split('T')[1].substring(0,5) + "\n" +
                       "chatzot - חצות היום: " + data.times.chatzot.split('T')[1].substring(0,5));
             }
             document.getElementById('sunset').onclick = function() {
-                alert("beinHaShmashos - בין השמשות : " + data.times.beinHaShmashos.split('T')[1].substring(0,5) + "\n" +
+                //   
+                alert("mincha Gedola -  מנחה גדולה: " + data.times.minchaGedola.split('T')[1].substring(0,5) + "\n" +
+                      "mincha Ketana -  מנחה קטנה: " + data.times.minchaKetana.split('T')[1].substring(0,5) + "\n" +
+                      "plag HaMincha -  פלג המנחה: " + data.times.plagHaMincha.split('T')[1].substring(0,5) + "\n" +
+                      "bein HaShmashos - בין השמשות : " + data.times.beinHaShmashos.split('T')[1].substring(0,5) + "\n" +
                       "Dusk -  חשיכה: " + data.times.dusk.split('T')[1].substring(0,5) + "\n" +
-                      "Tzeit - צאת הכוכבים: " + data.times.tzeit7083deg.split('T')[1].substring(0,5));
-            }
+                      "Tzeit - צאת הכוכבים: " + data.times.tzeit7083deg.split('T')[1].substring(0,5) + "\n" +
+                      "Tzeit 72' - צאת הכוכבים רבינו תם: " + data.times.tzeit72min.split('T')[1].substring(0,5));
+                    }
 
             const now = new Date();
             const hours = now.getHours();
@@ -316,6 +331,8 @@ async function calc() {
                 else if (resp3.items[i].category === 'omer') {
                     // ttip += "ספירת העומר (בבוקר): " + resp3.items[i].hebrew.replace("עומר", "") + "\n";
                     document.getElementById('fast').innerHTML = " ספירת העומר (בבוקר): " + resp3.items[i].hebrew.replace("עומר", "") + "<br>" + document.getElementById('fast').innerHTML;
+                    document.getElementById('fast').style.textDecoration = "underline";
+                    document.getElementById('fast').style.color = "blue";
                     document.getElementById('fast').onclick = function() {
                         window.open(resp3.items[i].link, "_blank");
                     }   

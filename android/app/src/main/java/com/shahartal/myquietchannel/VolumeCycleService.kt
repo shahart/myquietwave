@@ -1,6 +1,5 @@
 package com.shahartal.myquietchannel
 
-//import android.app.AlertDialog
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,19 +7,21 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.media.AudioManager
-//import android.os.Build
+import android.media.MediaPlayer
 import android.os.IBinder
 import android.util.Log
-//import android.widget.TextView
-//import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.google.firebase.Firebase
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
 import com.google.firebase.crashlytics.crashlytics
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -37,17 +38,26 @@ class VolumeCycleService : Service() {
 
     private var job: Job? = null
 
+    val GLZ = "https://glzwizzlv.bynetcdn.com/glz_mp3"
+    val GLGLZ = "https://glzwizzlv.bynetcdn.com/glglz_mp3"
 
+    // todo
+    val GIMMEL = "https://28993.live.streamtheworld.com/KAN_GIMMEL.mp3"
+    val BET = "https://28573.live.streamtheworld.com/KAN_BET.mp3"
 
     private var settedVolume = 0
     private var origVolume = 0
 
-    var mainIntent = Intent(this, MainActivity::class.java)
+    private var mediaPlayer: MediaPlayer? = null
+
+    var mainIntent =  Intent(this, MainActivity::class.java) // todo null?
     var mainPendingIntent: PendingIntent? = null
 
     override fun onCreate() {
         super.onCreate()
         isRunning = true
+
+        // @RequiresApi(8
         startHour = ZonedDateTime.now(ZoneId.systemDefault()).hour
         startSeconds = ZonedDateTime.now(ZoneId.systemDefault()).second
 
@@ -69,6 +79,63 @@ class VolumeCycleService : Service() {
             .setContentIntent(mainPendingIntent)
             .build()
         startForeground(1, notification)
+
+        mediaPlayer = getMediaPlayer(null)
+    }
+
+    fun getStationUrl(url: String?): String {
+        if (url == null) return GLZ
+        if (url == "GLGLZ") return GLGLZ
+        if (url == "GLZ") return GLZ
+        return GLZ
+    }
+
+    fun getMediaPlayer( url: String?): MediaPlayer? {
+//        val url = "https://28993.live.streamtheworld.co" // GLZ
+        val url = getStationUrl(url)
+        return MediaPlayer().apply {
+            setDataSource(url)
+//            setOnErrorListener(object : MediaPlayer.OnErrorListener {
+//                override fun onError(mp: MediaPlayer, what: Int, extra: Int): Boolean {
+//                    // Log the error (e.g., what=1, extra=-2147483648)
+//                    Log.e("myquietwave", "getMediaPlayer. Failed to stream from " + url + ". what=" + what)
+//                    Firebase.crashlytics.log("ERROR. getMediaPlayer. Failed to stream from " + url + ". what=" + what) // saw length=1; index=2
+////                    Firebase.crashlytics.recordException(e)
+//
+//                    val notification: Notification =
+//                        NotificationCompat.Builder(this@VolumeCycleService, CHANNEL_ID)
+//                            .setContentText("Failed to stream from " + url) // + ". " + e.toString())
+//                            .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
+//                            .setContentIntent(mainPendingIntent)
+//                            .build()
+//                    getSystemService(NotificationManager::class.java).notify(1, notification)
+//
+//                    mp.reset() // Move back to Idle state to recover
+//                    mp.setDataSource(GLZ)
+//
+//                    return true // Return true if you handled the error
+//                }
+//            })
+//            prepareAsync()
+            try {
+                prepare() // Async()
+            }
+            catch (e: Exception) {
+                Log.e("myquietwave", "getMediaPlayer. Failed to stream from " + url + ". ", e)
+                Firebase.crashlytics.log("ERROR. getMediaPlayer. Failed to stream from " + url + e.toString()) // saw length=1; index=2
+                Firebase.crashlytics.recordException(e)
+
+                val notification: Notification =
+                    NotificationCompat.Builder(this@VolumeCycleService, CHANNEL_ID)
+                        .setContentText("Failed to stream from " + url + ". " + e.toString())
+                        .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
+                        .setContentIntent(mainPendingIntent)
+                        .build()
+                getSystemService(NotificationManager::class.java).notify(1, notification)
+//
+                return null // getMediaPlayer(GLZ)
+            }
+        }
     }
 
     // @RequiresApi(Build.VERSION_CODES.O) // Unnecessary; SDK_INT is always >= 26
@@ -87,7 +154,7 @@ class VolumeCycleService : Service() {
             Log.i("myquietwave", "VolumeCycleService init volume $origVolume out of $maxVolume")
             // val currentVolume = audioManager.getStreamVolume(stream)
 
-//            var isTest5 = false
+            var station: String? = "GLZ"
             var newsDuration = 4
             var nextHours: String? = "17, 21, 7, 12, 15, 18"
             if (intent == null) {
@@ -97,11 +164,12 @@ class VolumeCycleService : Service() {
             else {
                 newsDuration = intent.getIntExtra("newsDuration", 4)
                 nextHours = intent.getStringExtra("nextHours")
-                Log.i("myquietwave", "VolumeCycleService Initial input: NewsDuration $newsDuration nextHours $nextHours currentHour " + ZonedDateTime.now(ZoneId.systemDefault()).hour)
+                station = intent.getStringExtra("station")
+                if (station == null) station = "GLZ"
+                Log.i("myquietwave", "VolumeCycleService Initial input: Station $station NewsDuration $newsDuration nextHours $nextHours currentHour " + ZonedDateTime.now(ZoneId.systemDefault()).hour)
             }
 
             val isNearShabbath =
-                // || (
                 ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY &&
                     ZonedDateTime.now(ZoneId.systemDefault()).hour >= 12 // )
 
@@ -115,11 +183,7 @@ class VolumeCycleService : Service() {
                 newsDuration = 1
             }
 
-//            var volume = intent.getIntExtra("volume", 2)
-//            if (volume > audioManager.getStreamMaxVolume(stream)) volume = 2
-//            if (volume < 1) volume = 1
-
-            Log.i("myquietwave", "VolumeCycleService settings: NewsDuration $newsDuration nextHours $nextHours currentHour " + ZonedDateTime.now(ZoneId.systemDefault()).hour)
+            Log.i("myquietwave", "VolumeCycleService settings: Station $station NewsDuration $newsDuration nextHours $nextHours currentHour " + ZonedDateTime.now(ZoneId.systemDefault()).hour)
 
             while (isActive) {
 
@@ -129,7 +193,7 @@ class VolumeCycleService : Service() {
                     Log.w("myquietwave", "VolumeCycleService Volume crossed threshold")
                 }
                 if (volume50 == 0) {
-                    volume50 = 3 // 2 out of 15 = 13% (maxVolume * 20 / 100).coerceAtLeast(1)
+                    volume50 = 4 // 2 out of 15 = 13% (maxVolume * 20 / 100).coerceAtLeast(1)
                 }
 
                 // Set to 20%
@@ -137,6 +201,12 @@ class VolumeCycleService : Service() {
                     "VolumeCycleService started positive volume: $volume50 out of $maxVolume, news duration [minutes] $newsDuration, is near shabbath $isNearShabbath"
                 )
 
+                if (! alertMediaIsPlaying("glz")) {
+                    if (mediaPlayer?.isPlaying == false) {
+                        mediaPlayer = getMediaPlayer(station)
+                        mediaPlayer?.start()
+                    }
+                }
 
                 audioManager.setStreamVolume(stream, volume50, 0)
 
@@ -169,6 +239,7 @@ class VolumeCycleService : Service() {
                                 .setContentIntent(mainPendingIntent)
                                 .build()
                             getSystemService(NotificationManager::class.java).notify(1, notification)
+
                             // break
                         }
 
@@ -214,10 +285,20 @@ class VolumeCycleService : Service() {
                 }
                 else {
 
-                    alertMediaIsPlaying("playing news")
+                    if (! alertMediaIsPlaying("playing news")) {
+                        if (mediaPlayer?.isPlaying == false) {
+                            mediaPlayer = getMediaPlayer(station)
+                            mediaPlayer?.start()
 
-                    Firebase.analytics.logEvent("PlayingNews") {
-                        param("currentHour", ZonedDateTime.now(ZoneId.systemDefault()).hour.toString())
+                            Firebase.analytics.logEvent("PlayingGlzNews") {
+                                param("currentHour", ZonedDateTime.now(ZoneId.systemDefault()).hour.toString())
+                            }
+                        }
+                    }
+                    else {
+                        Firebase.analytics.logEvent("PlayingNews") {
+                            param("currentHour", ZonedDateTime.now(ZoneId.systemDefault()).hour.toString())
+                        }
                     }
 
                     for (i in 1..newsDuration) {
@@ -236,6 +317,7 @@ class VolumeCycleService : Service() {
                         delay(60 * 1000L) // 6 minutes
                     }
                 }
+                // @RequiresApi(8
                 val now = ZonedDateTime.now(ZoneId.systemDefault()).minute
                 // continue the current news
                 if (now < newsDuration) {
@@ -257,8 +339,6 @@ class VolumeCycleService : Service() {
                     }
                 }
 
-//                var nextDelay = (minutesPerHours * hours - newsDuration)
-
                 // this happens only in the Init
                 if (settedVolume == 0) {
                     settedVolume = audioManager.getStreamVolume(stream)
@@ -266,8 +346,6 @@ class VolumeCycleService : Service() {
                     if (settedVolume == 0) {
                         settedVolume = 3 // (maxVolume * 15 / 100).coerceAtLeast(1) // let's start with 1 or 2
                     }
-
-
                 }
 
                 val notification: Notification = NotificationCompat.Builder(thisService, CHANNEL_ID)
@@ -291,6 +369,15 @@ class VolumeCycleService : Service() {
                 Log.d("myquietwave","VolumeCycleService started zero volume") // , delay till the next news [minutes] $nextDelay") //  + currentVolume)
                 audioManager.setStreamVolume(stream, 0, 0)
 
+                if (! alertMediaIsPlaying("glz")) {
+                    if (mediaPlayer?.isPlaying == true)
+                        mediaPlayer?.stop()
+
+                }
+
+                if (mediaPlayer?.isPlaying == true)
+                    mediaPlayer?.stop()
+
                 var oldText = ""
 
                 // delay(30_000)
@@ -298,8 +385,13 @@ class VolumeCycleService : Service() {
                 // WAS: for (i in 1..(nextDelay-1)*2) {
                 while ( true)
                 {
-                    if (ZonedDateTime.now(ZoneId.systemDefault()).minute == 0 &&
-                        (("," + nextHours?.replace(" ", "") + ",").contains("," + ZonedDateTime.now(ZoneId.systemDefault()).hour + ","))
+                    // @RequiresApi(8
+                    if ((
+                                (ZonedDateTime.now(ZoneId.systemDefault()).minute == 0 &&
+                        (("," + nextHours?.replace(" ", "") + ",").contains("," + ZonedDateTime.now(ZoneId.systemDefault()).hour + ",")))
+                        ||
+                        (("," + nextHours?.replace(" ", "") + ",").contains("," + ZonedDateTime.now(ZoneId.systemDefault()).hour + ":" + ZonedDateTime.now(ZoneId.systemDefault()).minute + ","))
+                        )
 			                &&
                         (ZonedDateTime.now(ZoneId.systemDefault()).second >= startSeconds-1 // ||
                         // ZonedDateTime.now(ZoneId.systemDefault()).second >= 30
@@ -314,6 +406,7 @@ class VolumeCycleService : Service() {
                         // cancel("VolumeCycleService media was stopped, cancelling", null)
                         // break
                         getString(R.string.notif_text_radio_stopped)
+
                     } else {
                         getString(R.string.notif_text_5)
                     }
@@ -349,6 +442,11 @@ class VolumeCycleService : Service() {
         Log.d("myquietwave", "VolumeCycleService on destroy, volume back to " + origVolume + " from " + audioManager.getStreamVolume(stream) + " out of " +  audioManager.getStreamMaxVolume(stream))
         audioManager.setStreamVolume(stream, origVolume, 0)
 
+//        if (! alertMediaIsPlaying("glz")) {
+            if (mediaPlayer?.isPlaying == true)
+                mediaPlayer?.stop()
+//        }
+
         job?.cancel()
         super.onDestroy()
         isRunning = false
@@ -359,6 +457,8 @@ class VolumeCycleService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    // @RequiresApi(8
+    // @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
         // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // Unnecessary; SDK_INT is always >= 26
             val serviceChannel = NotificationChannel(
@@ -374,18 +474,6 @@ class VolumeCycleService : Service() {
     fun alertMediaIsPlaying(from: String): Boolean {
         val audioManager = this.getSystemService(AUDIO_SERVICE) as AudioManager
         val isPlaying = audioManager.isMusicActive()
-        if (! isPlaying) {
-            Log.w("myquietwave", "VolumeCycleService isPlaying: $isPlaying from $from")
-//
-//            val alertDialog = AlertDialog.Builder(this).create()
-//            alertDialog.setTitle("האם רדיו מנוגן?" + isPlaying)
-//            alertDialog.setMessage("האפליקציה לא מנגנת בעצמה את הרדיו, עליכם מראש לבחור ניגון כלשהו")
-//            alertDialog.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, which: Int ->
-//                dialog!!.cancel()
-//            }
-//            // alertDialog.setIcon(R.drawable.icon)
-//            alertDialog.show()
-        }
         return isPlaying
     }
 }

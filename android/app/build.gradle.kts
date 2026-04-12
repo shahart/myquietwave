@@ -1,7 +1,6 @@
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
     // id("io.gitlab.arturbosch.detekt") version "1.23.8"
@@ -23,8 +22,8 @@ android {
         minSdk = 26
         targetSdk = 36
 
-        versionCode = 46
-        versionName = "1.36"
+        versionCode = 50
+        versionName = "1.40"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -44,9 +43,9 @@ android {
             ndk {
                 debugSymbolLevel = "FULL"
             }
-            firebaseCrashlytics {
-                nativeSymbolUploadEnabled = true
-            }
+//            firebaseCrashlytics {
+//                nativeSymbolUploadEnabled = true
+//            }
         }
         debug {
             ndk {
@@ -55,19 +54,16 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
-//    kotlinOptions {
-//        jvmTarget = "11"
-//    }
     buildFeatures {
         compose = true
     }
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(21)
 }
 
 dependencies {
@@ -97,7 +93,7 @@ dependencies {
     implementation(libs.converter.scalars)
 
 //    androidTestImplementation("com.android.support.test:rules:1.0.2")
-    androidTestImplementation("androidx.test:rules:1.7.0")
+    androidTestImplementation(libs.androidx.rules)
 
 //    implementation("com.google.android.gms:play-services-location:21.3.0")
 
@@ -112,11 +108,11 @@ dependencies {
     // implementation("com.google.android.play:review:2.0.2")
     // implementation("com.google.android.play:review-ktx:2.0.2")
 
-
     // Add the dependencies for the Crashlytics and Analytics libraries
     // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-crashlytics")
+    implementation(libs.firebase.crashlytics)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+    implementation(libs.kotlinx.datetime)
+
 
 }

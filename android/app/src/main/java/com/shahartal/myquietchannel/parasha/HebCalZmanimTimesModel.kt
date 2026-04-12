@@ -7,12 +7,23 @@ data class HebCalZmanimTimesModel(
     val beinHaShmashos: String,
     val dusk: String,
     val tzeit7083deg: String,
+    val tzeit72min: String,
 
     val dawn: String,
     val chatzot: String,
-    val minchaGedola: String,
 
     val chatzotNight: String,
-    val alotHaShachar: String
+    val alotHaShachar: String,
 
-)
+    val minchaGedola: String,
+    val plagHaMincha: String,
+    val minchaKetana: String,
+
+    val sofZmanShma: String,
+    val sofZmanTfilla: String,
+
+    val sofZmanShmaMGA: String,
+    val sofZmanTfillaMGA: String
+
+
+    )

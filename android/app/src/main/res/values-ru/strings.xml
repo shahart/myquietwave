@@ -4,8 +4,8 @@
     <string name="appName">Моя тихая волна</string>
     <string name="title_name">Моя тихая волна 📻</string>
 
-    <string name="title_name_enabled">Моя тихая волна %1$s 📻 Enabled</string>
-    <string name="title_name_disabled">Моя тихая волна %1$s 📻 Disabled</string>
+    <string name="title_name_enabled">Моя тихая волна %1$s 📻 Включено</string>
+    <string name="title_name_disabled">Моя тихая волна %1$s 📻 Отключено</string>
 	
     <string name="start">Начать</string>
     <string name="stop">Остановить</string>
@@ -18,8 +18,7 @@
     <string name="todoList">Список задач 📝</string>
  
     <string name="newsLength">Длительность новостей в минутах (1..6) ⏱️</string>
-    <string name="newsFreq">Частота новостей в часах (1..12)</string>
- 
+
     <string name="next_30_sec">Сейчас, в течение следующих 30 секунд, установите громкость, на которой вы хотите слышать новости. Радио затем отключится и автоматически включится в нужное время.</string>
     <string name="next_30_sec_with_sec">Сейчас, в течение следующих %1$d секунд, установите громкость на %2$d (из 100), на которой вы хотите слышать новости. Радио затем отключится и автоматически включится в нужное время.</string>
  
@@ -32,7 +31,7 @@
     <string name="rate">Оценить</string>
     <string name="share_text">Посмотрите это отличное приложение:</string>
  
-    <string name="candleLighting">Зажжение свечей</string>
+    <string name="candleLighting">Зажжение свечей 🕯</string>
     <string name="havdalah">Havdalah 🌠</string>
  
     <string name="sunrise">Восход 🔆</string>
@@ -52,9 +51,11 @@
     <string name="notif_text_4_1">Низкая громкость %1$d (из 100) для следующей минуты</string>
  
     <string name="notif_text_5">Без звука до следующих новостей</string>
-    <string name="notif_text_radio_stopped">Приложение радио больше не воспроизводится, вам нужно его перезапустить</string>
+    <string name="notif_text_radio_stopped">Без звука до следующих новостей</string>
 <!--    <string name="notif_text_6">Воспроизведение текущих новостей</string>-->
  
     <string name="ue_usage">Добавьте ,ue чтобы не использовать высоту в расчётах</string>
- 
+
+    <string name="station">Станция по умолчанию</string>
+
 </resources>

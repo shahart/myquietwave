@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4
+
+Add media player in case the user skipped the manual radio playing, defaults to GLZ/ GLGLZ.
+Support field request for hh:mm
+More zmanim
+
 ## 1.36
 
 UX improvements

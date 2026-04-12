@@ -1,19 +1,8 @@
 package com.shahartal.myquietchannel
 
-//import android.R
-//import android.app.Notification
-//import android.app.NotificationChannel
-//import android.content.Context
-//import android.media.MediaMetadata
-//import android.media.session.MediaController
-//import android.media.session.MediaSessionManager
-//import android.media.session.PlaybackState
 import android.Manifest
-import android.app.Activity
 import android.app.AlertDialog
-//import android.app.Notification
 import android.app.NotificationManager
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -25,11 +14,8 @@ import android.icu.util.HebrewCalendar
 import android.location.Location
 import android.location.LocationManager
 import android.media.AudioManager
-//import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.UnderlineSpan
@@ -39,21 +25,21 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
-//import android.widget.ImageView
 import android.widget.TextView
-//import android.widget.Toast
 import androidx.activity.ComponentActivity
-//import androidx.activity.result.contract.ActivityResultContracts
-//import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
-//import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
@@ -64,39 +50,33 @@ import com.shahartal.myquietchannel.parasha.HebCalZmanimModel
 import com.shahartal.myquietchannel.parasha.RetrofitInstance
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.offsetAt
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.time.DayOfWeek
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Date
-import java.util.TimeZone
-import java.util.Timer
-import java.util.TimerTask
-import com.google.android.play.core.appupdate.AppUpdateInfo
-import com.google.android.play.core.appupdate.AppUpdateManager
-import com.google.android.play.core.appupdate.AppUpdateManagerFactory
-import com.google.android.play.core.install.model.AppUpdateType
-import com.google.android.play.core.install.model.UpdateAvailability
+import java.util.Locale.getDefault
+import kotlin.time.Clock
 
 class MainActivity : ComponentActivity() {
 
-    private var isServiceRunning = false
+    val hebrewDays = arrayOf("א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ", "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל")
+    val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
 
-    private var dialog: AlertDialog? = null
+    private var isServiceRunning = false
 
     private lateinit var statusText: TextView
     private lateinit var shabesText: TextView
     private lateinit var toggleButton: Button
     private lateinit var shareButton: Button
-    private lateinit var rateButton: Button
 
     private lateinit var editTextNumberNewsDuration: TextView
     // private lateinit var editTextNumberVolume: TextView
@@ -106,6 +86,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var textViewNewsLinks: TextView
     private lateinit var textViewPosition: TextView
     // private lateinit var textViewNewsKan: TextView
+
 
     private lateinit var textViewClock : TextView
     private lateinit var textViewHebDate : TextView
@@ -130,6 +111,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var editTextTodo : TextView
 
     private lateinit var spinner : Spinner
+    private lateinit var stationsSpinner : Spinner
+
     private lateinit var editTextLocation : TextView
 
 
@@ -142,39 +125,13 @@ class MainActivity : ComponentActivity() {
                 Configuration.UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
     }
 
-//    @RequiresApi(Build.VERSION_CODES.N)
-//    fun requestPermissions() {
-//        val locationPermissionRequest = registerForActivityResult(
-//            ActivityResultContracts.RequestMultiplePermissions()
-//        ) { permissions ->
-//            when {
-//
-//                permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-//                    // Only approximate location access granted.
-//                }
-//                else -> {
-//                    // No location access granted.
-//                }
-//            }
-//        }
-//
-//        // Before you perform the actual permission request, check whether your app
-//        // already has the permissions, and whether your app needs to show a permission
-//        // rationale dialog. For more details, see Request permissions:
-//        // https://developer.android.com/training/permissions/requesting#request-permission
-//        locationPermissionRequest.launch(
-//            arrayOf(
-//                Manifest.permission.ACCESS_COARSE_LOCATION
-//            )
-//        )
-//    }
-
     override fun onResume() {
         super.onResume()
 
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         val savedName = sharedPreferences.getString("todoList", "פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן")
         val savedLocation = sharedPreferences.getString("location", "IL-Jerusalem")
+        val savedStation = sharedPreferences.getString("station", "GLZ")
 
         editTextTodo.text = savedName
         editTextLocation.text = savedLocation
@@ -189,6 +146,11 @@ class MainActivity : ComponentActivity() {
             spinner.setSelection(locations.indexOf("Geo/ GPS-Lat, Lon"))
         }
 
+        stationsSpinner = findViewById<Spinner>(R.id.editTextStationSpinner)
+
+        if (savedStation != null && savedStation == "GLGLZ") {
+            stationsSpinner.setSelection(1)
+        }
 
         fetchShabatZmanim()
         fetchSunsZmanim()
@@ -203,13 +165,7 @@ class MainActivity : ComponentActivity() {
         textViewNextNews.text = nextHours
 
         val serviceIntent = Intent(this, VolumeCycleService::class.java)
-        if (VolumeCycleService.isRunning) {
-            if (! alertMediaIsPlaying("onResume")) {
-                stopService(serviceIntent)
-                isServiceRunning = false
-            }
-        }
-        else {
+        if (! VolumeCycleService.isRunning) {
             stopService(serviceIntent)
             isServiceRunning = false
         }
@@ -231,6 +187,9 @@ class MainActivity : ComponentActivity() {
         textViewNextNews.isEnabled = ! isServiceRunning
         textViewNextNews.isClickable = ! isServiceRunning
 
+        stationsSpinner.isEnabled = ! isServiceRunning
+        stationsSpinner.isClickable = ! isServiceRunning
+
         getSystemService(NotificationManager::class.java).cancel(1)
 
     }
@@ -243,6 +202,7 @@ class MainActivity : ComponentActivity() {
 
         editor.putString("todoList", editTextTodo.text.toString())
         editor.putString("location", editTextLocation.text.toString())
+        editor.putString("station", stationsSpinner.getSelectedItem().toString())
 
         val newsDurationStr = editTextNumberNewsDuration.text.toString()
         var newsDuration = if (newsDurationStr.isEmpty()) 4 else newsDurationStr.toInt()
@@ -279,7 +239,7 @@ class MainActivity : ComponentActivity() {
                                 spannableStringYomi.setSpan(UnderlineSpan(), 0, fullTextYomi.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
                                 textViewClock4dafYomi.text = spannableStringYomi
-                                res = it.link
+                                res = it.link // "https://daf-yomi.com/Dafyomi_Page.aspx" // it.link
 
                                 val editor = sharedPreferences.edit()
                                 editor.putString("dafYomi", it.hebrew)
@@ -288,10 +248,11 @@ class MainActivity : ComponentActivity() {
                         }
                         if (res.isNotEmpty()) {
 
-                            var ttip = "עוד לימודים יומיים:\n\n"
-                            var omerLink = ""
+                            var ttip = "עוד לימודים יומיים:\n\nדף יומי צורת הדף\n https://daf-yomi.com/Dafyomi_Page.aspx\n\n"
+                            var omerLink: String
 
                             hebcal?.items?.forEach {
+
                                 if (it.category == "mishnayomi") {
                                     ttip +=  "משנה יומית: " + it.hebrew + "\n"
                                 }
@@ -305,14 +266,9 @@ class MainActivity : ComponentActivity() {
                                     ttip +=  "תנ'ך יומי: " + it.hebrew + "\n"
                                 }
                                 else if (it.category == "omer") {
-                                    // ttip +=  "ספירת העומר: " + it.hebrew.replace("עומר", "") + "\n"
 
                                     val fullTextYomi = "ספירת העומר (בבוקר): " + "\n" + it.hebrew.replace("עומר", "")
                                     textViewOmer.text = fullTextYomi
-
-//                                    val spannableStringYomi = SpannableString(fullTextYomi)
-//                                    spannableStringYomi.setSpan(UnderlineSpan(), 0, "ספירת העומר (בבוקר): ".length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-//                                    textViewOmer.text = spannableStringYomi
 
                                     omerLink = it.link
                                     textViewOmer.setOnClickListener {
@@ -331,11 +287,15 @@ class MainActivity : ComponentActivity() {
                                 alertDialogBuilder.setMessage(
                                     ttip
                                 )
+                                alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
+                                    dialog!!.cancel()
+                                }
                                 val alertDialog = alertDialogBuilder.create()
                                 alertDialog.show()
                             }
 
                             textViewClock4dafYomi.setOnClickListener {
+
                                 val browserIntent = Intent(
                                     Intent.ACTION_VIEW,
                                     res.toUri()
@@ -366,7 +326,6 @@ class MainActivity : ComponentActivity() {
         textViewClock3 = findViewById(R.id.textViewClock3)
         textViewClock3.text = ""
 
-        // val dow = ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek
         if ( // (dow == DayOfWeek.THURSDAY || dow == DayOfWeek.FRIDAY || dow == DayOfWeek.SATURDAY) &&
             editTextLocation.text.toString().trim().isNotEmpty()) {
 
@@ -391,10 +350,6 @@ class MainActivity : ComponentActivity() {
         }
 
         try {
-//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                Log.w("myquietwave","MainActivity fetchParasha no internet at all")
-//                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 112); // REQUEST_INTERNET_PERMISSION);
-//            }
 
             val call = // if (loc.get(0).isDigit()) RetrofitInstance.api.getShabbatByLoc(loc.split(",")[0].trim(), loc.split(",")[1].trim())
                 // else
@@ -407,6 +362,12 @@ class MainActivity : ComponentActivity() {
                 else {
                     if (loc.lowercase(getDefault()).contains("il-yavne")) {
                         RetrofitInstance.api.getShabbatPerGeoNameId("293222", Utils.getUe(loc))
+                    }
+                    else if (loc.lowercase(getDefault()).contains("il-modiin ilit")) {
+                        RetrofitInstance.api.getShabbatPerGeoNameId("8199378", Utils.getUe(loc))
+                    }
+                    else if (loc.lowercase(getDefault()).contains("il-betar ilit")) {
+                        RetrofitInstance.api.getShabbatPerGeoNameId("284375", Utils.getUe(loc))
                     }
                     else {
                         RetrofitInstance.api.getShabbatPerCity(Utils.getCity(loc), Utils.getUe(loc))
@@ -459,6 +420,7 @@ class MainActivity : ComponentActivity() {
                                 textViewClock3.setOnClickListener {
                                     val browserIntent = Intent(
                                         Intent.ACTION_VIEW,
+                                        // ("https://he.wikipedia.org/wiki/" + str ).toUri()
                                         ("https://he.wikipedia.org/wiki/" + str.substring(" מברכים חודש ".length-1) + (if (str.contains("שבט"))  "_(חודש)" else "")).toUri()
                                     )
                                     startActivity(browserIntent)
@@ -496,7 +458,6 @@ class MainActivity : ComponentActivity() {
         textViewClock5locTitle = findViewById(R.id.textViewClock5locTitle)
         textViewClock5suns.text = ""
 
-        // val dow = ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek
         if ( // (dow == DayOfWeek.THURSDAY || dow == DayOfWeek.FRIDAY || dow == DayOfWeek.SATURDAY) &&
             editTextLocation.text.toString().trim().isNotEmpty()) {
 
@@ -518,14 +479,9 @@ class MainActivity : ComponentActivity() {
         res = " "
 
         try {
-//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                Log.w("myquietwave","MainActivity fetchParasha no internet at all")
-//                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 112); // REQUEST_INTERNET_PERMISSION);
-//            }
 
             val call =
-            // if (loc.get(0).isDigit()) RetrofitInstance.api.getShabbatByLoc(loc.split(",")[0].trim(), loc.split(",")[1].trim())
-                // else
+
                 if (Character.isDigit(loc.trim().get(0)))  {
                     if (loc.contains(",") && Character.isDigit(loc.split(",")[1].trim().get(0)))
                         RetrofitInstance.api.getZmanimByLoc(
@@ -543,6 +499,12 @@ class MainActivity : ComponentActivity() {
             else {
                 if (loc.lowercase(getDefault()).contains("il-yavne")) {
                     RetrofitInstance.api.getZmanimPerGeoNameId("293222", Utils.getUe(loc))
+                }
+                else if (loc.lowercase(getDefault()).contains("il-modiin ilit")) {
+                    RetrofitInstance.api.getZmanimPerGeoNameId("8199378", Utils.getUe(loc))
+                }
+                else if (loc.lowercase(getDefault()).contains("il-betar ilit")) {
+                    RetrofitInstance.api.getZmanimPerGeoNameId("284375", Utils.getUe(loc))
                 }
                 else {
                     RetrofitInstance.api.getZmanimPerCity(Utils.getCity(loc), Utils.getUe(loc))
@@ -567,8 +529,8 @@ class MainActivity : ComponentActivity() {
                             res += "\n" + getString(R.string.sunset) + " " + truncDate(hebcal.times.sunset) + " "
 
                             val now = Date()
-                            val hours = now.getHours()
-                            val minutes = now.getMinutes()
+                            val hours = now.getHours() // Calendar.get(Calendar.HOUR_OF_DAY)
+                            val minutes = now.getMinutes() // Calendar.get(Calendar.MINUTE)
 
                             val hhmm = hebcal.times.sunset.split('T')[1].substring(0,5).split(':')
 
@@ -579,8 +541,6 @@ class MainActivity : ComponentActivity() {
                                 val hebrewYear = Utils.getYY(hebY)
                                 val hebrewMonth = hebrewCalendar.get(HebrewCalendar.MONTH)
                                 val hebrewDay = hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH) // switches at midnight by-design
-                                val hebrewDays = arrayOf("א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ", "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל")
-                                val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
                                 var hebrewMonthName = hebrewMonths[hebrewMonth]
 
                                 //return (year * 12 + 17) % 19 >= 12;
@@ -594,9 +554,8 @@ class MainActivity : ComponentActivity() {
                                         hebrewMonthName = "אדר ב"
                                 }
                                 val hebrewDayName = hebrewDays[hebrewDay-1]
-                                textViewHebDate.text = " הערב אור ל- $hebrewDayName/$hebrewMonthName/$hebrewYear"
+                                textViewHebDate.text = " הערב אור ל- $hebrewDayName $hebrewMonthName $hebrewYear"
                             }
-
 
                             textViewClock5locTitle.text = hebcal.location.title
 
@@ -612,11 +571,28 @@ class MainActivity : ComponentActivity() {
                                     "chatzot Night חצות הלילה: " + truncDate(hebcal.times.chatzotNight) + "\n" +
                                     "alot HaShahar עלות השחר: " + truncDate(hebcal.times.alotHaShachar) + "\n" +
                                     "dawn: " + truncDate(hebcal.times.dawn) + "\n" +
+
+                                    "sof Zman Shma מגן אברהם: " + truncDate(hebcal.times.sofZmanShmaMGA) + "\n" +
+                                    "sof Zman Shma: " + truncDate(hebcal.times.sofZmanShma) + "\n" +
+                                    "sof Zman Tfilla מגן אברהם: " + truncDate(hebcal.times.sofZmanTfillaMGA) + "\n" +
+                                    "sof Zman Tfilla: " + truncDate(hebcal.times.sofZmanTfilla) + "\n" +
+
                                     "chatzot חצות היום: " + truncDate(hebcal.times.chatzot) + "\n" +
+
+                                            "\n" +
+
+                                    "mincha Gedola מנחה גדולה: " + truncDate(hebcal.times.minchaGedola) + "\n" +
+                                    "mincha Ketana מנחה קטנה: " + truncDate(hebcal.times.minchaKetana) + "\n" +
+                                    "plag HaMincha פלג המנחה: " + truncDate(hebcal.times.plagHaMincha) + "\n" +
+
                                     "bein HaShmashos בין השמשות: " + truncDate(hebcal.times.beinHaShmashos) + "\n" +
                                     "Dusk חשיכה: " + truncDate(hebcal.times.dusk) + "\n" +
-                                    "Tzeit צאת הכוכבים: " + truncDate(hebcal.times.tzeit7083deg)
+                                    "Tzeit צאת הכוכבים: " + truncDate(hebcal.times.tzeit7083deg) + "\n" +
+                                    "Tzeit 72' צאת הכוכבים רבינו תם: " + truncDate(hebcal.times.tzeit72min)
                                 )
+                                alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
+                                    dialog!!.cancel()
+                                }
                                 val alertDialog = alertDialogBuilder.create()
                                 alertDialog.show()
                             }
@@ -657,13 +633,6 @@ class MainActivity : ComponentActivity() {
     fun fetchParasha() { // }: String {
 
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
-        textViewClock2 = findViewById(R.id.textViewClock2)
-        textViewDate = findViewById(R.id.textViewDate)
-        textViewDate.text = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת,ראשון".split(
-            ","
-        )
-            .get(LocalDate.now().dayOfWeek.value) + " " + SimpleDateFormat("dd-MM-yyyy").format(Date()) // Cannot format given Object as a Date
-
 
         textViewClockH = findViewById(R.id.textViewClockH)
         textViewClockHS = findViewById(R.id.textViewClockHS)
@@ -671,12 +640,7 @@ class MainActivity : ComponentActivity() {
         textViewClock7special = findViewById(R.id.textViewClock7special)
         textViewClock8fast = findViewById(R.id.textViewClock8fast)
 
-
         try {
-//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-//                Log.w("myquietwave","MainActivity fetchParasha no internet at all")
-//                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 112); // REQUEST_INTERNET_PERMISSION);
-//            }
 
             RetrofitInstance.api.getShabbatPerCity("IL-Jerusalem", "off").enqueue(object : Callback<HebCal> {
 
@@ -689,11 +653,12 @@ class MainActivity : ComponentActivity() {
                         var memo = ""
                         hebcal?.items?.forEach {
                             if (it.category == "roshchodesh") {
+
                                 textViewClock6rosh.text = textViewClock6rosh.text.toString() +
                                     it.hebrew + " - " + "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת,ראשון".split(
                                         ","
                                     )
-                                        .get(SimpleDateFormat("yyyy-MM-dd").parse(it.date).day) + " " + it.date;
+                                        .get(SimpleDateFormat("yyyy-MM-dd").parse(it.date).day) + " " + Utils.switchDate(it.date) + "\n";
                                 val roshchodeshDate = it.date;
                                 if (Utils.isBefore(roshchodeshDate)) {
                                     textViewClock6rosh.text = "";
@@ -770,7 +735,6 @@ class MainActivity : ComponentActivity() {
                                     startActivity(browserIntent)
                                 }
 
-
                                 val fullTextH =  " הפטרה " + it.leyning.haftarah
                                 val spannableStringH = SpannableString(fullTextH)
                                 spannableStringH.setSpan(UnderlineSpan(), " הפטרה ".length, fullTextH.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -815,6 +779,9 @@ class MainActivity : ComponentActivity() {
                             textViewClock7special.setOnClickListener {
                                 val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
                                 alertDialogBuilder.setMessage(memo )
+                                alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
+                                    dialog!!.cancel()
+                                }
                                 val alertDialog = alertDialogBuilder.create()
                                 alertDialog.show()
                             }
@@ -848,8 +815,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
-    // @RequiresApi(Build.VERSION_CODES.O) // Unnecessary; SDK_INT is always >= 26
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -863,12 +828,17 @@ class MainActivity : ComponentActivity() {
 
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         val savedLocation = sharedPreferences.getString("location", "IL-Jerusalem")
+        val savedStation = sharedPreferences.getString("station", "GLZ")
 
         editTextLocation.text = savedLocation
         val locations = resources.getStringArray(R.array.locations)
 
         val spinner = findViewById<Spinner>(R.id.editTextLocationSpinner)
+        val stationsSpinner = findViewById<Spinner>(R.id.editTextStationSpinner)
 
+        if (savedStation != null && savedStation == "GLGLZ") {
+            stationsSpinner.setSelection(1)
+        }
 
         if (savedLocation != null && locations.contains(Utils.convertLocationIL(savedLocation))) {
             spinner.setSelection(locations.indexOf(Utils.convertLocationIL(savedLocation)))
@@ -880,38 +850,41 @@ class MainActivity : ComponentActivity() {
         if (spinner != null) {
 
             val locations = resources.getStringArray(R.array.locations)
+            val stations = resources.getStringArray(R.array.stations)
 
             val adapter = ArrayAdapter(this,
                 android.R.layout.simple_spinner_item, locations)
 
             spinner.adapter = adapter
-            
+
+            val stationsAdapter = ArrayAdapter(this,
+                android.R.layout.simple_spinner_item, stations)
+
+            stationsSpinner.adapter = stationsAdapter
+
             lifecycleScope.launch {
                 delay(200)
 
-            spinner.onItemSelectedListener = object :
-                AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: AdapterView<*>,
-                                            view: View?, position: Int, id: Long) {
-                    // locations != null
-                    try {
+                spinner.onItemSelectedListener = object :
+                    AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>,
+                                                view: View?, position: Int, id: Long) {
+
                         editTextLocation.text = "IL-Jerusalem"
                         // try/catch so the main functionality- the click on Start will work
                         if (position != null && id != null && position >= 0 && position < locations.size && locations[position].isNotEmpty() && locations[position] != "Geo/ GPS-Lat, Lon") {
-                            editTextLocation.text = Utils.convertFromLocationIL(locations[position])
+                            editTextLocation.text =
+                                Utils.convertFromLocationIL(locations[position])
                         }
+
                         fetchShabatZmanim()
                         fetchSunsZmanim()
-                    }
-                    catch (e: Exception) {
-                        Log.e("myquietwave", "MainActivity onCreate Exception $e", e)
-                        Firebase.crashlytics.recordException(e)
-                    }
-                }
 
-                override fun onNothingSelected(parent: AdapterView<*>) {
-                    // TODO?
-		    }
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>) {
+                        // TODO?
+                    }
                 }
             }
         }
@@ -941,10 +914,7 @@ class MainActivity : ComponentActivity() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        alertMediaIsPlaying("onCreate")
-
         shareButton = findViewById(R.id.shareButton)
-        // rateButton = findViewById(R.id.rateButton)
 
         shareButton.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND)
@@ -953,41 +923,6 @@ class MainActivity : ComponentActivity() {
             shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text) + " " + shareLink)
             startActivity(Intent.createChooser(shareIntent, "Share this app"))
         }
-
-//        rateButton.setOnClickListener {
-/*
-            val manager = ReviewManagerFactory.create(applicationContext )
-            val request = manager.requestReviewFlow()
-            request.addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // We got the ReviewInfo object
-                    val reviewInfo = task.result
-
-                    val flow = manager.launchReviewFlow(this, reviewInfo)
-                    flow.addOnCompleteListener { l ->
-                        Log.i("myquietwave", "inapp review finished successfully")
-                        // The flow has finished. The API does not indicate whether the user
-                        // reviewed or not, or even whether the review dialog was shown. Thus, no
-                        // matter the result, we continue our app flow.
-                    }
-
-                } else {
-                    // There was some problem, log or handle the error code.
-                    @ReviewErrorCode val reviewErrorCode = (task.getException() as ReviewException).errorCode
-
-                    Log.e("myquietwave", "MainActivity reviewManager.requestReviewFlow error code: $reviewErrorCode")
-
-                }
-            }
-*/
-//            try {
-//                startActivity(Intent(Intent.ACTION_VIEW,
-//                    ("market://details?id=$packageName").toUri()))
-//            } catch (_: ActivityNotFoundException) {
-//                startActivity(Intent(Intent.ACTION_VIEW,
-//                    ("https://play.google.com/store/apps/details?id=$packageName").toUri()))
-//            }
-//        }
 
         statusText = findViewById(R.id.statusText)
         toggleButton = findViewById(R.id.toggleButton)
@@ -1090,15 +1025,18 @@ class MainActivity : ComponentActivity() {
         textViewClock_2nd = findViewById(R.id.textViewClock_2nd)
         textViewClock_3rd = findViewById(R.id.textViewClock_3rd)
 
-        textViewClock_2nd.text = kotlinx.datetime.TimeZone.currentSystemDefault().id
+        textViewClock2 = findViewById(R.id.textViewClock2)
+        textViewDate = findViewById(R.id.textViewDate)
+
+        textViewClock_2nd.text = TimeZone.currentSystemDefault().id
+        // todo? ZoneId.short_ids code, like idt, pst
+        textViewClock_3rd.text = "UTC" + TimeZone.currentSystemDefault().offsetAt(Clock.System.now()) // kotlinx.datetime.TimeZone.of(textViewClock_2nd.text.toString()).offsetAt(kotlinx.datetime.Instant.fromEpochMilliseconds(System.currentTimeMillis()))
 
         val hebrewCalendar = HebrewCalendar()
         val hebY = hebrewCalendar.get(HebrewCalendar.YEAR)
         val hebrewYear = Utils.getYY(hebY)
         val hebrewMonth = hebrewCalendar.get(HebrewCalendar.MONTH)
         val hebrewDay = hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH) // switches at midnight by-design
-        val hebrewDays = arrayOf("א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ", "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל")
-        val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
         var hebrewMonthName = hebrewMonths[hebrewMonth]
 
         //return (year * 12 + 17) % 19 >= 12;
@@ -1112,12 +1050,17 @@ class MainActivity : ComponentActivity() {
                 hebrewMonthName = "אדר ב"
         }
         val hebrewDayName = hebrewDays[hebrewDay-1]
-        textViewHebDate.text = "$hebrewDayName/$hebrewMonthName/$hebrewYear"
+        textViewHebDate.text = "$hebrewDayName $hebrewMonthName $hebrewYear"
 
         Thread {
             while (true) {
                 runOnUiThread {
                     textViewClock.text = LocalDateTime.now().format(DateTimeFormatter.ofPattern("H:mm:ss"))
+                    textViewDate.text = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת,ראשון".split(
+                        ","
+                    )
+                        .get(LocalDate.now().dayOfWeek.value) + " " + SimpleDateFormat("dd-MM-yyyy").format(Date()) // Cannot format given Object as a Date
+
                 }
                 Thread.sleep(500)
             }
@@ -1137,6 +1080,9 @@ class MainActivity : ComponentActivity() {
             textViewNextNews.isEnabled = true
             textViewNextNews.isClickable = true
 
+            stationsSpinner.isEnabled = true
+            stationsSpinner.isClickable = true
+
             toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
         }
         else {
@@ -1147,6 +1093,9 @@ class MainActivity : ComponentActivity() {
 
             textViewNextNews.isEnabled = false
             textViewNextNews.isClickable = false
+
+            stationsSpinner.isEnabled = false
+            stationsSpinner.isClickable = false
 
             toggleButton.setBackgroundColor(Color.Green.toArgb())
         }
@@ -1184,6 +1133,9 @@ class MainActivity : ComponentActivity() {
                 textViewNextNews.isEnabled = true
                 textViewNextNews.isClickable = true
 
+                stationsSpinner.isEnabled = true
+                stationsSpinner.isClickable = true
+
                 toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
 
                 isServiceRunning = false
@@ -1216,36 +1168,22 @@ class MainActivity : ComponentActivity() {
 
                 serviceIntent.putExtra("nextHours", textViewNextNews.text.toString())
 
+                serviceIntent.putExtra("station", stationsSpinner.getSelectedItem().toString())
+
                 // for testing
                 serviceIntent.putExtra("todoList", editTextTodo.text.toString())
                 serviceIntent.putExtra("location", editTextLocation.text.toString())
 
-                if (alertMediaIsPlaying("onClick to turn on")) {
+                if (true) {
 
-                    // @RequiresApi(8
                     startForegroundService(serviceIntent)
+
 
                     firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
                         param("newsDuration", newsDuration.toLong())
-                        // @RequiresApi(8
+                        param("station", stationsSpinner.getSelectedItem().toString())
                         param("isFriday", if (ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY) 1L else 0L)
                     }
-
-
-//                    val alertDialog = AlertDialog.Builder(this).create()
-
-//                    try {
-//                        val mediaSessionManager =
-//                            getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
-                    // TODO add the current media that is being used
-//                    }
-//                    catch (e: Exception) {
-//                        Log.w("myquietwave", "MainActivity Unable to get the active media session " + e)
-//                    }
-
-//                    alertDialog.setMessage(getString(R.string.next_30_sec))
-                    // alertDialog.setIcon(R.drawable.icon)
-//                    alertDialog.show()
 
                     val alertDialogBuilder = AlertDialog.Builder(this)
                     alertDialogBuilder.setMessage(getString(R.string.next_30_sec))
@@ -1254,13 +1192,10 @@ class MainActivity : ComponentActivity() {
                             dialog!!.cancel()
                         }
                     }
-                    // alertDialog.setIcon(R.drawable.icon)
                     val alertDialog = alertDialogBuilder.create()
                     alertDialog.show()
 
                     Thread {
-
-//                        val next_30_alert = (TextView) this.alertDialog.findViewById(android.R.id.message)
 
                         val audioManager = this.getSystemService(AUDIO_SERVICE) as AudioManager
                         for (i in 1..30) {
@@ -1277,9 +1212,6 @@ class MainActivity : ComponentActivity() {
                                         alertDialog.cancel()
                                     }
                                 }
-//                                if (i == 30) {
-//                                    alertDialog.cancel()
-//                                }
                             }
                             Thread.sleep(1000)
                         }
@@ -1299,32 +1231,16 @@ class MainActivity : ComponentActivity() {
                     textViewNextNews.isEnabled = false
                     textViewNextNews.isClickable = false
 
+                    stationsSpinner.isEnabled = false
+                    stationsSpinner.isClickable = false
+
                     isServiceRunning = true
-                }
-                else {
-                    val serviceIntent = Intent(this, VolumeCycleService::class.java)
-                    stopService(serviceIntent)
-
-                    statusText.text = getString(R.string.title_name_disabled, "" /*BuildConfig.VERSION_NAME*/)
-                    toggleButton.text = getString(R.string.start)
-
-                    editTextNumberNewsDuration.isEnabled = true
-                    editTextNumberNewsDuration.isClickable = true
-
-                    textViewNextNews.isEnabled = true
-                    textViewNextNews.isClickable = true
-
-                    toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
-
-                    isServiceRunning = false
-
-                    getSystemService(NotificationManager::class.java).cancel(1)
-
                 }
             }
         }
 
         checkForAppUpdate()
+
     }
 
     private lateinit var appUpdateManager: AppUpdateManager
@@ -1365,105 +1281,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    fun alertMediaIsPlaying(from: String): Boolean {
-        val audioManager = this.getSystemService(AUDIO_SERVICE) as AudioManager
-        val isPlaying = audioManager.isMusicActive()
-
-        Log.i("myquietwave", "MainActivity isPlaying:$isPlaying from $from")
-
-        var volumeZero = false
-        if (from == "onClick to turn on" || (from == "onCreate" && ! VolumeCycleService.isRunning) || from == "onResume") {
-
-            val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
-            val stream = AudioManager.STREAM_MUSIC
-
-            if (from != "onResume" && 0 == audioManager.getStreamVolume(stream)) {
-                volumeZero = true
-                Log.w("myquietwave", "MainActivity from $from and volume is zero")
-            }
-        }
-
-        if ((! isPlaying || volumeZero) && (dialog == null || ! dialog!!.isShowing)) {
-
-            val alertDialog = AlertDialog.Builder(this)
-            alertDialog.setTitle(getString(R.string.alert_title))
-            alertDialog.setMessage(getString(R.string.alert_message))
-            alertDialog.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
-                if (! this.isFinishing) {
-                    dialog!!.cancel()
-                }
-            }
-            // alertDialog.setIcon(R.drawable.icon)
-            dialog = alertDialog.create()
-//            alertDialog.create().show()
-
-            try {
-                dialog?.show()
-
-            } catch (e: Exception) {
-                Log.w("myquietwave", "MainActivity skipped dialog Exception $e", e)
-                Firebase.crashlytics.log("MainActivity skipped dialog Exception")
-                Firebase.crashlytics.recordException(e)
-            }
-
-            val timer = Timer()
-            timer.schedule(object : TimerTask() {
-                override fun run() {
-					if (dialog != null && dialog!!.isShowing() && !isFinishing()) {
-						dialog?.dismiss()
-					}
-                    timer.cancel()
-                }
-            }, 10_000)
-
-            if (from == "onResume") {
-                Log.w("myquietwave", "MainActivity Not disabling the app, might be a network glitch")
-                return true
-            }
-
-            return false
-        }
-        return isPlaying
-    }
-
-    fun initAdapter()
-    {
-        val locations = resources.getStringArray(R.array.locations)
-
-        val adapter = ArrayAdapter(this,
-            android.R.layout.simple_spinner_item, locations)
-
-        spinner.adapter = adapter
-
-        spinner.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>,
-                                        view: View?, position: Int, id: Long) {
-                // locations != null
-                if (view != null) {
-                    try {
-                        editTextLocation.text = "IL-Jerusalem"
-                        // try/catch so the main functionality- the click on Start will work
-                        if (position != null && id != null && position >= 0 && position < locations.size && locations[position].isNotEmpty() && locations[position] != "Geo/ GPS-Lat, Lon") {
-                            editTextLocation.text =
-                                Utils.convertFromLocationIL(locations[position])
-                        }
-                        fetchShabatZmanim()
-                        fetchSunsZmanim()
-                    } catch (e: Exception) {
-                        Log.e("myquietwave", "MainActivity onCreate Exception $e", e)
-                        Firebase.crashlytics.log("MainActivity onCreate Exception")
-                        Firebase.crashlytics.recordException(e)
-                    }
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // TODO?
-            }
-        }
-
-    }
-
 }

@@ -11,21 +11,20 @@
     <string name="start">הפעל</string>
     <string name="stop">הפסק</string>
 
-    <string name="instructions">הפעל ידנית את אפליקציית השמע שלך לרדיו. לחץ למעלה *הפעל*. מעתה והלאה, כשייגמרו החדשות - השמע יושתק</string>
-    <string name="nextNews">החדשות הבאות תהיינה בשעות</string>
+    <string name="instructions">לחץ *הפעל* וחדשות הרדיו יושמעו בשעות הנבחרות. \n\nתוכל לבחור אם להפעיל ידנית אפליקציית רדיו לבחירתך, או לשמוע את אחת מתחנות גלי צהל מתוך אפליקציה זו</string>
+    <string name="nextNews">החדשות הבאות תהיינה בשעות (ניתן להקליד לבחירתך)</string>
     <string name="newsLink">קישורים שימושיים</string>
     <string name="shabbath">🕯🕯 שבת שלום 🕯🕯</string>
     <string name="justListen">האזנה נעימה</string>
-    <string name="todoList">סידורים לפני שבת 📝</string>
+    <string name="todoList">סידורים לפני שבת 📝 ניתן להוסיף עצמאית</string>
 
     <string name="newsLength">משך החדשות בדקות (1 עד 6) ⏱️</string>
-    <string name="newsFreq">תדירות החדשות - כל כמה שעות (1 עד 12)</string>
 
     <string name="next_30_sec">כעת - במשך 30 השניות הקרובות - קבע את עוצמת השמע בה אתה מעוניין לשמוע את החדשות. לאחר מכן עוצמת הרדיו תושתק ותתעורר מעצמה בזמנים המתאימים</string>
     <string name="next_30_sec_with_sec">כעת - במשך %1$d השניות הקרובות - קבע את עוצמת השמע %2$d (מתוך 100) בה אתה מעוניין לשמוע את החדשות. לאחר מכן עוצמת הרדיו תושתק ותתעורר מעצמה בזמנים המתאימים</string>
 
-    <string name="alert_title">האם הרדיו מנגן? ואולי עוצמת השמע היא אפס?!</string>
-    <string name="alert_message">האפליקציה לא מפעילה בעצמה את הרדיו, עליכם להפעיל מראש את האפליקציה המתאימה</string>
+    <string name="alert_title">המוזיקה מהרדיו השתתקה?!</string>
+    <string name="alert_message">האם אפליקציית הרדיו מנגנת? ואולי עוצמת השמע היא אפס?!תוכל להפעיל תחנת רדיו כרצונך באפליקציה מתאימה; אחרת כברירת מחדל תחנת גלי צהל שנבחרה תשודר</string>
 
     <string name="close_alert">סגור</string>
 
@@ -33,7 +32,7 @@
     <string name="rate">דרג</string>
     <string name="share_text"> כדאי לך לנסות את האפליקציה </string>
 
-    <string name="candleLighting">הדלקת נרות</string>
+    <string name="candleLighting">הדלקת נרות🕯️</string>
     <string name="havdalah">הבדלה 🌠</string>
 
     <string name="sunrise">זריחה 🔆</string>
@@ -41,7 +40,7 @@
 
     <string name="location">מיקום 📍</string>
 
-    <string name="ue_usage">הוסף ue, עבור use elevation בחישובים - כלומר שקיעה המישורית. אחרת, תוצג השקיעה הנראית</string>
+    <string name="ue_usage">הוסף ue, עבור use elevation בחישובים - כלומר שקיעה הנראית. אחרת, תוצג השקיעה המישורית</string>
 
     <!-- notifications -->
 
@@ -55,7 +54,12 @@
     <string name="notif_text_4_1">משמיע אודיו בווליום %1$d (מתוך 100) בדקה הקרובה</string>
 
     <string name="notif_text_5">ממתין בשקט לחדשות הבאות</string>
-    <string name="notif_text_radio_stopped">הרדיו כבר לא מנגן, יש להפעילו שוב</string>
+
+    <string name="notif_text_radio_stopped">ממתין בשקט לחדשות הבאות</string>
+<!--    <string name="notif_text_radio_stopped">הרדיו כבר לא מנגן, יש להפעילו שוב. כברירת מחדל, תחנת גלי צהל שנבחרה תשודר</string>-->
+
     <!--    <string name="notif_text_6">מנגן את החדשות הנוכחיות</string>-->
+
+    <string name="station">תחנת ברירת מחדל</string>
 
 </resources>

@@ -19,7 +19,6 @@
     <string name="todoList">Liste de choses à faire 📝</string>
 
     <string name="newsLength">Durée de l\'actualité en minutes (1..6) ⏱️</string>
-    <string name="newsFreq">Fréquence des nouvelles en heures (1..12)</string>
 
     <string name="next_30_sec">Pendant 30 secondes, réglez le volume auquel vous souhaitez écouter les informations. La radio se coupera ensuite et s\'allumera automatiquement aux heures appropriées.</string>
     <string name="next_30_sec_with_sec">Pendant %1$d secondes - régler le volume %2$d (sur 100) À l\'heure souhaitée, la radio se mettra automatiquement en sourdine et se réactivera au moment opportun.</string>
@@ -33,7 +32,7 @@
     <string name="rate">Taux</string>
     <string name="share_text">Découvrez cette belle application:</string>
 
-    <string name="candleLighting">Allumage de bougies</string>
+    <string name="candleLighting">Allumage de bougies🕯️</string>
     <string name="havdalah">Havdalah 🌠</string>
 
     <string name="sunrise">Aurore 🔆</string>
@@ -55,7 +54,9 @@
     <string name="notif_text_4_1">Faible volume %1$d (sur 100) audio pour la minute suivante</string>
 
     <string name="notif_text_5">Silence, jusqu\'au prochain journal</string>
-    <string name="notif_text_radio_stopped">L\'application radio ne fonctionne plus, vous devriez l\'écouter à nouveau</string>
+    <string name="notif_text_radio_stopped">Silence, jusqu\'au prochain journal</string>
     <!--    <string name="notif_text_6">Playing the current news</string>-->
+
+    <string name="station">Station par défaut</string>
 
 </resources>
