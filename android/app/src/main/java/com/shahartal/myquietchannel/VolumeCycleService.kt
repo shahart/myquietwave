@@ -41,16 +41,17 @@ class VolumeCycleService : Service() {
     val GLZ = "https://glzwizzlv.bynetcdn.com/glz_mp3"
     val GLGLZ = "https://glzwizzlv.bynetcdn.com/glglz_mp3"
 
-    // todo
-    val GIMMEL = "https://28993.live.streamtheworld.com/KAN_GIMMEL.mp3"
-    val BET = "https://28573.live.streamtheworld.com/KAN_BET.mp3"
+    val GIMMEL = "https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_GIMMEL.mp3"
+    val BET = "https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_BET.mp3"
+
+    val FM102 = "https://cdn88.mediacast.co.il/102fm-tlv/102fm_mp3/icecast.audio"
 
     private var settedVolume = 0
     private var origVolume = 0
 
     private var mediaPlayer: MediaPlayer? = null
 
-    var mainIntent =  Intent(this, MainActivity::class.java) // todo null?
+    lateinit var mainIntent: Intent
     var mainPendingIntent: PendingIntent? = null
 
     override fun onCreate() {
@@ -87,6 +88,12 @@ class VolumeCycleService : Service() {
         if (url == null) return GLZ
         if (url == "GLGLZ") return GLGLZ
         if (url == "GLZ") return GLZ
+
+        if (url == "BET") return BET
+        if (url == "GIMMEL") return GIMMEL
+
+        if (url == "FM102") return FM102
+
         return GLZ
     }
 

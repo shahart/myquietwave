@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.41
+
+Add more stations to the internal radio player, like Reshet Bet/ Gimmel
+Fix "Attempt to invoke virtual method 'java.lang.String android.content.Context.getPackageName()' on a null object reference"
+
 ## 1.4
 
 Add media player in case the user skipped the manual radio playing, defaults to GLZ/ GLGLZ.

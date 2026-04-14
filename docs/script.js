@@ -118,6 +118,9 @@ async function calc() {
         else if (postfix.toLowerCase() === "il-betar ilit") {
             postfix = "geonameid=284375";
         }
+        else if (postfix.toLowerCase() === "il-zefat") {
+            postfix = "geonameid=293100";
+        }
         else {
             postfix = "city=" + postfix;
         }
@@ -330,7 +333,7 @@ async function calc() {
                 }
                 else if (resp3.items[i].category === 'omer') {
                     // ttip += "ספירת העומר (בבוקר): " + resp3.items[i].hebrew.replace("עומר", "") + "\n";
-                    document.getElementById('fast').innerHTML = " ספירת העומר (בבוקר): " + resp3.items[i].hebrew.replace("עומר", "") + "<br>" + document.getElementById('fast').innerHTML;
+                    document.getElementById('fast').innerHTML = " ספירת העומר (בבוקר): " + resp3.items[i].hebrew.replace("עומר", "") + "<br><br>" + document.getElementById('fast').innerHTML;
                     document.getElementById('fast').style.textDecoration = "underline";
                     document.getElementById('fast').style.color = "blue";
                     document.getElementById('fast').onclick = function() {

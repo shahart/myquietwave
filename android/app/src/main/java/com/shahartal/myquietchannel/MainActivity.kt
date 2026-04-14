@@ -77,6 +77,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var shabesText: TextView
     private lateinit var toggleButton: Button
     private lateinit var shareButton: Button
+    private lateinit var powerButton: Button
 
     private lateinit var editTextNumberNewsDuration: TextView
     // private lateinit var editTextNumberVolume: TextView
@@ -148,8 +149,14 @@ class MainActivity : ComponentActivity() {
 
         stationsSpinner = findViewById<Spinner>(R.id.editTextStationSpinner)
 
-        if (savedStation != null && savedStation == "GLGLZ") {
-            stationsSpinner.setSelection(1)
+        if (savedStation != null) {
+            when (savedStation) {
+                "GLZ"    -> stationsSpinner.setSelection(0)
+                "GLGLZ"  -> stationsSpinner.setSelection(1)
+                "BET"    -> stationsSpinner.setSelection(2)
+                "GIMMEL" -> stationsSpinner.setSelection(3)
+                "FM102"  -> stationsSpinner.setSelection(4)
+            }
         }
 
         fetchShabatZmanim()
@@ -363,6 +370,9 @@ class MainActivity : ComponentActivity() {
                     if (loc.lowercase(getDefault()).contains("il-yavne")) {
                         RetrofitInstance.api.getShabbatPerGeoNameId("293222", Utils.getUe(loc))
                     }
+                    else if (loc.lowercase(getDefault()).contains("il-zefat")) {
+                        RetrofitInstance.api.getShabbatPerGeoNameId("293100", Utils.getUe(loc))
+                    }
                     else if (loc.lowercase(getDefault()).contains("il-modiin ilit")) {
                         RetrofitInstance.api.getShabbatPerGeoNameId("8199378", Utils.getUe(loc))
                     }
@@ -499,6 +509,9 @@ class MainActivity : ComponentActivity() {
             else {
                 if (loc.lowercase(getDefault()).contains("il-yavne")) {
                     RetrofitInstance.api.getZmanimPerGeoNameId("293222", Utils.getUe(loc))
+                }
+                else if (loc.lowercase(getDefault()).contains("il-zefat")) {
+                    RetrofitInstance.api.getZmanimPerGeoNameId("293100", Utils.getUe(loc))
                 }
                 else if (loc.lowercase(getDefault()).contains("il-modiin ilit")) {
                     RetrofitInstance.api.getZmanimPerGeoNameId("8199378", Utils.getUe(loc))
@@ -836,8 +849,14 @@ class MainActivity : ComponentActivity() {
         val spinner = findViewById<Spinner>(R.id.editTextLocationSpinner)
         val stationsSpinner = findViewById<Spinner>(R.id.editTextStationSpinner)
 
-        if (savedStation != null && savedStation == "GLGLZ") {
-            stationsSpinner.setSelection(1)
+        if (savedStation != null) {
+            when (savedStation) {
+                "GLZ"    -> stationsSpinner.setSelection(0)
+                "GLGLZ"  -> stationsSpinner.setSelection(1)
+                "BET"    -> stationsSpinner.setSelection(2)
+                "GIMMEL" -> stationsSpinner.setSelection(3)
+                "FM102"  -> stationsSpinner.setSelection(4)
+            }
         }
 
         if (savedLocation != null && locations.contains(Utils.convertLocationIL(savedLocation))) {
@@ -923,6 +942,11 @@ class MainActivity : ComponentActivity() {
             shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text) + " " + shareLink)
             startActivity(Intent.createChooser(shareIntent, "Share this app"))
         }
+
+//        powerButton = findViewById(R.id.powerButton)
+//        powerButton.setOnClickListener {
+//            startActivity(Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+//        }
 
         statusText = findViewById(R.id.statusText)
         toggleButton = findViewById(R.id.toggleButton)

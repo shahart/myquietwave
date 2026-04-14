@@ -16,7 +16,7 @@
     <string name="start">Start</string>
     <string name="stop">Stop</string>
 
-    <string name="instructions">Manually start your radio app. Click on the top *Start*. From now on, when the news ends - the audio will be muted. \n\nYou can choose whether to manually launch a radio app of your choice, or listen to one of the GLZ radio stations from this app.</string>
+    <string name="instructions">Manually start your radio app. Click on the top *Start*. From now on, when the news ends - the audio will be muted. \n\nYou can choose whether to manually launch a radio app of your choice, or listen to one of the radio stations from this app.</string>
     <string name="nextNews">Upcoming news</string>
     <string name="newsLink">Useful links</string>
     <string name="shabbath">🕯🕯 Shabbat Shalom 🕯🕯</string>
@@ -29,7 +29,7 @@
     <string name="next_30_sec_with_sec">Now - for the next %1$d seconds - set the volume %2$d (out of 100) at which you want to hear the news. The radio will then mute and wake up automatically at the appropriate times.</string>
 
     <string name="alert_title">Is the radio app playing? Maybe the volume is at zero?!</string>
-    <string name="alert_message">You should turn on the appropriate radio app by yourself, otherwise, by default, the selected GLZ station will be used</string>
+    <string name="alert_message">You should turn on the appropriate radio app by yourself, otherwise, by default, the selected station will be used</string>
 
     <string name="close_alert">Close</string>
 
@@ -63,11 +63,14 @@
 
     <string name="ue_usage">Add ,ue for use elevation in the calculations</string>
 
-    <string name="station">Default Station</string>
+    <string name="station">Station</string>
 
     <string-array name="stations">
         <item>GLZ</item>
         <item>GLGLZ</item>
+		<item>BET</item>
+        <item>GIMMEL</item>
+        <item>FM102</item>
     </string-array>
 
     <string-array name="locations">
@@ -97,6 +100,7 @@
         <item>IL-נצרת</item>
         <item>IL-נתניה</item>
         <item>IL-פתח תקוה</item>
+		<item>IL-צפת</item>
         <item>IL-ראשון לציון</item>
         <item>IL-רעננה</item>
         <item>IL-רמלה</item>

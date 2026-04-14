@@ -123,6 +123,7 @@ object Utils {
 
         if (loc.startsWith("IL-Modiin Ilit")) return "IL-מודיעין עילית";
         if (loc.startsWith("IL-Betar Ilit")) return "IL-ביתר עילית";
+        if (loc.startsWith("IL-Zefat")) return "IL-צפת";
 
         return loc;
     }
@@ -161,6 +162,7 @@ object Utils {
         if (loc == "IL-יבנה") return "IL-Yavne";
         if (loc == "IL-ביתר עילית") return "IL-Betar Ilit";
         if (loc == "IL-מודיעין עילית") return "IL-Modiin Ilit";
+        if (loc == "IL-צפת") return "IL-Zefat";
 
         return loc;
     }
