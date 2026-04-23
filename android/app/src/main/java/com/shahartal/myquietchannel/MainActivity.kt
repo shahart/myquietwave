@@ -2,6 +2,7 @@ package com.shahartal.myquietchannel
 
 import android.Manifest
 import android.app.AlertDialog
+//import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
 import android.content.DialogInterface
@@ -14,6 +15,7 @@ import android.icu.util.HebrewCalendar
 import android.location.Location
 import android.location.LocationManager
 import android.media.AudioManager
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.text.SpannableString
@@ -26,10 +28,12 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.CheckBox
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
+//import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
@@ -77,7 +81,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var shabesText: TextView
     private lateinit var toggleButton: Button
     private lateinit var shareButton: Button
-    private lateinit var powerButton: Button
+    // private lateinit var powerButton: Button
+    private var mediaPlayer: MediaPlayer? = null
 
     private lateinit var editTextNumberNewsDuration: TextView
     // private lateinit var editTextNumberVolume: TextView
@@ -116,6 +121,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var editTextLocation : TextView
 
+    private lateinit var radioPlayer : CheckBox
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
 
@@ -156,6 +162,7 @@ class MainActivity : ComponentActivity() {
                 "BET"    -> stationsSpinner.setSelection(2)
                 "GIMMEL" -> stationsSpinner.setSelection(3)
                 "FM102"  -> stationsSpinner.setSelection(4)
+                "GALEY-ISRL" -> stationsSpinner.setSelection(5)
             }
         }
 
@@ -198,6 +205,9 @@ class MainActivity : ComponentActivity() {
         stationsSpinner.isClickable = ! isServiceRunning
 
         getSystemService(NotificationManager::class.java).cancel(1)
+        
+        if (mediaPlayer?.isPlaying == true)
+            stationsSpinner.setEnabled(false)
 
     }
 
@@ -748,12 +758,12 @@ class MainActivity : ComponentActivity() {
                                     startActivity(browserIntent)
                                 }
 
-                                val fullTextH =  " הפטרה " + it.leyning.haftarah
+                                val fullTextH =  " הפטרה " + it.leyning.haftarah.replace("|", "\n")
                                 val spannableStringH = SpannableString(fullTextH)
                                 spannableStringH.setSpan(UnderlineSpan(), " הפטרה ".length, fullTextH.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                 textViewClockH.text = spannableStringH
 
-                                editor.putString("haftarah", " הפטרה " + it.leyning.haftarah)
+                                editor.putString("haftarah", " הפטרה " + it.leyning.haftarah.replace("|", "\n"))
                                 editor.apply()
 
                                 val strH: String = it.leyning.haftarah.split(':')[0]
@@ -768,12 +778,12 @@ class MainActivity : ComponentActivity() {
                                 // it.leyning.haftarah_sephardic = "Ezekiel 8:25-29:21"
                                 if (it.leyning.haftarah_sephardic != null) {
 
-                                    val fullTextHS =  " הפטרה ספרדים " + it.leyning.haftarah_sephardic
+                                    val fullTextHS =  " הפטרה ספרדים " + it.leyning.haftarah_sephardic.replace("|", "\n")
                                     val spannableStringHS = SpannableString(fullTextHS)
                                     spannableStringHS.setSpan(UnderlineSpan(), " הפטרה ספרדים ".length, fullTextHS.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                     textViewClockHS.text = spannableStringHS
 
-                                    editor.putString("haftarah_sephardic", " הפטרה ספרדים " + it.leyning.haftarah_sephardic)
+                                    editor.putString("haftarah_sephardic", " הפטרה ספרדים " + it.leyning.haftarah_sephardic.replace("|", "\n"))
                                     editor.apply()
 
                                     val strHS: String = it.leyning.haftarah_sephardic.split(':')[0]
@@ -856,6 +866,7 @@ class MainActivity : ComponentActivity() {
                 "BET"    -> stationsSpinner.setSelection(2)
                 "GIMMEL" -> stationsSpinner.setSelection(3)
                 "FM102"  -> stationsSpinner.setSelection(4)
+                "GALEY-ISRL" -> stationsSpinner.setSelection(5)
             }
         }
 
@@ -925,6 +936,8 @@ class MainActivity : ComponentActivity() {
         fetchDafYomi()
 
         editTextTodo = findViewById(R.id.editTextTodo)
+
+        radioPlayer = findViewById(R.id.radioCheckbox)
 
         /* val infoIcon: ImageView = findViewById(R.id.info_icon)
         infoIcon.setOnClickListener {
@@ -1141,8 +1154,16 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        radioPlayer.setOnClickListener {
+            editTextNumberNewsDuration.isEnabled = ! editTextNumberNewsDuration.isEnabled
+            textViewNextNews.isEnabled = ! textViewNextNews.isEnabled
+        }
+
         toggleButton.setOnClickListener {
             // Log.d("myquietwave", "MainActivity isServiceRunning: " + isServiceRunning)
+
+            if (mediaPlayer?.isPlaying == true)
+                mediaPlayer?.stop()
 
             if (isServiceRunning) {
 
@@ -1159,6 +1180,7 @@ class MainActivity : ComponentActivity() {
 
                 stationsSpinner.isEnabled = true
                 stationsSpinner.isClickable = true
+                radioPlayer.isEnabled = true
 
                 toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
 
@@ -1197,52 +1219,61 @@ class MainActivity : ComponentActivity() {
                 // for testing
                 serviceIntent.putExtra("todoList", editTextTodo.text.toString())
                 serviceIntent.putExtra("location", editTextLocation.text.toString())
+                serviceIntent.putExtra("radioPlayer", if (radioPlayer.isChecked()) "true" else "false" )
 
                 if (true) {
 
                     startForegroundService(serviceIntent)
 
-
                     firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
                         param("newsDuration", newsDuration.toLong())
                         param("station", stationsSpinner.getSelectedItem().toString())
                         param("isFriday", if (ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY) 1L else 0L)
+                        param("isRadioPlayer", if (radioPlayer.isChecked()) 1L else 0L)
                     }
 
-                    val alertDialogBuilder = AlertDialog.Builder(this)
-                    alertDialogBuilder.setMessage(getString(R.string.next_30_sec))
-                    alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
-                        if (! this.isFinishing) {
-                            dialog!!.cancel()
-                        }
-                    }
-                    val alertDialog = alertDialogBuilder.create()
-                    alertDialog.show()
+                    if (! radioPlayer.isChecked()) {
 
-                    Thread {
-
-                        val audioManager = this.getSystemService(AUDIO_SERVICE) as AudioManager
-                        for (i in 1..30) {
-                            if (! alertDialog.isShowing) {
-                                break
+                        val alertDialogBuilder = AlertDialog.Builder(this)
+                        alertDialogBuilder.setMessage(getString(R.string.next_30_sec))
+                        alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
+                            if (! this.isFinishing) {
+                                dialog!!.cancel()
                             }
-                            runOnUiThread {
-                                if (isServiceRunning) {
-                                    alertDialog.setMessage(getString(R.string.next_30_sec_with_sec, (31 - i),
-                                        100*audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)/audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)))
+                        }
+                        val alertDialog = alertDialogBuilder.create()
+                        alertDialog.show()
+
+                        Thread {
+
+                            val audioManager = this.getSystemService(AUDIO_SERVICE) as AudioManager
+                            for (i in 1..30) {
+                                if (! alertDialog.isShowing) {
+                                    break
                                 }
-                                else {
-                                    if (! this.isFinishing) {
-                                        alertDialog.cancel()
+                                runOnUiThread {
+                                    if (isServiceRunning) {
+                                        alertDialog.setMessage(
+                                            getString(
+                                                R.string.next_30_sec_with_sec, (31 - i),
+                                                100 * audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) / audioManager.getStreamMaxVolume(
+                                                    AudioManager.STREAM_MUSIC
+                                                )
+                                            )
+                                        )
+                                    } else {
+                                        if (! this.isFinishing) {
+                                            alertDialog.cancel()
+                                        }
                                     }
                                 }
+                                Thread.sleep(1000)
                             }
-                            Thread.sleep(1000)
-                        }
-                        if (! this.isFinishing) {
-                            alertDialog.cancel()
-                        }
-                    }.start()
+                            if (! this.isFinishing) {
+                                alertDialog.cancel()
+                            }
+                        }.start()
+                    }
 
                     statusText.text = getString(R.string.title_name_enabled, "" /*BuildConfig.VERSION_NAME*/)
                     toggleButton.text = getString(R.string.stop)
@@ -1257,6 +1288,7 @@ class MainActivity : ComponentActivity() {
 
                     stationsSpinner.isEnabled = false
                     stationsSpinner.isClickable = false
+                    radioPlayer.isEnabled = false
 
                     isServiceRunning = true
                 }

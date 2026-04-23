@@ -88,6 +88,37 @@
 		
 		
     <TextView
+        android:id="@+id/textViewPad20"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAlignment="center"
+        android:textDirection="ltr" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/instructions2"
+        android:textAlignment="center"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/textViewPad21"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAlignment="center"
+        android:textDirection="ltr" />
+
+    <CheckBox
+        android:id="@+id/radioCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="true"
+        android:text="@string/radioPlayer"
+         />
+    <TextView
         android:id="@+id/textViewPad19"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -474,6 +505,12 @@
         android:layout_height="wrap_content"
         android:text="@string/rate"
         android:textAlignment="center" /-->
+        
+	<TextView
+        android:id="@+id/textViewPad22"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center" />
 
   </LinearLayout>
 

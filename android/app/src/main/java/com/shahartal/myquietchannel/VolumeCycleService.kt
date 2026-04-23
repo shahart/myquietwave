@@ -38,13 +38,8 @@ class VolumeCycleService : Service() {
 
     private var job: Job? = null
 
-    val GLZ = "https://glzwizzlv.bynetcdn.com/glz_mp3"
-    val GLGLZ = "https://glzwizzlv.bynetcdn.com/glglz_mp3"
 
-    val GIMMEL = "https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_GIMMEL.mp3"
-    val BET = "https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_BET.mp3"
 
-    val FM102 = "https://cdn88.mediacast.co.il/102fm-tlv/102fm_mp3/icecast.audio"
 
     private var settedVolume = 0
     private var origVolume = 0
@@ -84,22 +79,12 @@ class VolumeCycleService : Service() {
         mediaPlayer = getMediaPlayer(null)
     }
 
-    fun getStationUrl(url: String?): String {
-        if (url == null) return GLZ
-        if (url == "GLGLZ") return GLGLZ
-        if (url == "GLZ") return GLZ
 
-        if (url == "BET") return BET
-        if (url == "GIMMEL") return GIMMEL
 
-        if (url == "FM102") return FM102
 
-        return GLZ
-    }
 
     fun getMediaPlayer( url: String?): MediaPlayer? {
-//        val url = "https://28993.live.streamtheworld.co" // GLZ
-        val url = getStationUrl(url)
+        val url = Utils.getStationUrl(url)
         return MediaPlayer().apply {
             setDataSource(url)
 //            setOnErrorListener(object : MediaPlayer.OnErrorListener {
@@ -163,6 +148,7 @@ class VolumeCycleService : Service() {
 
             var station: String? = "GLZ"
             var newsDuration = 4
+            var radioPlayer: Boolean = false
             var nextHours: String? = "17, 21, 7, 12, 15, 18"
             if (intent == null) {
                 Log.e("myquietwave", "VolumeCycleService intent is null")
@@ -173,6 +159,8 @@ class VolumeCycleService : Service() {
                 nextHours = intent.getStringExtra("nextHours")
                 station = intent.getStringExtra("station")
                 if (station == null) station = "GLZ"
+                val radioPlayerStr = intent.getStringExtra("radioPlayer")
+                if (radioPlayerStr != null && radioPlayerStr == "true") radioPlayer = true
                 Log.i("myquietwave", "VolumeCycleService Initial input: Station $station NewsDuration $newsDuration nextHours $nextHours currentHour " + ZonedDateTime.now(ZoneId.systemDefault()).hour)
             }
 
@@ -192,7 +180,28 @@ class VolumeCycleService : Service() {
 
             Log.i("myquietwave", "VolumeCycleService settings: Station $station NewsDuration $newsDuration nextHours $nextHours currentHour " + ZonedDateTime.now(ZoneId.systemDefault()).hour)
 
+            if (radioPlayer) {
+                if (! alertMediaIsPlaying("glz")) {
+                    if (mediaPlayer?.isPlaying == false) {
+                        mediaPlayer = getMediaPlayer(station)
+                        mediaPlayer?.start()
+                    }
+                }
+                val notification: Notification = NotificationCompat.Builder(thisService, CHANNEL_ID)
+                    .setContentTitle(getString(R.string.notif_title_1)) // ""Volume Cycler Running")
+                    .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
+                    .setOngoing(true)
+                    .setOnlyAlertOnce(true)
+                    .setContentIntent(mainPendingIntent)
+                    .build()
+                getSystemService(NotificationManager::class.java).notify(1, notification)
+            }
+            
             while (isActive) {
+                if (radioPlayer) {
+                    delay(500)
+                    continue
+                }
 
                 var volume50 = settedVolume //  (maxVolume * volume / 100).coerceAtLeast(1)
                 if (isNearShabbath && volume50 > (maxVolume * maxPercentage / 100).coerceAtLeast(1) + 1) { // 0..15

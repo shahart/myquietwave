@@ -10,6 +10,30 @@ import kotlin.math.roundToInt
 
 object Utils {
     
+    val GLZ = "https://glzwizzlv.bynetcdn.com/glz_mp3"
+    val GLGLZ = "https://glzwizzlv.bynetcdn.com/glglz_mp3"
+
+    val GIMMEL = "https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_GIMMEL.mp3"
+    val BET = "https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_BET.mp3"
+
+    val FM102 = "https://cdn88.mediacast.co.il/102fm-tlv/102fm_mp3/icecast.audio"
+    val GALEY_ISRL = "https://cdn.cybercdn.live/Galei_Israel/Live/icecast.audio"
+
+    fun getStationUrl(url: String?): String {
+        if (url == null) return GLZ
+        
+        if (url == "GLGLZ") return GLGLZ
+        if (url == "GLZ") return GLZ
+
+        if (url == "BET") return BET
+        if (url == "GIMMEL") return GIMMEL
+
+        if (url == "FM102") return FM102
+        if (url == "GALEY-ISRL") return GALEY_ISRL
+
+        return GLZ
+    }
+
     fun switchDate(date: String): String {
         try {
             val splits = date.split("-").toTypedArray()

@@ -65,12 +65,17 @@
 
     <string name="station">Station</string>
 
+    <string name="radioPlayer">Ignore the \'Upcoming news\' text field\n      Just play continuously the radio</string>
+
+    <string name="instructions2">You can also play the radio right now</string>
+
     <string-array name="stations">
         <item>GLZ</item>
         <item>GLGLZ</item>
 		<item>BET</item>
         <item>GIMMEL</item>
         <item>FM102</item>
+		<item>GALEY-ISRL</item>
     </string-array>
 
     <string-array name="locations">
@@ -102,9 +107,9 @@
         <item>IL-פתח תקוה</item>
 		<item>IL-צפת</item>
         <item>IL-ראשון לציון</item>
-        <item>IL-רעננה</item>
         <item>IL-רמלה</item>
         <item>IL-רמת גן</item>
+        <item>IL-רעננה</item>
         <item> </item>
         <item>US-Atlanta-GA</item>
         <item>US-Austin-TX</item>

@@ -11,7 +11,7 @@
     <string name="start">הפעל</string>
     <string name="stop">הפסק</string>
 
-    <string name="instructions">לחץ *הפעל* וחדשות הרדיו יושמעו בשעות הנבחרות. \n\nתוכל לבחור אם להפעיל ידנית אפליקציית רדיו לבחירתך, או לשמוע את אחת מתחנות גלי צהל מתוך אפליקציה זו</string>
+	<string name="instructions">לחץ *הפעל* וחדשות הרדיו יושמעו בשעות הנבחרות. \n\nתוכל לבחור אם להפעיל ידנית אפליקציית רדיו לבחירתך, או לשמוע את אחת מהתחנות מתוך אפליקציה זו</string>
     <string name="nextNews">החדשות הבאות תהיינה בשעות (ניתן להקליד לבחירתך)</string>
     <string name="newsLink">קישורים שימושיים</string>
     <string name="shabbath">🕯🕯 שבת שלום 🕯🕯</string>
@@ -24,7 +24,7 @@
     <string name="next_30_sec_with_sec">כעת - במשך %1$d השניות הקרובות - קבע את עוצמת השמע %2$d (מתוך 100) בה אתה מעוניין לשמוע את החדשות. לאחר מכן עוצמת הרדיו תושתק ותתעורר מעצמה בזמנים המתאימים</string>
 
     <string name="alert_title">המוזיקה מהרדיו השתתקה?!</string>
-    <string name="alert_message">האם אפליקציית הרדיו מנגנת? ואולי עוצמת השמע היא אפס?!תוכל להפעיל תחנת רדיו כרצונך באפליקציה מתאימה; אחרת כברירת מחדל תחנת גלי צהל שנבחרה תשודר</string>
+    <string name="alert_message">האם אפליקציית הרדיו מנגנת? ואולי עוצמת השמע היא אפס?!תוכל להפעיל תחנת רדיו כרצונך באפליקציה מתאימה; אחרת כברירת מחדל התחנה שנבחרה תשודר</string>
 
     <string name="close_alert">סגור</string>
 
@@ -60,6 +60,9 @@
 
     <!--    <string name="notif_text_6">מנגן את החדשות הנוכחיות</string>-->
 
-    <string name="station">תחנת ברירת מחדל</string>
+    <string name="station">תחנה</string>
+
+    <string name="radioPlayer">התעלם מהשדה \'שעות החדשות הבאות\'\n   נגן את הרדיו ברצף וללא הפסקה</string>
+    <string name="instructions2">תוכל גם לנגן את הרדיו כבר עכשיו</string>
 
 </resources>

@@ -1,8 +1,13 @@
 # Changelog
 
+## 1.5
+
+Add an option to listen to the radio continuously
+Add Galey-Israel
+
 ## 1.41
 
-Add more stations to the internal radio player, like Reshet Bet/ Gimmel
+Add more stations to the internal radio player, like Reshet Bet/ Gimmel/ 102FM
 Fix "Attempt to invoke virtual method 'java.lang.String android.content.Context.getPackageName()' on a null object reference"
 
 ## 1.4
