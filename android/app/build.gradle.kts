@@ -11,7 +11,7 @@ plugins {
 //fun Project.android(configure: Action<BaseAppModuleExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.ApplicationExtension
 android {
     namespace = "com.shahartal.myquietchannel"
-    compileSdk = 36
+    compileSdk = 37
 
     buildFeatures {
         buildConfig = true
@@ -20,10 +20,10 @@ android {
     defaultConfig {
         applicationId = "com.shahartal.myquietchannel"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
 
-        versionCode = 60
-        versionName = "1.5"
+        versionCode = 62
+        versionName = "1.52"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

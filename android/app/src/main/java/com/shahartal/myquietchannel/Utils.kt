@@ -19,17 +19,26 @@ object Utils {
     val FM102 = "https://cdn88.mediacast.co.il/102fm-tlv/102fm_mp3/icecast.audio"
     val GALEY_ISRL = "https://cdn.cybercdn.live/Galei_Israel/Live/icecast.audio"
 
+    val KAN_88 = "https://27863.live.streamtheworld.com/KAN_88.mp3"
+    val KOL_BARAMA = "https://cdn.cybercdn.live/Kol_Barama/Live_Audio/icecast.audio"
+    val KOL_CHAI = "https://live.kcm.fm/live-new"
+    val KOL_CHAI_MUSIC = "https://live.kcm.fm/livemusic"
+    
     fun getStationUrl(url: String?): String {
         if (url == null) return GLZ
         
-        if (url == "GLGLZ") return GLGLZ
-        if (url == "GLZ") return GLZ
+        if (url == "גלגלצ") return GLGLZ
+        if (url == "גלי צהל") return GLZ
 
-        if (url == "BET") return BET
-        if (url == "GIMMEL") return GIMMEL
+        if (url == "רשת ב") return BET
+        if (url == "רשת ג") return GIMMEL
 
         if (url == "FM102") return FM102
-        if (url == "GALEY-ISRL") return GALEY_ISRL
+        if (url == "גלי ישראל") return GALEY_ISRL
+        if (url == "כאן 88") return KAN_88
+        if (url == "קול חי") return KOL_CHAI
+        if (url == "קול חי מיוזיק") return KOL_CHAI_MUSIC
+        if (url == "קול ברמה") return KOL_BARAMA
 
         return GLZ
     }
@@ -37,7 +46,10 @@ object Utils {
     fun switchDate(date: String): String {
         try {
             val splits = date.split("-").toTypedArray()
-            return splits[2] + "-" + splits[1] + "-" + splits[0]
+            var res = splits[2] + "-" + splits[1] + "-" + splits[0]
+            res = res.replace("-0", "-")
+            if (res.startsWith("0")) res = res.substring(1)
+            return res
         }
         catch (e: Exception) {
             Firebase.crashlytics.log("WARN. switchDate. Date " + date + " is not in the correct format " + e.toString()) // saw length=1; index=2

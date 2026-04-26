@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.52
+
+Add the day-of-week on holidays
+
+## 1.51
+
+More stations
+
 ## 1.5
 
 Add an option to listen to the radio continuously

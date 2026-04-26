@@ -70,12 +70,16 @@
     <string name="instructions2">You can also play the radio right now</string>
 
     <string-array name="stations">
-        <item>GLZ</item>
-        <item>GLGLZ</item>
-		<item>BET</item>
-        <item>GIMMEL</item>
+        <item>גלי צהל</item>
+        <item>גלגלצ</item>
+        <item>רשת ב</item>
+        <item>רשת ג</item>
         <item>FM102</item>
-		<item>GALEY-ISRL</item>
+        <item>גלי ישראל</item>
+        <item>כאן 88</item>
+        <item>קול חי</item>
+        <item>קול חי מיוזיק</item>
+        <item>קול ברמה</item>
     </string-array>
 
     <string-array name="locations">

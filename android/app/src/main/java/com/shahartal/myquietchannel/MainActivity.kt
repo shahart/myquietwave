@@ -75,6 +75,9 @@ class MainActivity : ComponentActivity() {
     val hebrewDays = arrayOf("א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ", "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל")
     val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
 
+    companion object {
+        const val NEXT_HOURS = "17, 21, 7, 12, 15, 18"
+    }
     private var isServiceRunning = false
 
     private lateinit var statusText: TextView
@@ -85,13 +88,10 @@ class MainActivity : ComponentActivity() {
     private var mediaPlayer: MediaPlayer? = null
 
     private lateinit var editTextNumberNewsDuration: TextView
-    // private lateinit var editTextNumberVolume: TextView
     private lateinit var textViewNextNews: TextView
 
-    // private lateinit var textViewNewsGlz: TextView
     private lateinit var textViewNewsLinks: TextView
     private lateinit var textViewPosition: TextView
-    // private lateinit var textViewNewsKan: TextView
 
 
     private lateinit var textViewClock : TextView
@@ -139,6 +139,7 @@ class MainActivity : ComponentActivity() {
         val savedName = sharedPreferences.getString("todoList", "פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן")
         val savedLocation = sharedPreferences.getString("location", "IL-Jerusalem")
         val savedStation = sharedPreferences.getString("station", "GLZ")
+        val justRadio = sharedPreferences.getString("justRadio", "false")
 
         editTextTodo.text = savedName
         editTextLocation.text = savedLocation
@@ -157,12 +158,16 @@ class MainActivity : ComponentActivity() {
 
         if (savedStation != null) {
             when (savedStation) {
-                "GLZ"    -> stationsSpinner.setSelection(0)
-                "GLGLZ"  -> stationsSpinner.setSelection(1)
-                "BET"    -> stationsSpinner.setSelection(2)
-                "GIMMEL" -> stationsSpinner.setSelection(3)
+                "גלי צהל"    -> stationsSpinner.setSelection(0)
+                "גלגלצ"  -> stationsSpinner.setSelection(1)
+                "רשת ב"    -> stationsSpinner.setSelection(2)
+                "רשת ג" -> stationsSpinner.setSelection(3)
                 "FM102"  -> stationsSpinner.setSelection(4)
-                "GALEY-ISRL" -> stationsSpinner.setSelection(5)
+                "גלי ישראל" -> stationsSpinner.setSelection(5)
+                "כאן 88" -> stationsSpinner.setSelection(6)
+                "קול חי"  -> stationsSpinner.setSelection(7)
+                "קול חי מיוזיק" -> stationsSpinner.setSelection(8)
+                "קול ברמה" -> stationsSpinner.setSelection(9)
             }
         }
 
@@ -175,7 +180,7 @@ class MainActivity : ComponentActivity() {
             newsDuration = 1
         editTextNumberNewsDuration.text = newsDuration.toString()
 
-        val nextHours = sharedPreferences.getString("nextHours", "17, 21, 7, 12, 15, 18")
+        val nextHours = sharedPreferences.getString("nextHours", NEXT_HOURS)
         textViewNextNews.text = nextHours
 
         val serviceIntent = Intent(this, VolumeCycleService::class.java)
@@ -184,22 +189,29 @@ class MainActivity : ComponentActivity() {
             isServiceRunning = false
         }
 
+        if (justRadio == "true") {
+            editTextNumberNewsDuration.isEnabled = false
+            textViewNextNews.isEnabled = false
+            radioPlayer.isChecked = true
+        }
         if (isServiceRunning) {
             statusText.text = getString(R.string.title_name_enabled, "" /*BuildConfig.VERSION_NAME*/)
             toggleButton.text = getString(R.string.stop)
             toggleButton.setBackgroundColor(Color.Green.toArgb())
+            radioPlayer.isEnabled = false
         }
         else {
             statusText.text = getString(R.string.title_name_disabled, "" /*BuildConfig.VERSION_NAME*/)
             toggleButton.text = getString(R.string.start)
             toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
+            radioPlayer.isEnabled = true
         }
 
-        editTextNumberNewsDuration.isEnabled = ! isServiceRunning
-        editTextNumberNewsDuration.isClickable = ! isServiceRunning
+        editTextNumberNewsDuration.isEnabled = ! isServiceRunning && ! radioPlayer.isChecked
+        editTextNumberNewsDuration.isClickable = ! isServiceRunning && ! radioPlayer.isChecked
 
-        textViewNextNews.isEnabled = ! isServiceRunning
-        textViewNextNews.isClickable = ! isServiceRunning
+        textViewNextNews.isEnabled = ! isServiceRunning && ! radioPlayer.isChecked
+        textViewNextNews.isClickable = ! isServiceRunning && ! radioPlayer.isChecked
 
         stationsSpinner.isEnabled = ! isServiceRunning
         stationsSpinner.isClickable = ! isServiceRunning
@@ -220,6 +232,7 @@ class MainActivity : ComponentActivity() {
         editor.putString("todoList", editTextTodo.text.toString())
         editor.putString("location", editTextLocation.text.toString())
         editor.putString("station", stationsSpinner.getSelectedItem().toString())
+        editor.putString("justRadio", if (radioPlayer.isChecked()) "true" else "false")
 
         val newsDurationStr = editTextNumberNewsDuration.text.toString()
         var newsDuration = if (newsDurationStr.isEmpty()) 4 else newsDurationStr.toInt()
@@ -706,11 +719,14 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                             else if (it.category == "holiday") {
-                                val roshchodeshDate = it.date
-                                if (! Utils.isBefore(roshchodeshDate)) {
+                                val holidayDate = it.date
+                                if (! Utils.isBefore(holidayDate)) {
 
                                     textViewClock7special.text = textViewClock7special.text.toString() + "\n" +
-                                        it.hebrew + " - " + Utils.switchDate(it.date) ;
+                                        it.hebrew + " - " + "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת,ראשון".split(
+                                        ","
+                                    )
+                                        .get(SimpleDateFormat("yyyy-MM-dd").parse(it.date).day) + " " + Utils.switchDate(it.date) ;
 
                                     if (! memo.contains(it.memo)) {
                                         memo += "\n\n" + it.hebrew + ": " + it.memo
@@ -852,6 +868,7 @@ class MainActivity : ComponentActivity() {
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         val savedLocation = sharedPreferences.getString("location", "IL-Jerusalem")
         val savedStation = sharedPreferences.getString("station", "GLZ")
+        val justRadio = sharedPreferences.getString("justRadio", "false")
 
         editTextLocation.text = savedLocation
         val locations = resources.getStringArray(R.array.locations)
@@ -861,12 +878,16 @@ class MainActivity : ComponentActivity() {
 
         if (savedStation != null) {
             when (savedStation) {
-                "GLZ"    -> stationsSpinner.setSelection(0)
-                "GLGLZ"  -> stationsSpinner.setSelection(1)
-                "BET"    -> stationsSpinner.setSelection(2)
-                "GIMMEL" -> stationsSpinner.setSelection(3)
+                "גלי צהל"    -> stationsSpinner.setSelection(0)
+                "גלגלצ"  -> stationsSpinner.setSelection(1)
+                "רשת ב"    -> stationsSpinner.setSelection(2)
+                "רשת ג" -> stationsSpinner.setSelection(3)
                 "FM102"  -> stationsSpinner.setSelection(4)
-                "GALEY-ISRL" -> stationsSpinner.setSelection(5)
+                "גלי ישראל" -> stationsSpinner.setSelection(5)
+                "כאן 88" -> stationsSpinner.setSelection(6)
+                "קול חי"  -> stationsSpinner.setSelection(7)
+                "קול חי מיוזיק" -> stationsSpinner.setSelection(8)
+                "קול ברמה" -> stationsSpinner.setSelection(9)
             }
         }
 
@@ -956,15 +977,10 @@ class MainActivity : ComponentActivity() {
             startActivity(Intent.createChooser(shareIntent, "Share this app"))
         }
 
-//        powerButton = findViewById(R.id.powerButton)
-//        powerButton.setOnClickListener {
-//            startActivity(Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-//        }
-
         statusText = findViewById(R.id.statusText)
         toggleButton = findViewById(R.id.toggleButton)
+
         editTextNumberNewsDuration = findViewById(R.id.editTextDuration)
-        // editTextNumberVolume = findViewById(R.id.editTextNumberVolumePercentage)
         textViewNextNews = findViewById(R.id.textViewNextNewsStr)
 
         textViewNewsLinks = findViewById(R.id.textView14)
@@ -1050,7 +1066,7 @@ class MainActivity : ComponentActivity() {
                     editTextNumberNewsDuration.text = "1"
                 }
                 if (textViewNextNews.text.toString() == "") {
-                    textViewNextNews.text = "17, 21, 7, 12, 15, 18"
+                    textViewNextNews.text = NEXT_HOURS
                 }
             }
         }
@@ -1096,7 +1112,7 @@ class MainActivity : ComponentActivity() {
                     textViewDate.text = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת,ראשון".split(
                         ","
                     )
-                        .get(LocalDate.now().dayOfWeek.value) + " " + SimpleDateFormat("dd-MM-yyyy").format(Date()) // Cannot format given Object as a Date
+                        .get(LocalDate.now().dayOfWeek.value) + " " + SimpleDateFormat("dd-M-yyyy").format(Date()) // Cannot format given Object as a Date
 
                 }
                 Thread.sleep(500)
@@ -1111,11 +1127,11 @@ class MainActivity : ComponentActivity() {
         if (! isServiceRunning) {
             toggleButton.text = getString(R.string.start)
 
-            editTextNumberNewsDuration.isEnabled = true
-            editTextNumberNewsDuration.isClickable = true
+            editTextNumberNewsDuration.isEnabled = true && ! radioPlayer.isChecked
+            editTextNumberNewsDuration.isClickable = true && ! radioPlayer.isChecked
 
-            textViewNextNews.isEnabled = true
-            textViewNextNews.isClickable = true
+            textViewNextNews.isEnabled = true && ! radioPlayer.isChecked
+            textViewNextNews.isClickable = true && ! radioPlayer.isChecked
 
             stationsSpinner.isEnabled = true
             stationsSpinner.isClickable = true
@@ -1155,8 +1171,13 @@ class MainActivity : ComponentActivity() {
         }
 
         radioPlayer.setOnClickListener {
-            editTextNumberNewsDuration.isEnabled = ! editTextNumberNewsDuration.isEnabled
-            textViewNextNews.isEnabled = ! textViewNextNews.isEnabled
+            editTextNumberNewsDuration.isEnabled = ! radioPlayer.isChecked
+            textViewNextNews.isEnabled = ! radioPlayer.isChecked
+        }
+        if (justRadio == "true") {
+            editTextNumberNewsDuration.isEnabled = false
+            textViewNextNews.isEnabled = false
+            radioPlayer.isChecked = true
         }
 
         toggleButton.setOnClickListener {
@@ -1172,11 +1193,11 @@ class MainActivity : ComponentActivity() {
                 statusText.text = getString(R.string.title_name_disabled, "" /*BuildConfig.VERSION_NAME*/)
                 toggleButton.text = getString(R.string.start)
 
-                editTextNumberNewsDuration.isEnabled = true
-                editTextNumberNewsDuration.isClickable = true
+                editTextNumberNewsDuration.isEnabled = true && ! radioPlayer.isChecked
+                editTextNumberNewsDuration.isClickable = true && ! radioPlayer.isChecked
 
-                textViewNextNews.isEnabled = true
-                textViewNextNews.isClickable = true
+                textViewNextNews.isEnabled = true && ! radioPlayer.isChecked
+                textViewNextNews.isClickable = true && ! radioPlayer.isChecked
 
                 stationsSpinner.isEnabled = true
                 stationsSpinner.isClickable = true
@@ -1207,16 +1228,12 @@ class MainActivity : ComponentActivity() {
                     editTextNumberNewsDuration.text = "1"
                 }
                 if (textViewNextNews.text.toString() == "") {
-                    textViewNextNews.text = "17, 21, 7, 12, 15, 18"
+                    textViewNextNews.text = NEXT_HOURS
                 }
 
                 serviceIntent.putExtra("newsDuration", newsDuration)
-
                 serviceIntent.putExtra("nextHours", textViewNextNews.text.toString())
-
                 serviceIntent.putExtra("station", stationsSpinner.getSelectedItem().toString())
-
-                // for testing
                 serviceIntent.putExtra("todoList", editTextTodo.text.toString())
                 serviceIntent.putExtra("location", editTextLocation.text.toString())
                 serviceIntent.putExtra("radioPlayer", if (radioPlayer.isChecked()) "true" else "false" )
