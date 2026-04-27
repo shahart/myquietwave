@@ -144,12 +144,11 @@ class VolumeCycleService : Service() {
 
             val maxVolume = audioManager.getStreamMaxVolume(stream) // usually 15
             Log.i("myquietwave", "VolumeCycleService init volume $origVolume out of $maxVolume")
-            // val currentVolume = audioManager.getStreamVolume(stream)
 
             var station: String? = "GLZ"
             var newsDuration = 4
             var radioPlayer: Boolean = false
-            var nextHours: String? = "17, 21, 7, 12, 15, 18"
+            var nextHours: String? = MainActivity.NEXT_HOURS
             if (intent == null) {
                 Log.e("myquietwave", "VolumeCycleService intent is null")
                 Firebase.crashlytics.log("VolumeCycleService intent is null")
@@ -458,10 +457,8 @@ class VolumeCycleService : Service() {
         Log.d("myquietwave", "VolumeCycleService on destroy, volume back to " + origVolume + " from " + audioManager.getStreamVolume(stream) + " out of " +  audioManager.getStreamMaxVolume(stream))
         audioManager.setStreamVolume(stream, origVolume, 0)
 
-//        if (! alertMediaIsPlaying("glz")) {
             if (mediaPlayer?.isPlaying == true)
                 mediaPlayer?.stop()
-//        }
 
         job?.cancel()
         super.onDestroy()
