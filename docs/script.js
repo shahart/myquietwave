@@ -427,3 +427,117 @@ setInterval(updateClock, 500);
 let days = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת";
 let d = new Date();
 document.getElementById('dat').innerHTML = d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear()  + " - " + days.split(",")[d.getDay()];
+
+let myWindow;
+let countdownInterval;
+let isRadioPending = false;
+
+function openWin() {
+  const url = document.getElementById("stationSelect").value;
+  myWindow = window.open(url, "_blank", "width=500,height=500");
+}
+
+function listenNow() {
+  isRadioPending = false;
+  if (myWindow && !myWindow.closed) {
+    alert("A window is already open. Close it first.");
+    return;
+  }
+  openWin();
+  clearInterval(countdownInterval);
+  document.getElementById("status").textContent = "Playing";
+  document.getElementById("timer").textContent = "";
+  document.getElementById("listenNowButton").disabled = true;
+  document.getElementById("radioButton").disabled = true;
+  let checkInterval = setInterval(() => {
+    if (myWindow && myWindow.closed) {
+      document.getElementById("listenNowButton").disabled = false;
+      document.getElementById("radioButton").disabled = false;
+      document.getElementById("status").textContent = "";
+      document.getElementById("timer").textContent = "";
+      clearInterval(checkInterval);
+    }
+  }, 1000);
+}
+
+function sleep (time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+
+function setCountdown(label, durationMs) {
+  const statusEl = document.getElementById("status");
+  const timerEl = document.getElementById("timer");
+  const endTime = Date.now() + durationMs;
+
+  clearInterval(countdownInterval);
+
+  function render() {
+    const remainingMs = Math.max(0, endTime - Date.now());
+    const totalSeconds = Math.floor(remainingMs / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    if (remainingMs >= 1000) {
+        statusEl.textContent = label;
+        timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}` + "  ";
+    }
+    else {
+        statusEl.textContent = "";
+        timerEl.textContent = "";
+    }
+
+    if (label === " החדשות יושתקו בעוד " && myWindow && myWindow.closed) {
+        statusEl.textContent = "";
+        timerEl.textContent = "";   
+        document.getElementById("radioButton").disabled = false;
+    }
+
+    if (remainingMs <= 0) {
+      clearInterval(countdownInterval);
+    }
+  }
+
+  render();
+  countdownInterval = setInterval(render, 1000);
+}
+
+function listenToNextNews() {
+  isRadioPending = true;
+  const now = new Date();
+  const minutes = now.getMinutes();
+  let msToNextHour = ((60 - minutes) * 60 - now.getSeconds()) * 1000;
+  document.getElementById("radioButton").disabled = true;
+  setCountdown(" החדשות יושמעו בעוד ", msToNextHour);
+  sleep(msToNextHour).then(() => {
+  if (!isRadioPending) {
+    document.getElementById("radioButton").disabled = false;
+    return;
+  }
+  // console.log(new Date() + " open");
+  if (myWindow && !myWindow.closed) {
+    alert("A window is already open. Close it first.");
+    document.getElementById("radioButton").disabled = false;
+    return;
+  }
+  openWin(); // Opens the window first to ensure we have a reference to it
+  isRadioPending = false;
+  if (myWindow) {
+    let newsLength = 4*60*1000; // 4 minutes in milliseconds
+    setCountdown(" החדשות יושתקו בעוד ", newsLength);
+    sleep(newsLength).then(() => {
+        // console.log(new Date() + " close");
+        myWindow.close(); // Closes the referenced window
+        document.getElementById("status").textContent = "Closed";
+        document.getElementById("timer").textContent = "";
+        document.getElementById("radioButton").disabled = false;
+    });
+  }
+  else {
+    console.error("Failed to open pop-up window");
+    window.alert("Failed to open pop-up window");
+    document.getElementById("status").textContent = "Failed to open pop-up window";
+    document.getElementById("timer").textContent = "";
+    document.getElementById("radioButton").disabled = false;
+  }
+  })
+
+}

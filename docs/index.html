@@ -5,11 +5,49 @@
     <meta name="description" content="App">
     <meta name='viewport' content='width=device-width, height=device-height, initial-scale=1.0'>
     <title>Radio for Shabbat App 📻</title>
+    <style>
+        .buttonRadio {
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .buttonRadio:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body> <!--  dir="rtl" -->
     
 <h2>Radio for Shabbat App 📻</h2>
+<div id="status"></div>
+<div id="timer"></div>
+<br/>
+<br/>
+<b>תחנה</b>
+<br/>
+<select id="stationSelect">
+<option value="https://glzwizzlv.bynetcdn.com/glz_mp3">גלצ</option>
+<option value="https://glzwizzlv.bynetcdn.com/glglz_mp3">גלגלצ</option>
+<option value="https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_BET.mp3">רשת ב</option>
+<option value="https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_GIMMEL.mp3" selected>רשת ג</option>
+<option value="https://cdn88.mediacast.co.il/102fm-tlv/102fm_mp3/icecast.audio">FM102</option>
+<option value="https://cdn.cybercdn.live/Galei_Israel/Live/icecast.audio">גלי ישראל</option>
+<option value="https://27863.live.streamtheworld.com/KAN_88.mp3">כאן 88 </option>
+<option value="https://live.kcm.fm/live-new">קול חי </option>
+<option value="https://live.kcm.fm/livemusic">קול חי מיוזיק </option>
+<option value="https://cdn.cybercdn.live/Kol_Barama/Live_Audio/icecast.audio">קול ברמה </option>
+</select><br>
+<br/>
+<button id="radioButton" class="buttonRadio" onClick="listenToNextNews()">שמע רק את החדשות</button><br>
+<br/>
+<button id="listenNowButton" class="buttonRadio" onClick="listenNow()">שמע כבר עכשיו וללא הפסקה</button><br>
+<br/>
 <hr>
+<br/>
 Links: <a href="links-shabbat.html">links.html</a><br>
 <br/>
 iPhone Shortcut: <a href="https://www.icloud.com/shortcuts/0b04a8e93d9a47e2977a04c9048a93b5">https://www.icloud.com/shortcuts/0b04a8e93d9a47e2977a04c9048a93b5</a><br>
