@@ -8,8 +8,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.icu.util.Calendar
 import android.icu.util.HebrewCalendar
 import android.location.Location
@@ -30,8 +28,6 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.CheckBox
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
 //import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -78,13 +74,16 @@ class MainActivity : ComponentActivity() {
     companion object {
         const val NEXT_HOURS = "17, 21, 7, 12, 15, 18"
     }
+
     private var isServiceRunning = false
 
     private lateinit var statusText: TextView
     private lateinit var shabesText: TextView
     private lateinit var toggleButton: Button
     private lateinit var shareButton: Button
+
     // private lateinit var powerButton: Button
+
     private var mediaPlayer: MediaPlayer? = null
 
     private lateinit var editTextNumberNewsDuration: TextView
@@ -92,7 +91,6 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var textViewNewsLinks: TextView
     private lateinit var textViewPosition: TextView
-
 
     private lateinit var textViewClock : TextView
     private lateinit var textViewHebDate : TextView
@@ -127,9 +125,37 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and
-                Configuration.UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
+    private fun updateServiceUi() {
+        val canEditSchedule = !isServiceRunning && !radioPlayer.isChecked
+
+        statusText.text = getString(
+            if (isServiceRunning) R.string.title_name_enabled else R.string.title_name_disabled,
+            ""
+        )
+        statusText.alpha = if (isServiceRunning) 1f else 0.92f
+
+        toggleButton.text = getString(if (isServiceRunning) R.string.stop else R.string.start)
+        toggleButton.setBackgroundResource(
+            if (isServiceRunning) R.drawable.bg_button_active else R.drawable.bg_button_idle
+        )
+        toggleButton.setTextColor(ContextCompat.getColor(this, R.color.button_text_light))
+
+//        infoText.text = if (isServiceRunning) {
+//            "השירות פעיל עכשיו"
+//        } else {
+//            "הגדר רדיו והפעל"
+//        }
+
+        radioPlayer.isEnabled = !isServiceRunning
+
+        editTextNumberNewsDuration.isEnabled = canEditSchedule
+        editTextNumberNewsDuration.isClickable = canEditSchedule
+
+        textViewNextNews.isEnabled = canEditSchedule
+        textViewNextNews.isClickable = canEditSchedule
+
+        stationsSpinner.isEnabled = !isServiceRunning
+        stationsSpinner.isClickable = !isServiceRunning
     }
 
     override fun onResume() {
@@ -139,7 +165,7 @@ class MainActivity : ComponentActivity() {
         val savedName = sharedPreferences.getString("todoList", "פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן")
         val savedLocation = sharedPreferences.getString("location", "IL-Jerusalem")
         val savedStation = sharedPreferences.getString("station", "GLZ")
-        val justRadio = sharedPreferences.getString("justRadio", "false")
+        val justRadio = sharedPreferences.getString("justRadio", "false") // TODO
 
         editTextTodo.text = savedName
         editTextLocation.text = savedLocation
@@ -194,30 +220,10 @@ class MainActivity : ComponentActivity() {
             textViewNextNews.isEnabled = false
             radioPlayer.isChecked = true
         }
-        if (isServiceRunning) {
-            statusText.text = getString(R.string.title_name_enabled, "" /*BuildConfig.VERSION_NAME*/)
-            toggleButton.text = getString(R.string.stop)
-            toggleButton.setBackgroundColor(Color.Green.toArgb())
-            radioPlayer.isEnabled = false
-        }
-        else {
-            statusText.text = getString(R.string.title_name_disabled, "" /*BuildConfig.VERSION_NAME*/)
-            toggleButton.text = getString(R.string.start)
-            toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
-            radioPlayer.isEnabled = true
-        }
 
-        editTextNumberNewsDuration.isEnabled = ! isServiceRunning && ! radioPlayer.isChecked
-        editTextNumberNewsDuration.isClickable = ! isServiceRunning && ! radioPlayer.isChecked
-
-        textViewNextNews.isEnabled = ! isServiceRunning && ! radioPlayer.isChecked
-        textViewNextNews.isClickable = ! isServiceRunning && ! radioPlayer.isChecked
-
-        stationsSpinner.isEnabled = ! isServiceRunning
-        stationsSpinner.isClickable = ! isServiceRunning
+        updateServiceUi()
 
         getSystemService(NotificationManager::class.java).cancel(1)
-        
         if (mediaPlayer?.isPlaying == true)
             stationsSpinner.setEnabled(false)
 
@@ -232,7 +238,7 @@ class MainActivity : ComponentActivity() {
         editor.putString("todoList", editTextTodo.text.toString())
         editor.putString("location", editTextLocation.text.toString())
         editor.putString("station", stationsSpinner.getSelectedItem().toString())
-        editor.putString("justRadio", if (radioPlayer.isChecked()) "true" else "false")
+        editor.putString("justRadio", if (radioPlayer.isChecked) "true" else "false")
 
         val newsDurationStr = editTextNumberNewsDuration.text.toString()
         var newsDuration = if (newsDurationStr.isEmpty()) 4 else newsDurationStr.toInt()
@@ -454,7 +460,7 @@ class MainActivity : ComponentActivity() {
                                     val browserIntent = Intent(
                                         Intent.ACTION_VIEW,
                                         // ("https://he.wikipedia.org/wiki/" + str ).toUri()
-                                        ("https://he.wikipedia.org/wiki/" + str.substring(" מברכים חודש ".length-1) + (if (str.contains("שבט"))  "_(חודש)" else "")).toUri()
+                                        ("https://he.wikipedia.org/wiki/" + str.substring(" מברכים חודש ".length-1).replace("סיון", "סיוון") + (if (str.contains("שבט"))  "_(חודש)" else "")).toUri()
                                     )
                                     startActivity(browserIntent)
                                 }
@@ -703,7 +709,7 @@ class MainActivity : ComponentActivity() {
                                     textViewClock6rosh.setOnClickListener {
                                         val browserIntent = Intent(
                                             Intent.ACTION_VIEW,
-                                            ("https://he.wikipedia.org/wiki/" + str.substring(" ראש חודש ".length - 1) + (if (str.contains("שבט"))  "_(חודש)" else "")).toUri()
+                                            ("https://he.wikipedia.org/wiki/" + str.substring(" ראש חודש ".length - 1).replace("סיון", "סיוון") + (if (str.contains("שבט"))  "_(חודש)" else "")).toUri()
                                         )
                                         startActivity(browserIntent)
                                     }
@@ -873,8 +879,8 @@ class MainActivity : ComponentActivity() {
         editTextLocation.text = savedLocation
         val locations = resources.getStringArray(R.array.locations)
 
-        val spinner = findViewById<Spinner>(R.id.editTextLocationSpinner)
-        val stationsSpinner = findViewById<Spinner>(R.id.editTextStationSpinner)
+        spinner = findViewById(R.id.editTextLocationSpinner)
+        stationsSpinner = findViewById(R.id.editTextStationSpinner)
 
         if (savedStation != null) {
             when (savedStation) {
@@ -1123,35 +1129,9 @@ class MainActivity : ComponentActivity() {
 
         isServiceRunning = VolumeCycleService.isRunning
         Log.i("myquietwave", "MainActivity isRunning: $isServiceRunning")
-
-        if (! isServiceRunning) {
-            toggleButton.text = getString(R.string.start)
-
-            editTextNumberNewsDuration.isEnabled = true && ! radioPlayer.isChecked
-            editTextNumberNewsDuration.isClickable = true && ! radioPlayer.isChecked
-
-            textViewNextNews.isEnabled = true && ! radioPlayer.isChecked
-            textViewNextNews.isClickable = true && ! radioPlayer.isChecked
-
-            stationsSpinner.isEnabled = true
-            stationsSpinner.isClickable = true
-
-            toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
-        }
-        else {
-            toggleButton.text = getString(R.string.stop)
-
-            editTextNumberNewsDuration.isEnabled = false
-            editTextNumberNewsDuration.isClickable = false
-
-            textViewNextNews.isEnabled = false
-            textViewNextNews.isClickable = false
-
-            stationsSpinner.isEnabled = false
-            stationsSpinner.isClickable = false
-
-            toggleButton.setBackgroundColor(Color.Green.toArgb())
-        }
+        toggleButton.setAllCaps(false)
+        shareButton.setAllCaps(false)
+        updateServiceUi()
 
         // Android 13+ needs to ask for notifications permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -1171,13 +1151,12 @@ class MainActivity : ComponentActivity() {
         }
 
         radioPlayer.setOnClickListener {
-            editTextNumberNewsDuration.isEnabled = ! radioPlayer.isChecked
-            textViewNextNews.isEnabled = ! radioPlayer.isChecked
+            updateServiceUi()
         }
+
         if (justRadio == "true") {
-            editTextNumberNewsDuration.isEnabled = false
-            textViewNextNews.isEnabled = false
             radioPlayer.isChecked = true
+            updateServiceUi()
         }
 
         toggleButton.setOnClickListener {
@@ -1190,22 +1169,9 @@ class MainActivity : ComponentActivity() {
 
                 val serviceIntent = Intent(this, VolumeCycleService::class.java)
                 stopService(serviceIntent)
-                statusText.text = getString(R.string.title_name_disabled, "" /*BuildConfig.VERSION_NAME*/)
-                toggleButton.text = getString(R.string.start)
-
-                editTextNumberNewsDuration.isEnabled = true && ! radioPlayer.isChecked
-                editTextNumberNewsDuration.isClickable = true && ! radioPlayer.isChecked
-
-                textViewNextNews.isEnabled = true && ! radioPlayer.isChecked
-                textViewNextNews.isClickable = true && ! radioPlayer.isChecked
-
-                stationsSpinner.isEnabled = true
-                stationsSpinner.isClickable = true
-                radioPlayer.isEnabled = true
-
-                toggleButton.setBackgroundColor(if (isDarkThemeOn()) Color.Black.toArgb() else Color.White.toArgb())
 
                 isServiceRunning = false
+                updateServiceUi()
 
                 getSystemService(NotificationManager::class.java).cancel(1)
 
@@ -1254,7 +1220,7 @@ class MainActivity : ComponentActivity() {
                         val alertDialogBuilder = AlertDialog.Builder(this)
                         alertDialogBuilder.setMessage(getString(R.string.next_30_sec))
                         alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
-                            if (! this.isFinishing) {
+                            if (!this.isFinishing) {
                                 dialog!!.cancel()
                             }
                         }
@@ -1265,7 +1231,7 @@ class MainActivity : ComponentActivity() {
 
                             val audioManager = this.getSystemService(AUDIO_SERVICE) as AudioManager
                             for (i in 1..30) {
-                                if (! alertDialog.isShowing) {
+                                if (!alertDialog.isShowing) {
                                     break
                                 }
                                 runOnUiThread {
@@ -1279,35 +1245,21 @@ class MainActivity : ComponentActivity() {
                                             )
                                         )
                                     } else {
-                                        if (! this.isFinishing) {
+                                        if (!this.isFinishing) {
                                             alertDialog.cancel()
                                         }
                                     }
                                 }
                                 Thread.sleep(1000)
                             }
-                            if (! this.isFinishing) {
+                            if (!this.isFinishing) {
                                 alertDialog.cancel()
                             }
                         }.start()
                     }
 
-                    statusText.text = getString(R.string.title_name_enabled, "" /*BuildConfig.VERSION_NAME*/)
-                    toggleButton.text = getString(R.string.stop)
-
-                    toggleButton.setBackgroundColor(Color.Green.toArgb())
-
-                    editTextNumberNewsDuration.isEnabled = false
-                    editTextNumberNewsDuration.isClickable = false
-
-                    textViewNextNews.isEnabled = false
-                    textViewNextNews.isClickable = false
-
-                    stationsSpinner.isEnabled = false
-                    stationsSpinner.isClickable = false
-                    radioPlayer.isEnabled = false
-
                     isServiceRunning = true
+                    updateServiceUi()
                 }
             }
         }

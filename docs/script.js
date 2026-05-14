@@ -259,7 +259,7 @@ async function calc() {
                             replace("Thursday", "חמישי").
                             replace("Friday", "שישי").
                             replace("Saturday", "שבת") + "<br>";
-                    document.getElementById('lightingUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" מברכים חודש ".length-1) + (data.items[i].hebrew.includes("שבט") ? "_(חודש)" : "");
+                    document.getElementById('lightingUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" מברכים חודש ".length-1).replace("סיון", "סיוון") + (data.items[i].hebrew.includes("שבט") ? "_(חודש)" : "");
                 }
                 else if (data.items[i].title == 'Fast begins') {
                     if (document.getElementById('fast').innerHTML.indexOf("ספירת העומר") < 0) {

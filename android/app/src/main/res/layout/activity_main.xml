@@ -4,514 +4,576 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/screen_background"
+    android:clipToPadding="false"
+    android:fillViewport="true"
     android:scrollbarAlwaysDrawVerticalTrack="true"
-    android:textAlignment="center">
+    android:textAlignment="center"
+    tools:context=".MainActivity">
 
-  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:gravity="center|top"
-      android:orientation="vertical"
-      android:padding="24dp">
-
-    <TextView
-        android:id="@+id/textViewPad4"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textDirection="ltr" />
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="32dp">
 
-    <TextView
-        android:id="@+id/statusText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:text="@string/title_name"
-        android:textAlignment="center"
-        android:textSize="26sp" />
+        <TextView
+            android:id="@+id/textViewPad4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textAlignment="center"
+            android:textDirection="ltr" />
 
-    <TextView
-        android:id="@+id/textViewPad17"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center" />
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:text="@string/title_name"
+            android:textAlignment="center"
+            android:textColor="@color/heading_text"
+            android:textSize="28sp" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_panel_primary"
+            android:elevation="6dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="20dp">
 
-    <Button
-        android:id="@+id/toggleButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/start"
-        android:textAlignment="center" />
+            <TextView
+                android:id="@+id/textViewPad17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center" />
 
-    <TextView
-        android:id="@+id/infoText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text=""
-        android:textSize="18sp" />
+            <Button
+                android:id="@+id/toggleButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_button_idle"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/start"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textColor="@color/button_text_light" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/instructions"
-        android:textAlignment="center"
-        android:textSize="20sp" />
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/instructions"
+                android:textAlignment="center"
+                android:textColor="@color/body_text"
+                android:textSize="20sp" />
 
-    <TextView
-        android:id="@+id/textViewPad2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textDirection="ltr" />
+            <TextView
+                android:id="@+id/textViewPad2"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textDirection="ltr" />
 
+            <TextView
+                android:id="@+id/textViewStationLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/station"
+                android:textAlignment="center"
+                android:textColor="@color/heading_text"
+                android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/textViewStationLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:text="@string/station"
-        android:textAlignment="center"
-        android:textSize="20sp" />
+            <Spinner
+                android:id="@+id/editTextStationSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input_surface"
+                android:paddingStart="12dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="8dp"
+                android:prompt="@string/station"
+                android:textAlignment="center" />
 
-    <Spinner
-        android:id="@+id/editTextStationSpinner"
-        android:layout_width="177dp"
-        android:layout_height="match_parent"
-        android:prompt="@string/station"
-        android:textAlignment="center" />
+            <TextView
+                android:id="@+id/textViewPad20"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textDirection="ltr" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/instructions2"
+                android:textAlignment="center"
+                android:textColor="@color/body_text"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textViewPad21"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textDirection="ltr" />
+
+            <CheckBox
+                android:id="@+id/radioCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="true"
+                android:text="@string/radioPlayer"
+                android:textColor="@color/body_text" />
+
+            <TextView
+                android:id="@+id/textViewPad19"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textDirection="ltr" />
+
+            <TextView
+                android:id="@+id/textViewNextNewsLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/nextNews"
+                android:textAlignment="center"
+                android:textColor="@color/heading_text"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/textViewNextNewsStr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input_surface"
+                android:inputType="text"
+                android:maxLines="1"
+                android:padding="12dp"
+                android:text="17, 21, 7, 12, 15, 18"
+                android:textAlignment="center"
+                android:textColor="@color/heading_text"
+                android:textDirection="ltr"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/textViewPad18"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:text=""
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/textViewDurationLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/newsLength"
+                android:textAlignment="center"
+                android:textColor="@color/heading_text" />
+
+            <EditText
+                android:id="@+id/editTextDuration"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input_surface"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="2"
+                android:padding="12dp"
+                android:text="4"
+                android:textAlignment="center"
+                android:textColor="@color/heading_text" />
+
+            <TextView
+                android:id="@+id/textViewPad3"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:text=""
+                android:textAlignment="center" />
+
+        </LinearLayout>
 		
+		<TextView
+            android:id="@+id/textViewPad24"
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:textAlignment="center" />
+
+		<TextView
+			android:id="@+id/textView14"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentRight="true"
+			android:text="@string/newsLink"
+			android:textAlignment="center"
+			android:textColor="@color/link_text"
+			android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/textViewPad5"
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/textViewShabes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/justListen"
+            android:textAlignment="center"
+            android:textColor="@color/accent_green"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textViewPad6"
+            android:layout_width="match_parent"
+            android:layout_height="12dp" />
+
+        <TextView
+            android:id="@+id/textViewHebDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textAlignment="center"
+            android:textColor="@color/heading_text"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/textViewClock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="monospace"
+            android:text=""
+            android:textAlignment="center"
+            android:textColor="@color/heading_text"
+            android:textSize="28sp" />
+
+        <TextView
+            android:id="@+id/textViewClock_2nd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Asia/Jerusalem"
+            android:textAlignment="center"
+            android:textColor="@color/body_text"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textViewClock_3rd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="UTC+03:00"
+            android:textAlignment="center"
+            android:textColor="@color/body_text"
+            android:textSize="16sp" />
+
+		<TextView
+			android:id="@+id/textViewDate"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text=""
+			android:textAlignment="center"
+			android:textColor="@color/heading_text"
+			android:textSize="20sp" />
+			
+        <LinearLayout
+            android:id="@+id/detailsSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_panel_surface"
+            android:elevation="4dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+
+            <TextView
+                android:id="@+id/textViewClock2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/heading_text"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textViewPad12"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textDirection="ltr" />
+
+            <TextView
+                android:id="@+id/textViewClockH"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/body_text"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textViewClockHS"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/body_text"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textViewPad10"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textDirection="ltr" />
+
+            <TextView
+                android:id="@+id/textViewClock3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/heading_text"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textViewPad11"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textDirection="ltr" />
+
+            <TextView
+                android:id="@+id/textViewClock4dafYomiTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="הדף היומי"
+                android:textAlignment="center"
+                android:textColor="@color/heading_text"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textViewClock4dafYomi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/link_text"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textViewPad14"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textDirection="ltr" />
+
+            <TextView
+                android:id="@+id/textViewClock5locTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/heading_text"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textViewClock5suns"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/body_text"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textViewPad15"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textDirection="ltr" />
+
+            <TextView
+                android:id="@+id/textViewClock6rosh"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/body_text"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textViewClock7special"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/body_text"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textViewPad7"
+                android:layout_width="match_parent"
+                android:layout_height="12dp" />
+
+            <TextView
+                android:id="@+id/textViewClock8fast"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/body_text"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textViewOmer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="הדף היומי"
+                android:textAlignment="center"
+                android:textColor="@color/link_text"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textViewPad9"
+                android:layout_width="match_parent"
+                android:layout_height="16dp" />
+
+            <TextView
+                android:id="@+id/textViewPad1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/textViewLocationLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/location"
+                android:textAlignment="center"
+                android:textColor="@color/heading_text"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/editTextLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input_surface"
+                android:ems="10"
+                android:inputType="text"
+                android:padding="12dp"
+                android:singleLine="true"
+                android:text="IL-ירושלים"
+                android:textAlignment="center"
+                android:textColor="@color/heading_text" />
+
+            <Spinner
+                android:id="@+id/editTextLocationSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_input_surface"
+                android:paddingStart="12dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="8dp"
+                android:prompt="@string/location"
+                android:textAlignment="center" />
+
+
+        </LinearLayout>
 		
-    <TextView
-        android:id="@+id/textViewPad20"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textDirection="ltr" />
+        <TextView
+            android:id="@+id/textViewPad25"
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:textAlignment="center" />		
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/instructions2"
-        android:textAlignment="center"
-        android:textSize="20sp" />
+		<TextView
+			android:id="@+id/textViewTodoLabel"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:fontFamily="sans-serif-medium"
+			android:text="@string/todoList"
+			android:textAlignment="center"
+			android:textColor="@color/heading_text"
+			android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/textViewPad21"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textDirection="ltr" />
+		<EditText
+			android:id="@+id/editTextTodo"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="8dp"
+			android:background="@drawable/bg_input_surface"
+			android:ems="10"
+			android:gravity="center"
+			android:minLines="3"
+			android:padding="12dp"
+			android:singleLine="false"
+			android:text="פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן"
+			android:textAlignment="center"
+			android:textColor="@color/heading_text" />
 
-    <CheckBox
-        android:id="@+id/radioCheckbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:enabled="true"
-        android:text="@string/radioPlayer"
-         />
-    <TextView
-        android:id="@+id/textViewPad19"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textDirection="ltr" />
+		<TextView
+			android:id="@+id/textViewPad"
+			android:layout_width="match_parent"
+			android:layout_height="16dp"
+			android:textAlignment="center" />
 
-    <TextView
-        android:id="@+id/textViewNextNewsLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/nextNews"
-        android:textAlignment="center"
-        android:textSize="20sp" />
+		<Button
+			android:id="@+id/shareButton"
+			android:layout_width="match_parent"
+			android:layout_height="52dp"
+			android:background="@drawable/bg_button_secondary"
+			android:fontFamily="sans-serif-medium"
+			android:text="@string/share"
+			android:textAlignment="center"
+			android:textAllCaps="false"
+			android:textColor="@color/button_text_dark" />
+			
+        <TextView
+            android:id="@+id/textViewPad22"
+            android:layout_width="match_parent"
+            android:layout_height="12dp"
+            android:textAlignment="center" />
 
-    <EditText
-        android:id="@+id/textViewNextNewsStr"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:maxLines="1"
-        android:inputType="text"
-		android:background="@android:color/transparent"
-		android:text="17, 21, 7, 12, 15, 18"
-        android:textDirection="ltr" />
-
-    <TextView
-        android:id="@+id/textViewPad18"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center" />
-
-    <TextView
-        android:id="@+id/textViewDurationLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/newsLength"
-        android:textAlignment="center" />
-
-    <EditText
-        android:id="@+id/editTextDuration"
-        android:layout_width="101dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:ems="10"
-        android:inputType="number"
-        android:maxLength="2"
-        android:text="4"
-        android:textAlignment="center" />
-
-    <TextView
-        android:id="@+id/textViewPad3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center" />
-
-<!--    <RelativeLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content">-->
-
-    <TextView
-        android:id="@+id/textView14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:text="@string/newsLink"
-        android:textAlignment="center"
-        android:textColor="#03A9F4"
-        android:textSize="20sp" />
-
-<!--    </RelativeLayout>-->
-
-    <TextView
-        android:id="@+id/textViewPad5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center" />
-
-    <TextView
-        android:id="@+id/textViewShabes"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/justListen"
-        android:textAlignment="center"
-        android:textColor="#8BC34A"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/textViewPad6"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/textViewHebDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textSize="20sp" />
-		
-    <TextView
-        android:id="@+id/textViewClock"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textSize="20sp" />
-
-      <TextView
-          android:id="@+id/textViewClock_2nd"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text="Asia/Jerusalem"
-          android:textAlignment="center"
-          android:textSize="20sp" />
-
-      <TextView
-          android:id="@+id/textViewClock_3rd"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text="UTC+03:00"
-          android:textAlignment="center"
-          android:textSize="20sp" />
-
-
-      <TextView
-        android:id="@+id/textViewDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textSize="20sp" />
-
-
-    <TextView
-        android:id="@+id/textViewPad13"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textDirection="ltr" />
-
-    <TextView
-        android:id="@+id/textViewClock2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textSize="20sp" />
-
-
-    <TextView
-        android:id="@+id/textViewPad12"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textDirection="ltr" />
-
-      <TextView
-          android:id="@+id/textViewClockH"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text=""
-          android:textAlignment="center"
-          android:textSize="20sp" />
-
-      <TextView
-          android:id="@+id/textViewClockHS"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text=""
-          android:textAlignment="center"
-          android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/textViewPad10"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textDirection="ltr" />
-
-      <TextView
-        android:id="@+id/textViewClock3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textSize="20sp" />
-
-
-    <TextView
-        android:id="@+id/textViewPad11"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textDirection="ltr" />
-
-    <TextView
-        android:id="@+id/textViewClock4dafYomiTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="הדף היומי"
-        android:textAlignment="center"
-        android:textSize="20sp" />
-		
-    <TextView
-        android:id="@+id/textViewClock4dafYomi"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textSize="20sp" />
-
-
-    <TextView
-        android:id="@+id/textViewPad14"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textDirection="ltr" />
-
-    <TextView
-        android:id="@+id/textViewClock5locTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textSize="20sp" />
-		
-    <TextView
-        android:id="@+id/textViewClock5suns"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/textViewPad15"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textDirection="ltr" />
-
-    <TextView
-        android:id="@+id/textViewClock6rosh"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/textViewClock7special"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAlignment="center"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/textViewPad7"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-      <TextView
-          android:id="@+id/textViewClock8fast"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text=""
-          android:textAlignment="center"
-          android:textSize="20sp" />
-
-      <TextView
-          android:id="@+id/textViewOmer"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text="הדף היומי"
-          android:textAlignment="center"
-		  android:textColor="#03A9F4"
-          android:textSize="20sp" />
-
-      <TextView
-          android:id="@+id/textViewPad9"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/textViewPad1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center" />
-
-	<!--ImageView
-		android:id="@+id/info_icon"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:src="@android:drawable/ic_dialog_info"
-		android:contentDescription="Information" /-->
-
-    <TextView
-        android:id="@+id/textViewLocationLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:text="@string/location"
-        android:textAlignment="center"
-        android:textSize="20sp" />
-
-      <EditText
-          android:id="@+id/editTextLocation"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="@android:color/transparent"
-          android:ems="10"
-          android:inputType="text"
-          android:singleLine="true"
-          android:text="IL-ירושלים"
-          android:textAlignment="center" />
-
-      <Spinner
-          android:id="@+id/editTextLocationSpinner"
-          android:layout_width="287dp"
-          android:layout_height="match_parent"
-          android:prompt="@string/location"
-          android:textAlignment="center" />
-
-      <TextView
-        android:id="@+id/textViewPad8"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center" />
-
-    <TextView
-        android:id="@+id/textViewPad16"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center" />
-
-    <TextView
-        android:id="@+id/textViewTodoLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/todoList"
-        android:textAlignment="center"
-        android:textSize="20sp" />
-
-    <EditText
-        android:id="@+id/editTextTodo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:ems="10"
-        
-        android:singleLine="false"
-        android:text="פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן"
-        android:textAlignment="center" />
-
-    <TextView
-        android:id="@+id/textViewPad"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center" />
-
-    <Button
-        android:id="@+id/shareButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/share"
-        android:textAlignment="center" />
-
-    <!--Button
-        android:id="@+id/rateButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/rate"
-        android:textAlignment="center" /-->
-        
-	<TextView
-        android:id="@+id/textViewPad22"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center" />
-
-  </LinearLayout>
+    </LinearLayout>
 
 </ScrollView>
