@@ -240,7 +240,7 @@ async function calc() {
                         document.getElementById('roshchodesh').innerHTML = "";
                     }
                     else {
-                        document.getElementById('roshchodeshUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" ראש חודש ".length-1) + (data.items[i].hebrew.includes("שבט") ? "_(חודש)" : "");
+                        document.getElementById('roshchodeshUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" ראש חודש ".length-1).replace("סיון", "סיוון") + (data.items[i].hebrew.includes("שבט") ? "_(חודש)" : "");
                     }
                 }
                 else if (data.items[i].category === 'mevarchim') {
