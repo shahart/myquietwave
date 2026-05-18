@@ -422,13 +422,13 @@ class MainActivity : ComponentActivity() {
 
                         val hebcal = response.body()
                         hebcal?.items?.forEach {
-                            if (it.category == "candles") { // && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat") || it.memo.contains("Parashat"))) {
+                            if (it.category == "candles" && ! textViewClock3.text.contains(getString(R.string.candleLighting))) { // && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat") || it.memo.contains("Parashat"))) {
                                 res += " " + getString(R.string.candleLighting) + " " + truncDate(it.date)
                                 textViewClock3.text = res
                                 editor.putString("candles", getString(R.string.candleLighting) + " " + truncDate(it.date))
                                 editor.apply()
                             }
-                            else if (it.category == "havdalah" && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat"))) {
+                            else if (it.category == "havdalah" && ! textViewClock3.text.contains(getString(R.string.havdalah))) { //  (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat"))) {
                                 res += "\n" + getString(R.string.havdalah) + " " +  truncDate(it.date)
                                 textViewClock3.text = res
                                 editor.putString("havdalah", getString(R.string.havdalah) + " " +  truncDate(it.date))

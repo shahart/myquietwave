@@ -2,303 +2,784 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="App">
-    <meta name='viewport' content='width=device-width, height=device-height, initial-scale=1.0'>
+    <meta name="description" content="Radio for Shabbat App">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio for Shabbat App 📻</title>
     <style>
-        .buttonRadio {
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        :root {
+            color-scheme: light;
+            --bg: #f5f0e7;
+            --bg-alt: #fffaf3;
+            --panel: rgba(255, 255, 255, 0.86);
+            --panel-strong: rgba(255, 255, 255, 0.96);
+            --border: rgba(77, 55, 32, 0.14);
+            --text: #23160f;
+            --muted: #6c5a49;
+            --accent: #b04b16;
+            --accent-2: #1c6a74;
+            --shadow: 0 18px 50px rgba(55, 35, 16, 0.12);
+            --shadow-soft: 0 10px 24px rgba(55, 35, 16, 0.08);
+            --radius-xl: 28px;
+            --radius-lg: 22px;
+            --radius-md: 16px;
         }
-        .buttonRadio:disabled {
-            background-color: #cccccc;
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            direction: rtl;
+            font-family: "Segoe UI", "Noto Sans Hebrew", "Arial Hebrew", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(176, 75, 22, 0.16), transparent 24%),
+                radial-gradient(circle at top right, rgba(28, 106, 116, 0.14), transparent 28%),
+                linear-gradient(180deg, var(--bg) 0%, #f8f3ea 45%, #f0e8db 100%);
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .page {
+            width: min(1120px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 24px 0 42px;
+        }
+
+        .hero {
+            display: grid;
+            gap: 18px;
+            padding: 24px;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 250, 244, 0.9));
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(176, 75, 22, 0.12);
+            color: var(--accent);
+            font-size: 0.88rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4vw, 3.25rem);
+            line-height: 1.02;
+        }
+
+        .lead {
+            margin: 0;
+            max-width: 74ch;
+            color: var(--muted);
+            font-size: 1.02rem;
+            line-height: 1.75;
+        }
+
+        .hero-meta {
+            display: grid;
+            gap: 10px;
+            min-width: min(100%, 280px);
+            padding: 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.78);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(77, 55, 32, 0.08);
+        }
+
+        .meta-row:last-child {
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
+
+        .meta-label {
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .status {
+            font-weight: 700;
+            color: var(--accent-2);
+        }
+
+        .status:empty,
+        .timer:empty {
+            display: none;
+        }
+
+        .layout {
+            display: grid;
+            gap: 18px;
+            margin-top: 18px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 18px;
+        }
+
+        @media (min-width: 900px) {
+            .grid.two-up {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .grid.three-up {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        .card {
+            padding: 22px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+        }
+
+        .card.strong {
+            background: linear-gradient(180deg, var(--panel-strong), rgba(255, 250, 244, 0.94));
+        }
+
+        .card h2,
+        .card h3 {
+            margin: 0 0 12px;
+            line-height: 1.15;
+        }
+
+        .card h2 {
+            font-size: 1.35rem;
+        }
+
+        .card h3 {
+            font-size: 1.08rem;
+        }
+
+        .section-note {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .radio-controls {
+            display: grid;
+            gap: 12px;
+        }
+
+        .radio-controls .actions {
+            flex-direction: column;
+        }
+
+        label.field-label {
+            display: inline-block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        select,
+        textarea,
+        input[type="text"] {
+            width: 100%;
+            border: 1px solid rgba(77, 55, 32, 0.18);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.96);
+            color: var(--text);
+            font: inherit;
+            padding: 12px 14px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+        }
+
+        textarea {
+            min-height: 96px;
+            resize: vertical;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        button {
+            appearance: none;
+            border: 0;
+            border-radius: 14px;
+            padding: 12px 16px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, opacity 160ms ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.55;
             cursor: not-allowed;
+            transform: none;
+        }
+
+        .buttonRadio {
+            color: white;
+            background: linear-gradient(180deg, #5aa04a 0%, #447f39 100%);
+            box-shadow: 0 10px 22px rgba(68, 127, 57, 0.22);
+        }
+
+        .buttonSecondary {
+            color: var(--text);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(246, 239, 228, 0.96));
+            border: 1px solid rgba(77, 55, 32, 0.14);
+        }
+
+        .buttonIcon {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(28, 106, 116, 0.11);
+            color: var(--accent-2);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .stack {
+            display: grid;
+            gap: 14px;
+        }
+
+        .info-block {
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(77, 55, 32, 0.12);
+            background: rgba(255, 255, 255, 0.78);
+        }
+
+        .info-block a {
+            word-break: break-word;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .mono-ltr {
+            direction: ltr;
+            unicode-bidi: plaintext;
+            word-break: break-word;
+        }
+
+        .image-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            align-items: center;
+        }
+
+        .image-card {
+            display: grid;
+            gap: 10px;
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(77, 55, 32, 0.12);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .image-card img {
+            display: block;
+            margin-inline: auto;
+        }
+
+        .location-row {
+            display: grid;
+            gap: 14px;
+        }
+
+        @media (min-width: 780px) {
+            .location-row {
+                grid-template-columns: 1fr auto;
+                align-items: end;
+            }
+
+            .radio-controls .actions {
+                flex-direction: row;
+            }
+
+            .radio-controls .actions button {
+                width: auto;
+            }
+        }
+
+        .footer-links {
+            display: grid;
+            gap: 12px;
+        }
+
+        .footer-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            padding: 0 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(77, 55, 32, 0.14);
+            background: rgba(255, 255, 255, 0.84);
+            width: fit-content;
+            max-width: 100%;
+        }
+
+        .footer-links a span {
+            word-break: break-word;
+        }
+
+        .divider {
+            height: 1px;
+            margin: 4px 0;
+            background: rgba(77, 55, 32, 0.12);
+        }
+
+        #status,
+        #timer,
+        #foundLoc,
+        #clock,
+        #hdat,
+        #dat,
+        #parasha,
+        #haftarah,
+        #haftarahS,
+        #lighting,
+        #havdala,
+        #sunrise,
+        #sunset,
+        #special,
+        #fast,
+        #roshchodesh,
+        #dafYomi {
+            line-height: 1.7;
+        }
+
+        #status,
+        #timer {
+            min-height: 1.5em;
+        }
+
+        #shabbathExists {
+            font-weight: 700;
         }
     </style>
 </head>
-<body> <!--  dir="rtl" -->
-    
-<h2>Radio for Shabbat App 📻</h2>
-<div id="status"></div>
-<div id="timer"></div>
-<br/>
-<br/>
-<b>תחנה</b>
-<br/>
-<select id="stationSelect">
-<option value="https://glzwizzlv.bynetcdn.com/glz_mp3">גלצ</option>
-<option value="https://glzwizzlv.bynetcdn.com/glglz_mp3">גלגלצ</option>
-<option value="https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_BET.mp3">רשת ב</option>
-<option value="https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_GIMMEL.mp3" selected>רשת ג</option>
-<option value="https://cdn88.mediacast.co.il/102fm-tlv/102fm_mp3/icecast.audio">FM102</option>
-<option value="https://cdn.cybercdn.live/Galei_Israel/Live/icecast.audio">גלי ישראל</option>
-<option value="https://27863.live.streamtheworld.com/KAN_88.mp3">כאן 88 </option>
-<option value="https://live.kcm.fm/live-new">קול חי </option>
-<option value="https://live.kcm.fm/livemusic">קול חי מיוזיק </option>
-<option value="https://cdn.cybercdn.live/Kol_Barama/Live_Audio/icecast.audio">קול ברמה </option>
-</select><br>
-<br/>
-<button id="radioButton" class="buttonRadio" onClick="listenToNextNews()">שמע רק את החדשות</button><br>
-<br/>
-<button id="listenNowButton" class="buttonRadio" onClick="listenNow()">שמע כבר עכשיו וללא הפסקה</button><br>
-<br/>
-<hr>
-<br/>
-Links: <a href="links-shabbat.html">links.html</a><br>
-<br/>
-iPhone Shortcut: <a href="https://www.icloud.com/shortcuts/0b04a8e93d9a47e2977a04c9048a93b5">https://www.icloud.com/shortcuts/0b04a8e93d9a47e2977a04c9048a93b5</a><br>
-<br><img src="iphone-shortcut.jpeg" width="80p"><br>
-<br>
-Android App: <a href="https://play.google.com/store/apps/details?id=com.shahartal.myquietchannel">https://play.google.com/store/apps/details?id=com.shahartal.myquietchannel</a><br>
-<br><img src="Google_Play_Store_badge_EN.svg" width="150p">
+<body>
+    <main class="page">
+        <section class="hero">
+            <div class="hero-top">
+                <div>
+                    <div class="eyebrow">📻 Radio for Shabbat App</div>
+                    <h1>חדשות, זמני שבת וכלי עזר במקום אחד</h1>
+                    <p class="lead">
+                        בחר תחנה, סנכרן מיקום, וקבל זמני היום, שבת, פרשה, הדף היומי ועוד 
+                    </p>
+                </div>
+            </div>
+        </section>
 
-<br>
-<br>
-<hr>
-<br>
-🕰️ <label id="clock"></label><br><br>
-📅 <label id="hdat"></label><br>
-<label id="dat"></label><br>
-<br>
-<label id="shabbathExists">🕯🕯 שבת </label>
-<a id="parashaUrl" href=""> 
-<label id="parasha"></label></a><br>
-<a id="haftarahUrl" href="" target="_blank" ></a>
-<label id="haftarah"></label><br>
-<a id="haftarahSUrl" href="" target="_blank" ></a>
-<label id="haftarahS"></label><br><br>
-🕯️<label id="lighting"></label><br>
-<a id="lightingUrl" href="">
-<label id="lightingM"></label></a>
-🌠<label id="havdala"></label><br><br>
-🔆 זריחה היום <label id="sunrise"></label><br>
-🌅 שקיעה <label id="sunset"></label><br><br>
-<label id="special"></label>
-<label id="fast"></label>
-<a id="roshchodeshUrl" href="">
-<label id="roshchodesh"></label></a>
-<br>
-<a id="dafYomiUrl" href="" target="_blank">הדף היומי</a><br><label id="dafYomi"></label><br><br>
-<button onClick="getLoc()">📍</button>
-<label for="locationSelect">
- מיקום</label><br>
-<select id="locationSelect">
-    <optgroup label="ישראל"> 
-        <option value="IL-Jerusalem">IL-ירושלים</option>
-        <option value="IL-Tel Aviv">IL-תל אביב</option>
-        <option value="IL-Haifa">IL-חיפה</option>
-        <option value="IL-Be'er Sheva">IL-באר שבע</option>
-        <option value="IL-Eilat">IL-אילת</option>
-        <option value="IL-Ashdod">IL-אשדוד</option>
-        <option value="IL-Ashkelon">IL-אשקלון</option>
-        <option value="IL-Betar Ilit">IL-ביתר עילית</option>
-        <option value="IL-Bat Yam">IL-בת ים</option>
-        <option value="IL-Beit Shemesh">IL-בית שמש</option>
-        <option value="IL-Bnei Brak">IL-בני ברק</option>
-        <option value="IL-Herzliya">IL-הרצליה</option>
-        <option value="IL-Hadera">IL-חדרה</option>
-        <option value="IL-Holon">IL-חולון</option>
-        <option value="IL-Tiberias">IL-טבריה</option>
-        <option value="IL-Yavne">IL-יבנה</option>
-        <option value="IL-Kfar Saba">IL-כפר סבא</option>
-        <option value="IL-Lod">IL-לוד</option>
-        <option value="IL-Modiin">IL-מודיעין</option>
-        <option value="IL-Modiin Ilit">IL-מודיעין עילית</option>
-        <option value="IL-Nazareth">IL-נצרת</option>
-        <option value="IL-Netanya">IL-נתניה</option>
-        <option value="IL-Petach Tikvah">IL-פתח תקוה</option>
-        <option value="IL-Zefat">IL-צפת</option>
-        <option value="IL-Rishon LeZion">IL-ראשון לציון</option>
-        <option value="IL-Ramla">IL-רמלה</option>
-        <option value="IL-Ramat Gan">IL-רמת גן</option>
-        <option value="IL-Ra'anana">IL-רעננה</option>
-    </optgroup>
-    <optgroup label="Other"> 
-        <option value="other">Geo/ GPS-Lat, Lon</option>
-    </optgroup>
-    <optgroup label="US"> 
-        <option value="US-Atlanta-GA">US-Atlanta-GA</option>
-        <option value="US-Austin-TX">US-Austin-TX</option>
-        <option value="US-Baltimore-MD">US-Baltimore-MD</option>
-        <option value="US-Boston-MA">US-Boston-MA</option>
-        <option value="US-Buffalo-NY">US-Buffalo-NY</option>
-        <option value="US-Chicago-IL">US-Chicago-IL</option>
-        <option value="US-Cincinnati-OH">US-Cincinnati-OH</option>
-        <option value="US-Cleveland-OH">US-Cleveland-OH</option>
-        <option value="US-Columbus-OH">US-Columbus-OH</option>
-        <option value="US-Dallas-TX">US-Dallas-TX</option>
-        <option value="US-Denver-CO">US-Denver-CO</option>
-        <option value="US-Detroit-MI">US-Detroit-MI</option>
-        <option value="US-Hartford-CT">US-Hartford-CT</option>
-        <option value="US-Honolulu-HI">US-Honolulu-HI</option>
-        <option value="US-Houston-TX">US-Houston-TX</option>
-        <option value="US-Lakewood-NJ">US-Lakewood-NJ</option>
-        <option value="US-Las Vegas-NV">US-Las Vegas-NV</option>
-        <option value="US-Livingston-NY">US-Livingston-NY</option>
-        <option value="US-Los Angeles-CA">US-Los Angeles-CA</option>
-        <option value="US-Memphis-TN">US-Memphis-TN</option>
-        <option value="US-Miami-FL">US-Miami-FL</option>
-        <option value="US-Milwaukee-WI">US-Milwaukee-WI</option>
-        <option value="US-Monsey-NY">US-Monsey-NY</option>
-        <option value="US-New Haven-CT">US-New Haven-CT</option>
-        <option value="US-New York-NY">US-New York-NY</option>
-        <option value="US-Omaha-NE">US-Omaha-NE</option>
-        <option value="US-Orlando-FL">US-Orlando-FL</option>
-        <option value="US-Passaic-NJ">US-Passaic-NJ</option>
-        <option value="US-Philadelphia-PA">US-Philadelphia-PA</option>
-        <option value="US-Phoenix-AZ">US-Phoenix-AZ</option>
-        <option value="US-Pittsburgh-PA">US-Pittsburgh-PA</option>
-        <option value="US-Portland-OR">US-Portland-OR</option>
-        <option value="US-Providence-RI">US-Providence-RI</option>
-        <option value="US-Richmond-VA">US-Richmond-VA</option>
-        <option value="US-Rochester-NY">US-Rochester-NY</option>
-        <option value="US-Saint Louis-MO">US-Saint Louis-MO</option>
-        <option value="US-Saint Paul-MN">US-Saint Paul-MN</option>
-        <option value="US-San Diego-CA">US-San Diego-CA</option>
-        <option value="US-San Francisco-CA">US-San Francisco-CA</option>
-        <option value="US-Seattle-WA">US-Seattle-WA</option>
-        <option value="US-Silver Spring-MD">US-Silver Spring-MD</option>
-        <option value="US-Teaneck-NJ">US-Teaneck-NJ</option>
-        <option value="US-Washington-DC">US-Washington-DC</option>
-        <option value="US-White Plains-NY">US-White Plains-NY</option>
-    </optgroup>
-    <optgroup label="Canada"> 
-        <option value="CA-Calgary">CA-Calgary</option>
-        <option value="CA-Edmonton">CA-Edmonton</option>
-        <option value="CA-Halifax">CA-Halifax</option>
-        <option value="CA-Mississauga">CA-Mississauga</option>
-        <option value="CA-Montreal">CA-Montreal</option>
-        <option value="CA-Ottawa">CA-Ottawa</option>
-        <option value="CA-Quebec City">CA-Quebec City</option>
-        <option value="CA-Regina">CA-Regina</option>
-        <option value="CA-Saskatoon">CA-Saskatoon</option>
-        <option value="CA-St. John's-05">CA-St. John's-05</option>
-        <option value="CA-Toronto">CA-Toronto</option>
-        <option value="CA-Vancouver">CA-Vancouver</option>
-        <option value="CA-Victoria">CA-Victoria</option>
-        <option value="CA-Winnipeg">CA-Winnipeg</option>
-    </optgroup>
-    <optgroup label="France"> 
-        <option value="FR-Marseilles">FR-Marseilles</option>
-        <option value="FR-Paris">FR-Paris</option>
-    </optgroup>
-    <optgroup label="Great Britain"> 
-        <option value="GB-Belfast">GB-Belfast</option>
-        <option value="GB-Birmingham">GB-Birmingham</option>
-        <option value="GB-Bristol">GB-Bristol</option>
-        <option value="GB-Cardiff">GB-Cardiff</option>
-        <option value="GB-Edinburgh">GB-Edinburgh</option>
-        <option value="GB-Glasgow">GB-Glasgow</option>
-        <option value="GB-Leeds">GB-Leeds</option>
-        <option value="GB-Liverpool">GB-Liverpool</option>
-        <option value="GB-London">GB-London</option>
-        <option value="GB-Manchester">GB-Manchester</option>
-        <option value="GB-Sheffield">GB-Sheffield</option>
-    </optgroup>
-    <optgroup label="Even more.."> 
-        <option>AR-Buenos Aires</option>
-        <option>AR-Cordoba</option>
-        <option>AR-Rosario</option>
+        <section class="layout grid two-up">
+            <article class="card strong">
+                <h2>שידור</h2>
+                <p class="section-note">בחר תחנה והפעל את מצב ההאזנה הרצוי.</p>
+                <div class="radio-controls" style="margin-top: 14px;">
+                    <div>
+                        <label class="field-label" for="stationSelect">תחנה</label>
+                        <select id="stationSelect">
+                            <option value="https://glzwizzlv.bynetcdn.com/glz_mp3">גלצ</option>
+                            <option value="https://glzwizzlv.bynetcdn.com/glglz_mp3">גלגלצ</option>
+                            <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_BET.mp3">רשת ב</option>
+                            <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_GIMMEL.mp3" selected>רשת ג</option>
+                            <option value="https://cdn88.mediacast.co.il/102fm-tlv/102fm_mp3/icecast.audio">FM102</option>
+                            <option value="https://cdn.cybercdn.live/Galei_Israel/Live/icecast.audio">גלי ישראל</option>
+                            <option value="https://27863.live.streamtheworld.com/KAN_88.mp3">כאן 88</option>
+                            <option value="https://live.kcm.fm/live-new">קול חי</option>
+                            <option value="https://live.kcm.fm/livemusic">קול חי מיוזיק</option>
+                            <option value="https://cdn.cybercdn.live/Kol_Barama/Live_Audio/icecast.audio">קול ברמה</option>
+                        </select>
+                    </div>
+                    <div class="actions">
+                        <button id="radioButton" class="buttonRadio" onClick="listenToNextNews()">שמע רק את החדשות</button>
+                        <button id="listenNowButton" class="buttonRadio" onClick="listenNow()">שמע כבר עכשיו וללא הפסקה</button>
+                    </div>
+                </div>
+                <br>
+                <div class="hero-meta" aria-live="polite">
+                    <div class="meta-row">
+                        <span class="meta-label">מצב ניגון</span>
+                        <strong id="status" class="status"></strong>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">טיימר</span>
+                        <span id="timer" class="timer"></span>
+                    </div>
+                </div>
 
-        <option>AU-Adelaide</option>
-        <option>AU-Brisbane</option>
-        <option>AU-Canberra</option>
-        <option>AU-Gold Coast</option>
-        <option>AU-Hobart</option>
-        <option>AU-Melbourne</option>
-        <option>AU-Perth</option>
-        <option>AU-Sydney</option>
+            </article>
 
-        <option>UA-Kharkiv</option>
-        <option>UA-Kiev</option>
+            <article class="card">
+                <h2>קישורים מהירים</h2>
+                <div class="footer-links">
+                    <a href="links-shabbat.html"><span>פתיחת דף הקישורים</span></a>
+                    <a href="https://www.icloud.com/shortcuts/0b04a8e93d9a47e2977a04c9048a93b5" target="_blank" rel="noopener"><span>iPhone Shortcut</span></a>
+                    <a href="https://play.google.com/store/apps/details?id=com.shahartal.myquietchannel" target="_blank" rel="noopener"><span>Android App</span></a>
+                </div>
+                <div class="image-row" style="margin-top: 16px;">
+                    <div class="image-card">
+                        <strong>קיצור iPhone</strong>
+                        <img src="iphone-shortcut.jpeg" alt="iPhone Shortcut" width="120">
+                    </div>
+                    <div class="image-card">
+                        <strong>Google Play</strong>
+                        <img src="Google_Play_Store_badge_EN.svg" alt="Google Play badge" width="170">
+                    </div>
+                </div>
+            </article>
+        </section>
 
-        <option>IT-Milano</option>
-        <option>IT-Rome</option>
+        <section class="layout grid two-up">
+            <article class="card">
+                <h2>  זמני היום 🔆 </h2>
+                <div class="stack">
+                    <div class="info-block">
+                        <div id="clock" class="mono-ltr" style="margin-top: 10px;"></div>
+                        <div id="hdat" style="margin-top: 8px;"></div>
+                        <div id="dat" class="muted" style="margin-top: 4px;"></div>
+                    </div>
+                    <div class="info-block">
+                        <div style="margin-top: 10px;">זריחה היום <label id="sunrise"></label></div>
+                        <div>שקיעה 🌅 <label id="sunset"></label></div>
+                    </div>
+                    <div class="info-block">
+                        <div class="pill">📍 מיקום</div>
+                        <div id="foundLoc" style="margin-top: 10px;"></div>
+                    </div>
+                </div>
+            </article>
 
-        <option>IE-Dublin</option>
+            <article class="card">
+                <h2>מיקום </h2>
+                <div class="location-row">
+                    <div>
+                        <label class="field-label" for="locationSelect">רשימת מיקומים</label>
+                        <select id="locationSelect">
+                                <optgroup label="ישראל">
+                                    <option value="IL-Jerusalem">IL-ירושלים</option>
+                                    <option value="IL-Tel Aviv">IL-תל אביב</option>
+                                    <option value="IL-Haifa">IL-חיפה</option>
+                                    <option value="IL-Be'er Sheva">IL-באר שבע</option>
+                                    <option value="IL-Eilat">IL-אילת</option>
+                                    <option value="IL-Ashdod">IL-אשדוד</option>
+                                    <option value="IL-Ashkelon">IL-אשקלון</option>
+                                    <option value="IL-Betar Ilit">IL-ביתר עילית</option>
+                                    <option value="IL-Bat Yam">IL-בת ים</option>
+                                    <option value="IL-Beit Shemesh">IL-בית שמש</option>
+                                    <option value="IL-Bnei Brak">IL-בני ברק</option>
+                                    <option value="IL-Herzliya">IL-הרצליה</option>
+                                    <option value="IL-Hadera">IL-חדרה</option>
+                                    <option value="IL-Holon">IL-חולון</option>
+                                    <option value="IL-Tiberias">IL-טבריה</option>
+                                    <option value="IL-Yavne">IL-יבנה</option>
+                                    <option value="IL-Kfar Saba">IL-כפר סבא</option>
+                                    <option value="IL-Lod">IL-לוד</option>
+                                    <option value="IL-Modiin">IL-מודיעין</option>
+                                    <option value="IL-Modiin Ilit">IL-מודיעין עילית</option>
+                                    <option value="IL-Nazareth">IL-נצרת</option>
+                                    <option value="IL-Netanya">IL-נתניה</option>
+                                    <option value="IL-Petach Tikvah">IL-פתח תקוה</option>
+                                    <option value="IL-Zefat">IL-צפת</option>
+                                    <option value="IL-Rishon LeZion">IL-ראשון לציון</option>
+                                    <option value="IL-Ramla">IL-רמלה</option>
+                                    <option value="IL-Ramat Gan">IL-רמת גן</option>
+                                    <option value="IL-Ra'anana">IL-רעננה</option>
+                                </optgroup>
+                                <optgroup label="Other">
+                                    <option value="other">Geo/ GPS-Lat, Lon</option>
+                                </optgroup>
+                                <optgroup label="US">
+                                    <option value="US-Atlanta-GA">US-Atlanta-GA</option>
+                                    <option value="US-Austin-TX">US-Austin-TX</option>
+                                    <option value="US-Baltimore-MD">US-Baltimore-MD</option>
+                                    <option value="US-Boston-MA">US-Boston-MA</option>
+                                    <option value="US-Buffalo-NY">US-Buffalo-NY</option>
+                                    <option value="US-Chicago-IL">US-Chicago-IL</option>
+                                    <option value="US-Cincinnati-OH">US-Cincinnati-OH</option>
+                                    <option value="US-Cleveland-OH">US-Cleveland-OH</option>
+                                    <option value="US-Columbus-OH">US-Columbus-OH</option>
+                                    <option value="US-Dallas-TX">US-Dallas-TX</option>
+                                    <option value="US-Denver-CO">US-Denver-CO</option>
+                                    <option value="US-Detroit-MI">US-Detroit-MI</option>
+                                    <option value="US-Hartford-CT">US-Hartford-CT</option>
+                                    <option value="US-Honolulu-HI">US-Honolulu-HI</option>
+                                    <option value="US-Houston-TX">US-Houston-TX</option>
+                                    <option value="US-Lakewood-NJ">US-Lakewood-NJ</option>
+                                    <option value="US-Las Vegas-NV">US-Las Vegas-NV</option>
+                                    <option value="US-Livingston-NY">US-Livingston-NY</option>
+                                    <option value="US-Los Angeles-CA">US-Los Angeles-CA</option>
+                                    <option value="US-Memphis-TN">US-Memphis-TN</option>
+                                    <option value="US-Miami-FL">US-Miami-FL</option>
+                                    <option value="US-Milwaukee-WI">US-Milwaukee-WI</option>
+                                    <option value="US-Monsey-NY">US-Monsey-NY</option>
+                                    <option value="US-New Haven-CT">US-New Haven-CT</option>
+                                    <option value="US-New York-NY">US-New York-NY</option>
+                                    <option value="US-Omaha-NE">US-Omaha-NE</option>
+                                    <option value="US-Orlando-FL">US-Orlando-FL</option>
+                                    <option value="US-Passaic-NJ">US-Passaic-NJ</option>
+                                    <option value="US-Philadelphia-PA">US-Philadelphia-PA</option>
+                                    <option value="US-Phoenix-AZ">US-Phoenix-AZ</option>
+                                    <option value="US-Pittsburgh-PA">US-Pittsburgh-PA</option>
+                                    <option value="US-Portland-OR">US-Portland-OR</option>
+                                    <option value="US-Providence-RI">US-Providence-RI</option>
+                                    <option value="US-Richmond-VA">US-Richmond-VA</option>
+                                    <option value="US-Rochester-NY">US-Rochester-NY</option>
+                                    <option value="US-Saint Louis-MO">US-Saint Louis-MO</option>
+                                    <option value="US-Saint Paul-MN">US-Saint Paul-MN</option>
+                                    <option value="US-San Diego-CA">US-San Diego-CA</option>
+                                    <option value="US-San Francisco-CA">US-San Francisco-CA</option>
+                                    <option value="US-Seattle-WA">US-Seattle-WA</option>
+                                    <option value="US-Silver Spring-MD">US-Silver Spring-MD</option>
+                                    <option value="US-Teaneck-NJ">US-Teaneck-NJ</option>
+                                    <option value="US-Washington-DC">US-Washington-DC</option>
+                                    <option value="US-White Plains-NY">US-White Plains-NY</option>
+                                </optgroup>
+                                <optgroup label="Canada">
+                                    <option value="CA-Calgary">CA-Calgary</option>
+                                    <option value="CA-Edmonton">CA-Edmonton</option>
+                                    <option value="CA-Halifax">CA-Halifax</option>
+                                    <option value="CA-Mississauga">CA-Mississauga</option>
+                                    <option value="CA-Montreal">CA-Montreal</option>
+                                    <option value="CA-Ottawa">CA-Ottawa</option>
+                                    <option value="CA-Quebec City">CA-Quebec City</option>
+                                    <option value="CA-Regina">CA-Regina</option>
+                                    <option value="CA-Saskatoon">CA-Saskatoon</option>
+                                    <option value="CA-St. John's-05">CA-St. John's-05</option>
+                                    <option value="CA-Toronto">CA-Toronto</option>
+                                    <option value="CA-Vancouver">CA-Vancouver</option>
+                                    <option value="CA-Victoria">CA-Victoria</option>
+                                    <option value="CA-Winnipeg">CA-Winnipeg</option>
+                                </optgroup>
+                                <optgroup label="France">
+                                    <option value="FR-Marseilles">FR-Marseilles</option>
+                                    <option value="FR-Paris">FR-Paris</option>
+                                </optgroup>
+                                <optgroup label="Great Britain">
+                                    <option value="GB-Belfast">GB-Belfast</option>
+                                    <option value="GB-Birmingham">GB-Birmingham</option>
+                                    <option value="GB-Bristol">GB-Bristol</option>
+                                    <option value="GB-Cardiff">GB-Cardiff</option>
+                                    <option value="GB-Edinburgh">GB-Edinburgh</option>
+                                    <option value="GB-Glasgow">GB-Glasgow</option>
+                                    <option value="GB-Leeds">GB-Leeds</option>
+                                    <option value="GB-Liverpool">GB-Liverpool</option>
+                                    <option value="GB-London">GB-London</option>
+                                    <option value="GB-Manchester">GB-Manchester</option>
+                                    <option value="GB-Sheffield">GB-Sheffield</option>
+                                </optgroup>
+                                <optgroup label="Even more..">
+                                    <option>AR-Buenos Aires</option>
+                                    <option>AR-Cordoba</option>
+                                    <option>AR-Rosario</option>
+                                    <option>AU-Adelaide</option>
+                                    <option>AU-Brisbane</option>
+                                    <option>AU-Canberra</option>
+                                    <option>AU-Gold Coast</option>
+                                    <option>AU-Hobart</option>
+                                    <option>AU-Melbourne</option>
+                                    <option>AU-Perth</option>
+                                    <option>AU-Sydney</option>
+                                    <option>UA-Kharkiv</option>
+                                    <option>UA-Kiev</option>
+                                    <option>IT-Milano</option>
+                                    <option>IT-Rome</option>
+                                    <option>IE-Dublin</option>
+                                    <option>BE-Brussels</option>
+                                    <option>CL-Santiago</option>
+                                    <option>CR-San Jose</option>
+                                    <option>CY-Nicosia</option>
+                                    <option>CZ-Prague</option>
+                                    <option>DE-Berlin</option>
+                                    <option>DE-Hamburg</option>
+                                    <option>DE-Munich</option>
+                                    <option>GE-Tbilisi</option>
+                                    <option>GI-Gibraltar</option>
+                                    <option>GR-Athens</option>
+                                    <option>HK-Hong Kong</option>
+                                    <option>HR-Zagreb</option>
+                                    <option>HU-Budapest</option>
+                                    <option>LU-Luxemburg</option>
+                                    <option>NL-Amsterdam</option>
+                                    <option>NO-Oslo</option>
+                                    <option>NZ-Auckland</option>
+                                    <option>NZ-Christchurch</option>
+                                    <option>NZ-Wellington</option>
+                                    <option>PA-Panama City</option>
+                                    <option>PE-Lima</option>
+                                    <option>PT-Lisbon</option>
+                                    <option>RO-Bucharest</option>
+                                    <option>RS-Belgrade</option>
+                                    <option>RU-Moscow</option>
+                                    <option>RU-Novosibirsk</option>
+                                    <option>RU-Saint Petersburg</option>
+                                    <option>RU-Yekaterinburg</option>
+                                    <option>SE-Stockholm</option>
+                                    <option>SG-Singapore</option>
+                                    <option>SK-Bratislava</option>
+                                    <option>PL-Warsaw</option>
+                                    <option>IN-Ahmadabad</option>
+                                    <option>IN-Bangalore</option>
+                                    <option>IN-Bombay</option>
+                                    <option>IN-Calcutta</option>
+                                    <option>IN-Chennai</option>
+                                    <option>IN-Cochin</option>
+                                    <option>IN-Hyderabad</option>
+                                    <option>IN-Jaipur</option>
+                                    <option>IN-Kanpur</option>
+                                    <option>IN-New Delhi</option>
+                                    <option>IN-Pune</option>
+                                    <option>IN-Surat</option>
+                                </optgroup>
+                        </select>
+                    </div>
+                    <div class="stack">
+                        <button class="buttonSecondary buttonIcon" onClick="getLoc()" aria-label="Use current location">📍</button>
+                        <button class="buttonRadio" onClick="calc()">Refresh</button>
+                    </div>
+                </div>
+                <input type="text" id="otherLocation" value="IL-Jerusalem" name="otherLocation" style="display:none;">
+            </article>
+        </section>
 
-        <option>BE-Brussels</option>
+        <section class="layout grid two-up">
+            <article class="card">
+                <h2>שבת וחגים</h2>
+                <p id="shabbathExists">🕯🕯 שבת </p>
+                <div class="divider"></div>
+                <div class="stack">
+                    <div class="info-block">
+                        <a id="parashaUrl" href="">
+                            <strong id="parasha"></strong>
+                        </a>
+                    </div>
+                    <div class="info-block">
+                        <a id="haftarahUrl" href="" target="_blank"></a>
+                        <div id="haftarah" class="mono-ltr"></div>
+                    </div>
+                    <div class="info-block">
+                        <a id="haftarahSUrl" href="" target="_blank"></a>
+                        <div id="haftarahS" class="mono-ltr"></div>
+                    </div>
+                    <div class="info-block">
+                        <div>🕯️ <span id="lighting"></span></div>
+                        <div style="margin-top: 8px;">
+                            <a id="lightingUrl" href=""><span id="lightingM"></span></a>
+                        </div>
+                        <div style="margin-top: 8px;">🌠 <span id="havdala"></span></div>
+                    </div>
+                </div>
+            </article>
 
-        <option>CL-Santiago</option>
+            <article class="card">
+                <h2>יומן יומי</h2>
+                <div class="stack">
+                    <div class="info-block">
+                        <p class="section-note">
+                            זמני הזריחה והשקיעה מופיעים בכרטיס "זמני היום" למעלה, יחד עם פירוט נוסף בלחיצה.
+                        </p>
+                    </div>
+                    <div class="info-block">
+                        <div id="special"></div>
+                        <div id="fast"></div>
+                        <div style="margin-top: 10px;">
+                            <a id="roshchodeshUrl" href=""><span id="roshchodesh"></span></a>
+                        </div>
+                    </div>
+                    <div class="info-block">
+                        <a id="dafYomiUrl" href="" target="_blank">הדף היומי</a>
+                        <div id="dafYomi" style="margin-top: 8px;"></div>
+                    </div>
+                </div>
+            </article>
+        </section>
 
-        <option>CR-San Jose</option>
+        <section class="layout grid two-up">
+            <article class="card">
+                <h2>סידורים לקראת שבת</h2>
+                <p class="section-note">רשום כאן משימות או תזכורות סביב שבת </p>
+                <textarea rows="4" id="todo">שעון שבת</textarea>
+            </article>
 
-        <option>CY-Nicosia</option>
+            <article class="card">
+                <h2>טיפ מהיר</h2>
+                <p class="section-note">
+                    לחץ על זמני הזריחה והשקיעה כדי לראות פירוט נוסף, ועל חלק מהאירועים כדי לפתוח קישורים חיצוניים.
+                </p>
+            </article>
+        </section>
+    </main>
 
-        <option>CZ-Prague</option>
-
-        <option>DE-Berlin</option>
-        <option>DE-Hamburg</option>
-        <option>DE-Munich</option>
-
-        <option>GE-Tbilisi</option>
-
-        <option>GI-Gibraltar</option>
-
-        <option>GR-Athens</option>
-
-        <option>HK-Hong Kong</option>
-
-        <option>HR-Zagreb</option>
-
-        <option>HU-Budapest</option>
-
-        <option>LU-Luxemburg</option>
-
-        <option>NL-Amsterdam</option>
-
-        <option>NO-Oslo</option>
-
-        <option>NZ-Auckland</option>
-        <option>NZ-Christchurch</option>
-        <option>NZ-Wellington</option>
-
-        <option>PA-Panama City</option>
-
-        <option>PE-Lima</option>
-
-        <option>PT-Lisbon</option>
-
-        <option>RO-Bucharest</option>
-
-        <option>RS-Belgrade</option>
-
-        <option>RU-Moscow</option>
-        <option>RU-Novosibirsk</option>
-        <option>RU-Saint Petersburg</option>
-        <option>RU-Yekaterinburg</option>
-
-        <option>SE-Stockholm</option>
-
-        <option>SG-Singapore</option>
-
-        <option>SK-Bratislava</option>
-
-        <option>PL-Warsaw</option>
-
-        <option>IN-Ahmadabad</option>
-        <option>IN-Bangalore</option>
-        <option>IN-Bombay</option>
-        <option>IN-Calcutta</option>
-        <option>IN-Chennai</option>
-        <option>IN-Cochin</option>
-        <option>IN-Hyderabad</option>
-        <option>IN-Jaipur</option>
-        <option>IN-Kanpur</option>
-        <option>IN-New Delhi</option>
-        <option>IN-Pune</option>
-        <option>IN-Surat</option>
-    </optgroup>
-</select>
-<input type="text" id="otherLocation" value="IL-Jerusalem" name="otherLocation" style="display:none;">
-<button onClick="calc()">Refresh</button><br>
-<label id="foundLoc"></label><br><br>
-<b>סידורים לקראת שבת</b><br>
-<textarea rows="4" id="todo">שעון שבת</textarea>
-<script src="script.js" ></script>
+    <script src="script.js"></script>
 </body>
 </html>
