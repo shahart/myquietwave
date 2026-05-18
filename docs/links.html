@@ -3,148 +3,408 @@
 <head>
     <meta charset="utf-8">
     <meta name="description" content="Links">
-    <meta name='viewport' content='width=device-width, height=device-height, initial-scale=1.0'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Links 🚨</title>
-    <!--link rel="icon" href="favicon.ico"-->
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f4efe6;
+            --bg-alt: #fffaf2;
+            --card: rgba(255, 255, 255, 0.84);
+            --card-border: rgba(80, 56, 32, 0.14);
+            --text: #24170f;
+            --muted: #6e5a49;
+            --accent: #b44d19;
+            --accent-2: #1f6f78;
+            --shadow: 0 18px 50px rgba(55, 35, 16, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            direction: rtl;
+            font-family: "Segoe UI", "Noto Sans Hebrew", "Arial Hebrew", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(180, 77, 25, 0.15), transparent 24%),
+                radial-gradient(circle at top right, rgba(31, 111, 120, 0.14), transparent 28%),
+                linear-gradient(180deg, var(--bg) 0%, #f7f1e7 40%, #efe7da 100%);
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .page {
+            width: min(1080px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 24px 0 40px;
+        }
+
+        .hero {
+            display: grid;
+            gap: 16px;
+            padding: 24px;
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 250, 242, 0.9));
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(180, 77, 25, 0.12);
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4vw, 3.1rem);
+            line-height: 1.05;
+        }
+
+        .lead {
+            margin: 0;
+            max-width: 70ch;
+            color: var(--muted);
+            font-size: 1.02rem;
+            line-height: 1.7;
+        }
+
+        .iframe-wrap {
+            padding: 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 10px 24px rgba(43, 28, 12, 0.08);
+        }
+
+        .iframe-wrap iframe {
+            display: block;
+            width: 100%;
+            max-width: 260px;
+            height: 170px;
+            border: 0;
+            margin-inline-start: auto;
+        }
+
+        .section {
+            margin-top: 22px;
+            padding: 22px;
+            border: 1px solid var(--card-border);
+            border-radius: 22px;
+            background: var(--card);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+        }
+
+        .section h2 {
+            margin: 0 0 10px;
+            font-size: 1.35rem;
+        }
+
+        .section p {
+            margin: 0;
+            line-height: 1.75;
+            color: var(--text);
+        }
+
+        .section .note {
+            color: var(--muted);
+        }
+
+        .link-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .link-card {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(80, 56, 32, 0.12);
+            background: rgba(255, 255, 255, 0.78);
+        }
+
+        .link-card strong {
+            font-size: 1rem;
+        }
+
+        .link-card a {
+            direction: ltr;
+            word-break: break-word;
+        }
+
+        .stack-list {
+            margin: 14px 0 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 12px;
+        }
+
+        .stack-item {
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.76);
+            border: 1px solid rgba(80, 56, 32, 0.12);
+        }
+
+        .stack-item a {
+            direction: ltr;
+            word-break: break-word;
+        }
+
+        h2 a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .label {
+            display: inline-block;
+            margin-bottom: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(31, 111, 120, 0.11);
+            color: var(--accent-2);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .callout {
+            padding: 16px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, rgba(180, 77, 25, 0.09), rgba(31, 111, 120, 0.06));
+            border: 1px solid rgba(80, 56, 32, 0.12);
+            line-height: 1.75;
+        }
+
+        .spaced {
+            margin-top: 14px;
+        }
+
+        .inline-image {
+            display: block;
+            width: min(100%, 520px);
+            height: auto;
+            margin-top: 12px;
+            border-radius: 18px;
+            border: 1px solid rgba(80, 56, 32, 0.12);
+            box-shadow: 0 12px 28px rgba(43, 28, 12, 0.14);
+        }
+
+        .small-image {
+            width: min(100%, 300px);
+        }
+
+        .footer-space {
+            height: 10px;
+        }
+
+        @media (max-width: 720px) {
+            .page {
+                width: min(100% - 20px, 1080px);
+                padding-top: 14px;
+            }
+
+            .hero,
+            .section {
+                padding: 18px;
+                border-radius: 18px;
+            }
+
+            .hero-top {
+                align-items: stretch;
+            }
+
+            .iframe-wrap iframe {
+                max-width: 100%;
+                margin-inline-start: 0;
+            }
+        }
+    </style>
 </head>
-<body dir="rtl">
+<body>
+    <div class="page">
+        <header class="hero">
+            <div class="hero-top">
+                <div>
+                    <div class="eyebrow">Links 🚨</div>
+                    <h1>Useful links and setup notes</h1>
+                    <p class="lead">
+                        A cleaner reference page for news, candle-lighting, troubleshooting, and related apps.
+                    </p>
+                </div>
+                <div class="iframe-wrap" aria-label="Alert preview">
+                    <iframe src="https://www.isramedia.net/alerts?sound=0" title="IsraMedia alerts" scrolling="no"></iframe>
+                </div>
+            </div>
+        </header>
 
-<iframe src="https://www.isramedia.net/alerts?sound=0"  width="190" frameborder="0" height="150" scrolling="no"></iframe>
+        <!--script src="https://cdn.shabbatguard.com/shabbat-guard.umd.min.js?location=prompt-then-api&minhag=default" defer></script-->
+        <!--a href="https://cdn.shabbatguard.com/">אתר שומר שבת</a-->
 
-<!--script src="https://cdn.shabbatguard.com/shabbat-guard.umd.min.js?location=prompt-then-api&minhag=default" defer></script-->
-<!--a href="https://cdn.shabbatguard.com/">אתר שומר שבת</a-->
-<h2>Links 🚨</h2>
-<hr>
-<h3>Not Live - לא חי - Just the last hour news - חדשות השעה</h3>
-<br/>
-GLZ גלי צהל: <a href="https://omny.fm/shows/newsbulletin/playlists/podcast">https://omny.fm/shows/newsbulletin/playlists/podcast</a><br>
-Reshet Bet כאן ב: <a href="https://www.kan.org.il/hourly-news/">https://www.kan.org.il/hourly-news/</a><br>
-<br/>
+        <section class="section">
+            <h2>Not Live - לא חי</h2>
+            <p class="note">Just the last hour news - חדשות השעה</p>
+            <div class="link-grid">
+                <div class="link-card">
+                    <strong>GLZ גלי צהל</strong>
+                    <a href="https://omny.fm/shows/newsbulletin/playlists/podcast" target="_blank" rel="noreferrer">https://omny.fm/shows/newsbulletin/playlists/podcast</a>
+                </div>
+                <div class="link-card">
+                    <strong>Reshet Bet כאן ב</strong>
+                    <a href="https://www.kan.org.il/hourly-news/" target="_blank" rel="noreferrer">https://www.kan.org.il/hourly-news/</a>
+                </div>
+            </div>
+        </section>
 
-<h3>More</h3>
-<br/>
-Radio Apps - אפליקציות רדיו: <a href="https://play.google.com/store/search?q=רדיו&c=apps">https://play.google.com/store/search?q=רדיו&c=apps</a><br>
-Yes מבזקים, ערוץ 101 המשמש את חברת: <a href="https://news.walla.co.il/breaking">https://news.walla.co.il/breaking</a><br>
-<br/>
-<h3><a href="./candle-lighting-cities.txt">Cities for Times of Candle Lighting 🕯🕯 and Havdalah</a><br></h3>
-<br/>
-בשדה באפליקציה "מיקום<br>
- הפריט יכול להיות עיר מהרשימה<br> 
-(geoNameId-או ה),<br>
-(latitude,longitude-או ה),<br>
+        <section class="section">
+            <h2>More</h2>
+            <div class="link-grid">
+                <div class="link-card">
+                    <strong>Radio Apps - אפליקציות רדיו</strong>
+                    <a href="https://play.google.com/store/search?q=רדיו&c=apps" target="_blank" rel="noreferrer">https://play.google.com/store/search?q=רדיו&c=apps</a>
+                </div>
+                <div class="link-card">
+                    <strong>Yes מבזקים, ערוץ 101</strong>
+                    <a href="https://news.walla.co.il/breaking" target="_blank" rel="noreferrer">https://news.walla.co.il/breaking</a>
+                </div>
+            </div>
+        </section>
 
- ואז יוצגו זמני הדלקת הנרות וההבדלה<br>
-הזריחה והשקיעה<br><br>
+        <section class="section">
+            <h2><a href="./candle-lighting-cities.txt">Cities for Times of Candle Lighting 🕯🕯 and Havdalah</a></h2>
+            <div class="callout">
+                <p>בשדה באפליקציה "מיקום" הפריט יכול להיות עיר מהרשימה, geoNameId, או latitude/longitude.</p>
+                <p>ואז יוצגו זמני הדלקת הנרות וההבדלה, הזריחה והשקיעה.</p>
+                <p class="note">For example לדוגמה: US-New York, IL-Jerusalem</p>
+            </div>
+            <div class="stack-list">
+                <div class="stack-item">
+                    <div class="label">Hebcal example</div>
+                    <p>Call to תוכל לקרוא ל-</p>
+                    <a href="https://www.hebcal.com/shabbat?cfg=json&city=IL-Ramat%20Gan" target="_blank" rel="noreferrer">https://www.hebcal.com/shabbat?cfg=json&city=IL-Ramat%20Gan</a>
+                </div>
+                <div class="stack-item">
+                    <div class="label">GeoNames lookup</div>
+                    <p>geoNameId-למציאת ה</p>
+                    <a href="https://www.geonames.org/search.html?q=Nataf&country=" target="_blank" rel="noreferrer">https://www.geonames.org/search.html?q=Nataf&country=</a>
+                </div>
+                <div class="stack-item">
+                    <div class="label">Verification</div>
+                    <p>For verification לוודא שהוא נתמך</p>
+                    <a href="https://www.hebcal.com/zmanim?cfg=json&geonameid=10254173" target="_blank" rel="noreferrer">https://www.hebcal.com/zmanim?cfg=json&geonameid=10254173</a>
+                </div>
+            </div>
+        </section>
 
-For example לדוגמה<br><br>
+        <section class="section">
+            <h2>Utils עזרים</h2>
+            <div class="link-grid">
+                <div class="link-card">
+                    <strong>More...</strong>
+                    <a href="https://shahart.github.io/myquietwave" target="_blank" rel="noreferrer">https://shahart.github.io/myquietwave</a>
+                </div>
+                <div class="link-card">
+                    <strong>Offline Bible תנ"ך למצב אופליין</strong>
+                    <a href="https://shahart.github.io/heb-bible" target="_blank" rel="noreferrer">https://shahart.github.io/heb-bible</a>
+                </div>
+            </div>
 
-US-New York<br>
-IL-Jerusalem<br>
-<br/>
-Call to תוכל לקרוא ל-<br>
-<a href="https://www.hebcal.com/shabbat?cfg=json&city=IL-Ramat%20Gan" target="_blank"> https://www.hebcal.com/shabbat?cfg=json&city=IL-Ramat%20Gan</a> <br>
- לוודא את אופן השימוש<br><br>
- geoNameId-למציאת ה <br>
-<a href="https://www.geonames.org/search.html?q=Nataf&country=" target="_blank"> https://www.geonames.org/search.html?q=Nataf&country=</a> <br><br>
-For verification לוודא שהוא נתמך <br>
-<a href="https://www.hebcal.com/zmanim?cfg=json&geonameid=10254173" target="_blank">https://www.hebcal.com/zmanim?cfg=json&geonameid=10254173</a><br><br>
-<hr>
-<h3>Utils עזרים</h3>
-<br/>
-More...<br>
-<a href="https://shahart.github.io/myquietwave">https://shahart.github.io/myquietwave</a>
-<br/>
-<br/>
-Offline Bible תנ"ך למצב אופליין, למקרה ותהיו בחדר ללא קליטה:<br>
-<a href="https://shahart.github.io/heb-bible">https://shahart.github.io/heb-bible</a>
-<br/>
-<br/>
-<b>מקלטים בסביבה:</b>
-<br><br>
-<a href="https://www.govmap.gov.il/?lay=417&q=ירושלים&z=5">https://www.govmap.gov.il/?lay=417&q=ירושלים&z=5 </a>
-<br><br>
-<a href="https://www.google.com/maps/search/מקלט">https://www.google.com/maps/search/מקלט </a>
-<br><br>
-<b>Waze</b> הקלידו "מקלט" בתיבת החיפוש של וייז כדי למצוא את המקלטים הקרובים אליכם
-<hr>
-<h3>Troubleshooting</h3>
-<br/>
-וודא שהטלפון לא יעבור איתחול באמצע הלילה<br/>
-הגדרות >> תחזוקת המכשיר >> מיטוב אוטומטי >> הפעלה מחדש אוטומטית: הפעלה אוטומטית בעת הצורך >> כבוי
-<br/>
-<br/>
-:ודא שהאפליקציה לא מוגבלת במיטוב סוללה<br/>
-<br>
-מתוך פרטי האפליקציה, פתח את הגדרות הסוללה <br/>
-<br/>
-<img src="./app_details.jpeg" width="300"/>
-<br/>
-<br/>
-וקבע את המיטוב על "לא מוגבל" או "לא ממוטב
-<br/>
-<br/>
-<img src="./battery_optimization.jpeg" width="300"/>
-<br/>
-<br/>
-בצע זאת גם עבור האפליקציה שמשמיעה את הרדיו
-<br/>
-<br/>
-יש לזכור שהאפליקציה שולטת רק בעוצמת הקול של המוסיקה, ולא של ההתראות או הצלצול. כדאי להשתיק אותם ידנית
-<br/>
-ליתר בטחון שלא יושמע משהו בשבת, אפשר גם לשים את הטלפון על שקט או רטט
-<br/>
-<hr>
-<h3>
-אפליקציות נוספות
-</h3>
-<br>
-גל שקט חכם לשבת - <b>ויזואלי בלבד</b> - איו צורך לחכות לחדשות
-<br>
-<a href="https://galshaket.com/">https://galshaket.com/</a> 
-<br>
+            <div class="callout spaced">
+                <p><strong>מקלטים בסביבה:</strong></p>
+                <p><a href="https://www.govmap.gov.il/?lay=417&q=ירושלים&z=5" target="_blank" rel="noreferrer">https://www.govmap.gov.il/?lay=417&q=ירושלים&z=5</a></p>
+                <p><a href="https://www.google.com/maps/search/מקלט" target="_blank" rel="noreferrer">https://www.google.com/maps/search/מקלט</a></p>
+                <p><strong>Waze</strong> הקלידו "מקלט" בתיבת החיפוש של וייז כדי למצוא את המקלטים הקרובים אליכם</p>
+            </div>
+        </section>
 
-<br>
-אפליקציית פיקוד העורף
-<br>
-<a href="https://www.oref.org.il/heb/articles/info/iron-swords/1107">https://www.oref.org.il/heb/articles/info/iron-swords/1107</a>
-<br>
-<br>
-ראה גם אפליקציות נוספות
-<br>
-(וגם לאייפון)
-<br>
-<br>
-&nbsp;&nbsp;צבע אדום - התרעות בזמן אמת
-<br>
-&nbsp;&nbsp;<a href="https://play.google.com/store/apps/details?id=com.red.alert">https://play.google.com/store/apps/details?id=com.red.alert</a> 
-<br>
-<br>
-&nbsp;&nbsp;צופר
-<br>
-&nbsp;&nbsp;<a href="https://play.google.com/store/apps/details?id=com.redalert.tzevaadom">https://play.google.com/store/apps/details?id=com.redalert.tzevaadom</a> 
-<br>
+        <section class="section">
+            <h2>Troubleshooting</h2>
+            <div class="callout">
+                <p>וודא שהטלפון לא יעבור איתחול באמצע הלילה.</p>
+                <p>הגדרות >> תחזוקת המכשיר >> מיטוב אוטומטי >> הפעלה מחדש אוטומטית: הפעלה אוטומטית בעת הצורך >> כבוי</p>
+            </div>
+            <div class="callout spaced">
+                <p>ודא שהאפליקציה לא מוגבלת במיטוב סוללה.</p>
+                <p>מתוך פרטי האפליקציה, פתח את הגדרות הסוללה.</p>
+                <img src="./app_details.jpeg" alt="App details screenshot" class="inline-image small-image">
+                <p>וקבע את המיטוב על "לא מוגבל" או "לא ממוטב".</p>
+                <img src="./battery_optimization.jpeg" alt="Battery optimization screenshot" class="inline-image small-image">
+                <p>בצע זאת גם עבור האפליקציה שמשמיעה את הרדיו.</p>
+                <p>יש לזכור שהאפליקציה שולטת רק בעוצמת הקול של המוסיקה, ולא של ההתראות או הצלצול. כדאי להשתיק אותם ידנית.</p>
+                <p>ליתר בטחון שלא יושמע משהו בשבת, אפשר גם לשים את הטלפון על שקט או רטט.</p>
+            </div>
+        </section>
 
-<br>
-&nbsp;&nbsp;רמזור
-<br>
-&nbsp;&nbsp;<a href="https://play.google.com/store/apps/details?id=media.wizzo.redalert">https://play.google.com/store/apps/details?id=media.wizzo.redalert</a> 
-<br>
-<br>
-&nbsp;&nbsp;צבע אדום
-<br>
-&nbsp;&nbsp;<a href="https://play.google.com/store/apps/details?id=com.kobisnir.redcolor">https://play.google.com/store/apps/details?id=com.kobisnir.redcolor</a> 
-<br>
+        <section class="section">
+            <h2>אפליקציות נוספות</h2>
+            <div class="callout">
+                <p>גל שקט חכם לשבת - <strong>ויזואלי בלבד</strong> - אין צורך לחכות לחדשות</p>
+                <p><a href="https://galshaket.com/" target="_blank" rel="noreferrer">https://galshaket.com/</a></p>
+                <p>אפליקציית פיקוד העורף</p>
+                <p><a href="https://www.oref.org.il/heb/articles/info/iron-swords/1107" target="_blank" rel="noreferrer">https://www.oref.org.il/heb/articles/info/iron-swords/1107</a></p>
+                <p>ראה גם אפליקציות נוספות (וגם לאייפון)</p>
+                <div class="link-grid">
+                    <div class="link-card">
+                        <strong>צבע אדום - התרעות בזמן אמת</strong>
+                        <a href="https://play.google.com/store/apps/details?id=com.red.alert" target="_blank" rel="noreferrer">https://play.google.com/store/apps/details?id=com.red.alert</a>
+                    </div>
+                    <div class="link-card">
+                        <strong>צופר</strong>
+                        <a href="https://play.google.com/store/apps/details?id=com.redalert.tzevaadom" target="_blank" rel="noreferrer">https://play.google.com/store/apps/details?id=com.redalert.tzevaadom</a>
+                    </div>
+                    <div class="link-card">
+                        <strong>רמזור</strong>
+                        <a href="https://play.google.com/store/apps/details?id=media.wizzo.redalert" target="_blank" rel="noreferrer">https://play.google.com/store/apps/details?id=media.wizzo.redalert</a>
+                    </div>
+                    <div class="link-card">
+                        <strong>צבע אדום</strong>
+                        <a href="https://play.google.com/store/apps/details?id=com.kobisnir.redcolor" target="_blank" rel="noreferrer">https://play.google.com/store/apps/details?id=com.kobisnir.redcolor</a>
+                    </div>
+                </div>
+                <img src="./shabbat-halacha.jfif" alt="Shabbat halacha reference" class="inline-image">
+                <p><a href="https://zomet.org.il/wp-content/uploads/2026/03/%D7%9E%D7%93%D7%A8%D7%99%D7%9A-%D7%A9%D7%92%D7%A8%D7%AA-%D7%97%D7%99%D7%A8%D7%95%D7%9D-%D7%91%D7%A9%D7%91%D7%AA.pdf" target="_blank" rel="noreferrer">מכון צמת</a></p>
+                <img src="./shabbat-connected.jpg" alt="Shabbat connected reference" class="inline-image">
+                <!--p><a href="https://cdn.shabbatguard.com/" target="_blank" rel="noreferrer">אתר שומר שבת</a></p-->
+            </div>
+        </section>
 
-<br>
-<img src="./shabbat-halacha.jfif" width="500"/>
-<br>
-<br>
-<a href="https://zomet.org.il/wp-content/uploads/2026/03/%D7%9E%D7%93%D7%A8%D7%99%D7%9A-%D7%A9%D7%92%D7%A8%D7%AA-%D7%97%D7%99%D7%A8%D7%95%D7%9D-%D7%91%D7%A9%D7%91%D7%AA.pdf">מכון צמת</a>
-<br>
-<br>
-<img src="./shabbat-connected.jpg" width="500"/>
-<br>
-<br>
-<!--a href="https://cdn.shabbatguard.com/">אתר שומר שבת</a-->
+        <div class="footer-space"></div>
+    </div>
 </body>
 </html>

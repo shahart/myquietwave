@@ -422,7 +422,7 @@ class MainActivity : ComponentActivity() {
 
                         val hebcal = response.body()
                         hebcal?.items?.forEach {
-                            if (it.category == "candles" && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat") || it.memo.contains("Parashat"))) {
+                            if (it.category == "candles") { // && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat") || it.memo.contains("Parashat"))) {
                                 res += " " + getString(R.string.candleLighting) + " " + truncDate(it.date)
                                 textViewClock3.text = res
                                 editor.putString("candles", getString(R.string.candleLighting) + " " + truncDate(it.date))
@@ -862,12 +862,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
         firebaseAnalytics = Firebase.analytics
 
         Log.i("myquietwave", "MainActivity Version " + BuildConfig.VERSION_NAME)
 
-        setContentView(R.layout.activity_main)
 
         editTextLocation = findViewById(R.id.editTextLocation)
 
