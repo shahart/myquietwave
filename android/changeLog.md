@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.56
+
+show the hebrew name of the haftarah's book
+
 ## 1.55 (version no. 40)
 
 Fix race condition with rendering of the Shabat's candles lighting

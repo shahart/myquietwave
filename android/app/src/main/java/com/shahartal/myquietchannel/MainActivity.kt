@@ -679,6 +679,31 @@ class MainActivity : ComponentActivity() {
         return " " + res + " "
     }
 
+    fun convertEng(hebre: String): String {
+        var hebrew = hebre
+        hebrew = hebrew.replace("Joshua", "יהושע");
+        hebrew = hebrew.replace("Judges", "שופטים");
+        hebrew = hebrew.replace("I Samuel", "שמואל א");
+        hebrew = hebrew.replace("II Samuel", "שמואל ב");
+        hebrew = hebrew.replace("I Kings", "מלכים א");
+        hebrew = hebrew.replace("II Kings", "מלכים ב");
+        hebrew = hebrew.replace("Isaiah", "ישעיהו");
+        hebrew = hebrew.replace("Jeremiah", "ירמיהו");
+        hebrew = hebrew.replace("Ezekiel", "יחזקאל");
+        hebrew = hebrew.replace("Hosea", "הושע");
+        hebrew = hebrew.replace("Joel", "יואל");
+        hebrew = hebrew.replace("Amos", "עמוס");
+        hebrew = hebrew.replace("Obadiah", "עובדיה")
+        hebrew = hebrew.replace("Jonah", "יונה");
+        hebrew = hebrew.replace("Micah", "מיכה");
+        hebrew = hebrew.replace("Nachum", "נחום");
+        hebrew = hebrew.replace("Habakkuk", "חבקוק");
+        hebrew = hebrew.replace("Zephaniah", "צפניה");
+        hebrew = hebrew.replace("Haggai", "חגי");
+        hebrew = hebrew.replace("Zechariah", "זכריה");
+        hebrew = hebrew.replace("Malachi", "מלאכי");
+        return hebrew;
+    }
     fun fetchParasha() { // }: String {
 
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
@@ -787,12 +812,13 @@ class MainActivity : ComponentActivity() {
                                     startActivity(browserIntent)
                                 }
 
-                                val fullTextH =  " הפטרה " + it.leyning.haftarah.replace("|", "\n")
+                                val hebName = convertEng(it.leyning.haftarah.replace("|", "\n"))
+                                val fullTextH =  " הפטרה " + hebName
                                 val spannableStringH = SpannableString(fullTextH)
                                 spannableStringH.setSpan(UnderlineSpan(), " הפטרה ".length, fullTextH.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                 textViewClockH.text = spannableStringH
 
-                                editor.putString("haftarah", " הפטרה " + it.leyning.haftarah.replace("|", "\n"))
+                                editor.putString("haftarah", " הפטרה " + hebName)
                                 editor.apply()
 
                                 val strH: String = it.leyning.haftarah.split(':')[0]
@@ -807,12 +833,13 @@ class MainActivity : ComponentActivity() {
                                 // it.leyning.haftarah_sephardic = "Ezekiel 8:25-29:21"
                                 if (it.leyning.haftarah_sephardic != null) {
 
-                                    val fullTextHS =  " הפטרה ספרדים " + it.leyning.haftarah_sephardic.replace("|", "\n")
+                                    val hebName = convertEng(it.leyning.haftarah_sephardic.replace("|", "\n"))
+                                    val fullTextHS =  " הפטרה ספרדים " + hebName
                                     val spannableStringHS = SpannableString(fullTextHS)
                                     spannableStringHS.setSpan(UnderlineSpan(), " הפטרה ספרדים ".length, fullTextHS.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                     textViewClockHS.text = spannableStringHS
 
-                                    editor.putString("haftarah_sephardic", " הפטרה ספרדים " + it.leyning.haftarah_sephardic.replace("|", "\n"))
+                                    editor.putString("haftarah_sephardic", " הפטרה ספרדים " + hebName)
                                     editor.apply()
 
                                     val strHS: String = it.leyning.haftarah_sephardic.split(':')[0]
