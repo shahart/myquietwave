@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.55 (version no. 40)
+
+Fix race condition with rendering of the Shabat's candles lighting
+DafYomi from Sefaria to Tzurat Hadaf
+
+At @MainActivity.kt lines 424-468, the input hebcal.items always includes the it.category = "candles", and yet, SOMETIMES the res string value does not include the it.date. Any idea why?
+
+The issue you're seeing is primarily caused by a race condition in your response handling logic.
+At line 425 (and 431), you are checking the current text of the UI component (textViewClock3.text.contains(...)) to decide whether to append data to your local res string. Because fetchShabatZmanim is an asynchronous network call, if multiple requests are triggered (e.g., when the Activity resumes or the spinner initializes), they can overlap:
+1. Request A finishes and updates textViewClock3.text with "Candle lighting...".
+2. Request B finishes. It checks textViewClock3.text, finds that it already contains "Candle lighting", and therefore skips adding the candle info to its own local res variable.
+3. Request B then executes textViewClock3.text = res. Since Request B's res didn't include the candles, the candle information disappears from the screen.
+
+Recommended Fixes:
+
+1. Check the local res variable instead of the UI component: This ensures each network response builds its own string independently.
+2. Update UI once: Move the UI updates outside the loop to prevent intermediate states and preserve SpannableString formatting.
+
+By checking res.contains(...), you prevent duplicate entries within a single response without being affected by the current (and potentially stale or concurrent) state of the UI.
+
+## 1.54 (v. 39)
+
+Fix rare bug in candle lighting rendering
+
+## 1.53
+
+Better UX
+
 ## 1.52
 
 Add the day-of-week on holidays

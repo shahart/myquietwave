@@ -22,8 +22,8 @@ android {
         minSdk = 26
         targetSdk = 37
 
-        versionCode = 64
-        versionName = "1.54"
+        versionCode = 65
+        versionName = "1.55"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -114,5 +114,9 @@ dependencies {
 
     implementation(libs.kotlinx.datetime)
 
-
+    constraints{
+        implementation("androidx.fragment:fragment:1.8.9"){
+            because("Gms library depends on outdated androidx fragment")
+        }
+    }
 }

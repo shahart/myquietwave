@@ -284,7 +284,7 @@ class MainActivity : ComponentActivity() {
                         }
                         if (res.isNotEmpty()) {
 
-                            var ttip = "עוד לימודים יומיים:\n\nדף יומי צורת הדף\n https://daf-yomi.com/Dafyomi_Page.aspx\n\n"
+                            var ttip = "עוד לימודים יומיים:\n\n"
                             var omerLink: String
 
                             hebcal?.items?.forEach {
@@ -334,7 +334,7 @@ class MainActivity : ComponentActivity() {
 
                                 val browserIntent = Intent(
                                     Intent.ACTION_VIEW,
-                                    res.toUri()
+                                    "https://daf-yomi.com/Dafyomi_Page.aspx".toUri() // res.toUri()
                                 )
                                 startActivity(browserIntent)
                             }
@@ -421,26 +421,23 @@ class MainActivity : ComponentActivity() {
                         val editor = sharedPreferences.edit()
 
                         val hebcal = response.body()
+                        var mevarchimHebrew: String? = null
                         hebcal?.items?.forEach {
-                            if (it.category == "candles" && ! textViewClock3.text.contains(getString(R.string.candleLighting))) { // && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat") || it.memo.contains("Parashat"))) {
-                                res += " " + getString(R.string.candleLighting) + " " + truncDate(it.date)
-                                textViewClock3.text = res
+                            // Check 'res' (local) instead of 'textViewClock3.text' (shared UI state)
+                            if (it.category == "candles" && !res.contains(getString(R.string.candleLighting))) {
+                                res += "\n" + getString(R.string.candleLighting) + " " + truncDate(it.date) + "\n"
                                 editor.putString("candles", getString(R.string.candleLighting) + " " + truncDate(it.date))
-                                editor.apply()
                             }
-                            else if (it.category == "havdalah" && ! textViewClock3.text.contains(getString(R.string.havdalah))) { //  (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat"))) {
-                                res += "\n" + getString(R.string.havdalah) + " " +  truncDate(it.date)
-                                textViewClock3.text = res
+                            else if (it.category == "havdalah" && !res.contains(getString(R.string.havdalah))) {
+                                res += "\n" + getString(R.string.havdalah) + " " +  truncDate(it.date) + "\n"
                                 editor.putString("havdalah", getString(R.string.havdalah) + " " +  truncDate(it.date))
-                                editor.apply()
                             }
                             else if (it.category == "mevarchim") {
-                                // hebrew = מברכים חודש שבט
+                                mevarchimHebrew = it.hebrew
                                 res += "\n" + it.hebrew + " " +  "\nהמולד: " + it.memo.
                                     substring(it.memo.indexOf(": ") + 2).
                                         replace("chalakim", "חלקים").
                                     replace("and", "ו-").
-                                        // replace("Molad", "מולד").
                                         replace("Sunday", "ראשון").
                                         replace("Monday", "שני").
                                         replace("Tuesday", "שלישי").
@@ -449,25 +446,32 @@ class MainActivity : ComponentActivity() {
                                         replace("Friday", "שישי").
                                         replace("Saturday", "שבת") + "\n"
 
-                                // todo this doesn't work, maybe because the string is too long for the mobile screen?!
-                                val spannableStringYomi = SpannableString(res)
-                                spannableStringYomi.setSpan(UnderlineSpan(), res.indexOf(it.hebrew), res.indexOf(it.hebrew) + it.hebrew.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                // Set the listener for the whole text view if mevarchim exists
 
-                                textViewClock3.text = spannableStringYomi
 
                                 val str: String = it.hebrew
                                 textViewClock3.setOnClickListener {
-                                    val browserIntent = Intent(
-                                        Intent.ACTION_VIEW,
-                                        // ("https://he.wikipedia.org/wiki/" + str ).toUri()
+                                    val browserIntent = Intent(Intent.ACTION_VIEW,
                                         ("https://he.wikipedia.org/wiki/" + str.substring(" מברכים חודש ".length-1).replace("סיון", "סיוון") + (if (str.contains("שבט"))  "_(חודש)" else "")).toUri()
                                     )
                                     startActivity(browserIntent)
                                 }
                             }
                         }
-                        // textViewClock3.text = res
+                        // Final UI Update: Handle Spannable formatting once building is complete
+                        if (mevarchimHebrew != null) {
+                            val spannable = SpannableString(res)
+                            val start = res.indexOf(mevarchimHebrew!!)
+                            if (start != -1) {
+                                spannable.setSpan(UnderlineSpan(), start, start + mevarchimHebrew!!.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            }
+                            textViewClock3.text = spannable
                     } else {
+                            textViewClock3.text = res
+                        }
+                        editor.apply()
+                    }
+                    else {
                         Log.w("myquietwave", "MainActivity fetchParasha Error: ${response.code()}")
                         // textViewClock3.text = "" // ""Not found " + response.code()
                         res += " " + sharedPreferences.getString("candles", "") + " " + sharedPreferences.getString("havdalah", "")
@@ -563,7 +567,7 @@ class MainActivity : ComponentActivity() {
                         val hebcal = response.body()
                         if (hebcal != null) {
                             res =
-                                " " + getString(R.string.sunrise) + " " + truncDate(hebcal.times.sunrise)
+                                "\n" + getString(R.string.sunrise) + " " + truncDate(hebcal.times.sunrise)
                             editor.putString(
                                 "sunrise",
                                 getString(R.string.sunrise) + " " + truncDate(hebcal.times.sunrise)
@@ -669,7 +673,10 @@ class MainActivity : ComponentActivity() {
 
 
     fun truncDate(date: String): String {
-        return " " + date.substring(date.indexOf("T")+1, date.indexOf("T")+1 +5) + " "
+        var res = date.substring(date.indexOf("T")+1, date.indexOf("T")+1 +5)
+        if (res.startsWith('0'))
+            res = res.substring(1)
+        return " " + res + " "
     }
 
     fun fetchParasha() { // }: String {
@@ -1118,7 +1125,7 @@ class MainActivity : ComponentActivity() {
                     textViewDate.text = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת,ראשון".split(
                         ","
                     )
-                        .get(LocalDate.now().dayOfWeek.value) + " " + SimpleDateFormat("dd-M-yyyy").format(Date()) // Cannot format given Object as a Date
+                        .get(LocalDate.now().dayOfWeek.value) + " " + SimpleDateFormat("d/M/yyyy").format(Date()) // Cannot format given Object as a Date
 
                 }
                 Thread.sleep(500)
