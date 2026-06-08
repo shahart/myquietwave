@@ -695,7 +695,7 @@ class MainActivity : ComponentActivity() {
         hebrew = hebrew.replace("Amos", "עמוס");
         hebrew = hebrew.replace("Obadiah", "עובדיה")
         hebrew = hebrew.replace("Jonah", "יונה");
-        hebrew = hebrew.replace("Micah", "מיכה");
+        hebrew = hebrew.replace("Micha", "מיכה");
         hebrew = hebrew.replace("Nachum", "נחום");
         hebrew = hebrew.replace("Habakkuk", "חבקוק");
         hebrew = hebrew.replace("Zephaniah", "צפניה");
