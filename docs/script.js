@@ -90,6 +90,31 @@ let hebyy = parseInt(hdateStr.split(" ")[2]);
 hdat = hdat.substr(0, hdat.lastIndexOf(' '));
 document.getElementById('hdat').innerHTML = 'היום 📅 ' + no2gim(parseInt(hdat.split(' ')[0])) + ' ' + hdat.split(' ')[1] + ' ' + getYY(hebyy);
 
+function convertEng(hebrew) {
+    hebrew = hebrew.replace("Joshua", "יהושע");
+    hebrew = hebrew.replace("Judges", "שופטים");
+    hebrew = hebrew.replace("I Samuel", "שמואל א");
+    hebrew = hebrew.replace("II Samuel", "שמואל ב");
+    hebrew = hebrew.replace("I Kings", "מלכים א");
+    hebrew = hebrew.replace("II Kings", "מלכים ב");
+    hebrew = hebrew.replace("Isaiah", "ישעיהו");
+    hebrew = hebrew.replace("Jeremiah", "ירמיהו");
+    hebrew = hebrew.replace("Ezekiel", "יחזקאל");
+    hebrew = hebrew.replace("Hosea", "הושע");
+    hebrew = hebrew.replace("Joel", "יואל");
+    hebrew = hebrew.replace("Amos", "עמוס");
+    hebrew = hebrew.replace("Obadiah", "עובדיה")
+    hebrew = hebrew.replace("Jonah", "יונה");
+    hebrew = hebrew.replace("Micah", "מיכה");
+    hebrew = hebrew.replace("Nachum", "נחום");
+    hebrew = hebrew.replace("Habakkuk", "חבקוק");
+    hebrew = hebrew.replace("Zephaniah", "צפניה");
+    hebrew = hebrew.replace("Haggai", "חגי");
+    hebrew = hebrew.replace("Zechariah", "זכריה");
+    hebrew = hebrew.replace("Malachi", "מלאכי");
+    return hebrew;
+}
+
 async function calc() {
     var postfix = document.getElementById('locationSelect').value;
     saveInput("zmanim-location", postfix);
@@ -209,11 +234,11 @@ async function calc() {
                 if (data.items[i].category === 'parashat') {
                     document.getElementById('parasha').innerHTML = data.items[i].hebrew;
                     document.getElementById('haftarahUrl').innerHTML = 'הפטרה: ';
-                    document.getElementById('haftarah').innerHTML = data.items[i].leyning.haftarah.replaceAll('|', ' <br>');
+                    document.getElementById('haftarah').innerHTML = convertEng(data.items[i].leyning.haftarah.replaceAll('|', ' <br>'));
                     document.getElementById('haftarahUrl').href = "https://shahart.github.io/heb-bible/index.html?b=" + data.items[i].leyning.haftarah.split(':')[0];
                     if (data.items[i].leyning.haftarah_sephardic) {
                         document.getElementById('haftarahSUrl').innerHTML = 'הפטרה ספרדים: ';
-                        document.getElementById('haftarahS').innerHTML = data.items[i].leyning.haftarah_sephardic.replaceAll('|', ' <br>');
+                        document.getElementById('haftarahS').innerHTML = convertEng(data.items[i].leyning.haftarah_sephardic.replaceAll('|', ' <br>'));
                         document.getElementById('haftarahSUrl').href = "https://shahart.github.io/heb-bible/index.html?b=" + data.items[i].leyning.haftarah_sephardic.split(':')[0];
                     }
                     let parashaUrl = "https://he.wikipedia.org/wiki/";
