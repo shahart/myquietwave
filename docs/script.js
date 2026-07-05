@@ -115,6 +115,11 @@ function convertEng(hebrew) {
     return hebrew;
 }
 
+function trim(n) {
+    if (n.startsWith('0')) return n.substring(1);
+    return n;
+}
+
 async function calc() {
     var postfix = document.getElementById('locationSelect').value;
     saveInput("zmanim-location", postfix);
@@ -136,6 +141,9 @@ async function calc() {
     } else {
         if (postfix.toLowerCase() === "il-yavne") {
             postfix = "geonameid=293222";
+        }
+        else if (postfix.toLowerCase() === "il-mitzpe ramon") {
+            postfix = "geonameid=294166";
         }
         else if (postfix.toLowerCase() === "il-modiin ilit") {
             postfix = "geonameid=8199378";
@@ -178,29 +186,29 @@ async function calc() {
                 alert("Error in zmanim data: " + data.error);
                 return;
             }
-            document.getElementById('sunrise') .innerHTML = data.times.sunrise.split('T')[1].substring(0,5);
-            document.getElementById('sunset')  .innerHTML = data.times.sunset.split('T')[1].substring(0,5);
+            document.getElementById('sunrise') .innerHTML = trim(data.times.sunrise.split('T')[1].substring(0,5));
+            document.getElementById('sunset')  .innerHTML = trim(data.times.sunset.split('T')[1].substring(0,5));
             document.getElementById('foundLoc').innerHTML = data.location.title;
 
             document.getElementById('sunrise').onclick = function() {
-                alert("chatzot Night - חצות הלילה: " + data.times.chatzotNight.split('T')[1].substring(0,5) + "\n" +
-                      "alot HaShachar - עלות השחר: " + data.times.alotHaShachar.split('T')[1].substring(0,5) + "\n" +
-                      "dawn: " + data.times.dawn.split('T')[1].substring(0,5) + "\n" +
-                      "sof Zman Shma MGA: " + data.times.sofZmanShmaMGA.split('T')[1].substring(0,5) + "\n" +
-                      "sof Zman Shma: " + data.times.sofZmanShma.split('T')[1].substring(0,5) + "\n" +
-                      "sof Zman Tfilla MGA: " + data.times.sofZmanTfillaMGA.split('T')[1].substring(0,5) + "\n" +
-                      "sof Zman Tfilla: " + data.times.sofZmanTfilla.split('T')[1].substring(0,5) + "\n" +
-                      "chatzot - חצות היום: " + data.times.chatzot.split('T')[1].substring(0,5));
+                alert("chatzot Night - חצות הלילה: " + trim(data.times.chatzotNight.split('T')[1].substring(0,5)) + "\n" +
+                      "alot HaShachar - עלות השחר: " + trim(data.times.alotHaShachar.split('T')[1].substring(0,5)) + "\n" +
+                      "dawn: " + trim(data.times.dawn.split('T')[1].substring(0,5)) + "\n" +
+                      "sof Zman Shma MGA: " + trim(data.times.sofZmanShmaMGA.split('T')[1].substring(0,5)) + "\n" +
+                      "sof Zman Shma: " + trim(data.times.sofZmanShma.split('T')[1].substring(0,5)) + "\n" +
+                      "sof Zman Tfilla MGA: " + trim(data.times.sofZmanTfillaMGA.split('T')[1].substring(0,5)) + "\n" +
+                      "sof Zman Tfilla: " + trim(data.times.sofZmanTfilla.split('T')[1].substring(0,5)) + "\n" +
+                      "chatzot - חצות היום: " + trim(data.times.chatzot.split('T')[1].substring(0,5)));
             }
             document.getElementById('sunset').onclick = function() {
                 //   
-                alert("mincha Gedola -  מנחה גדולה: " + data.times.minchaGedola.split('T')[1].substring(0,5) + "\n" +
-                      "mincha Ketana -  מנחה קטנה: " + data.times.minchaKetana.split('T')[1].substring(0,5) + "\n" +
-                      "plag HaMincha -  פלג המנחה: " + data.times.plagHaMincha.split('T')[1].substring(0,5) + "\n" +
-                      "bein HaShmashos - בין השמשות : " + data.times.beinHaShmashos.split('T')[1].substring(0,5) + "\n" +
-                      "Dusk -  חשיכה: " + data.times.dusk.split('T')[1].substring(0,5) + "\n" +
-                      "Tzeit - צאת הכוכבים: " + data.times.tzeit7083deg.split('T')[1].substring(0,5) + "\n" +
-                      "Tzeit 72' - צאת הכוכבים רבינו תם: " + data.times.tzeit72min.split('T')[1].substring(0,5));
+                alert("mincha Gedola -  מנחה גדולה: " + trim(data.times.minchaGedola.split('T')[1].substring(0,5) )+ "\n" +
+                      "mincha Ketana -  מנחה קטנה: " + trim(data.times.minchaKetana.split('T')[1].substring(0,5)) + "\n" +
+                      "plag HaMincha -  פלג המנחה: " + trim(data.times.plagHaMincha.split('T')[1].substring(0,5)) + "\n" +
+                      "bein HaShmashos - בין השמשות : " + trim(data.times.beinHaShmashos.split('T')[1].substring(0,5)) + "\n" +
+                      "Dusk -  חשיכה: " + trim(data.times.dusk.split('T')[1].substring(0,5)) + "\n" +
+                      "Tzeit - צאת הכוכבים: " + trim(data.times.tzeit7083deg.split('T')[1].substring(0,5)) + "\n" +
+                      "Tzeit 72' - צאת הכוכבים רבינו תם: " + trim(data.times.tzeit72min.split('T')[1].substring(0,5)));
                     }
 
             const now = new Date();
@@ -234,7 +242,7 @@ async function calc() {
                 if (data.items[i].category === 'parashat') {
                     document.getElementById('parasha').innerHTML = data.items[i].hebrew;
                     document.getElementById('haftarahUrl').innerHTML = 'הפטרה: ';
-                    document.getElementById('haftarah').innerHTML = convertEng(data.items[i].leyning.haftarah.replaceAll('|', ' <br>'));
+                    document.getElementById('haftarah').innerHTML = convertEng(data.items[i].leyning.haftarah.replaceAll('|', ' <br>')); // for example: "Pinchas occurring after 17 Tammuz"
                     document.getElementById('haftarahUrl').href = "https://shahart.github.io/heb-bible/index.html?b=" + data.items[i].leyning.haftarah.split(':')[0];
                     if (data.items[i].leyning.haftarah_sephardic) {
                         document.getElementById('haftarahSUrl').innerHTML = 'הפטרה ספרדים: ';
@@ -244,6 +252,8 @@ async function calc() {
                     let parashaUrl = "https://he.wikipedia.org/wiki/";
                     if (data.items[i].hebrew.includes("-"))
                         parashaUrl += data.items[i].hebrew.split("-")[0];
+                    else if (data.items[i].hebrew.includes("־"))
+                        parashaUrl += data.items[i].hebrew.split("־")[0];
                     else 
                         parashaUrl += data.items[i].hebrew;
                     document.getElementById('parashaUrl').href = parashaUrl;
