@@ -21,6 +21,11 @@ Current approach: Pros: simplicity, Cons: not being cut at the end of the news
 
 - `C:\Users\user\AppData\Local\Android\Sdk\platform-tools\adb connect 10.100.102.16:39569`
 
-- iOS example:
+- iOS shortcut example:
 
 ![iOS shortcut](ios-shortcut.jpg)
+
+- iOS alpha version:
+
+![iOS](ios-light.png)
+
