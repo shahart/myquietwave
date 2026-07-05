@@ -1,4 +1,5 @@
-# Volume Cycler iOS App
+# Volume Cycler iOS App -- Deprecated # 
+## See new impl at myQuietChannel folder ##
 
 An iOS app that automatically cycles media volume between muted and 30% volume according to a specific schedule.
 
@@ -102,6 +103,44 @@ This app only controls media volume and does not:
 
 This project is provided as-is for educational and personal use.
 
+# New
 
+What’s included:
+- Native SwiftUI app target: MyQuietWaveiOS.xcodeproj
+- Shared SwiftPM package for source + tests: Package.swift
+- Radio station playback/scheduling with AVPlayer
+- Continuous radio mode
+- Upcoming-news schedule parsing
+- Hebcal Shabbat/zmanim/daf-yomi API integration
+- Location/station/settings persistence
+- Android-style main screen, todo list, links, share action
+- Unit tests for schedule parsing, Hebrew date utilities, and location conversion
+
+Validation passed:
+- `swift test` passed: 5 tests, 0 failures
+- `xcodebuild -project MyQuietWaveiOS.xcodeproj -scheme MyQuietWaveiOS -destination "generic/platform=iOS Simulator" build` succeeded
+
+Note: iOS does not allow an app to mute global system audio like the Android foreground service does. The migrated behavior uses in-app radio playback, timers, and notifications. A physical-device build will require selecting a Development Team in Xcode signing settings.
+
+## Sanity tests ##
+
+Done also on real device.
+
+Passed
+
+- AVPlayer works
+- Timers
+
+Failed
+
+- Trim zero (05/07 -> 5/7)
+- No seconds in current time
+- Mevarchin link
+- geo/gps. DONE remove from list (temp)
+- volume changes "
+- no UTC+03:00
+- short locations list. TODO equalize
+- no icon
+- Dark theme
 
 
