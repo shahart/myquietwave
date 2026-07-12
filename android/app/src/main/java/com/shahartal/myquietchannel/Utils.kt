@@ -23,6 +23,10 @@ object Utils {
     val KOL_BARAMA = "https://cdn.cybercdn.live/Kol_Barama/Live_Audio/icecast.audio"
     val KOL_CHAI = "https://live.kcm.fm/live-new"
     val KOL_CHAI_MUSIC = "https://live.kcm.fm/livemusic"
+
+    val MORESHET = "https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_MORESHET.mp3"
+
+    // val N12news = "http://ff_engine.streamgates.net/Ch10News.mp3"
     
     fun getStationUrl(url: String?): String {
         if (url == null) return GLZ
@@ -39,6 +43,8 @@ object Utils {
         if (url == "קול חי") return KOL_CHAI
         if (url == "קול חי מיוזיק") return KOL_CHAI_MUSIC
         if (url == "קול ברמה") return KOL_BARAMA
+
+        if (url == "כאן מורשת") return MORESHET
 
         return GLZ
     }
@@ -156,6 +162,7 @@ object Utils {
         
        	// special treatment
         if (loc.startsWith("IL-Yavne")) return "IL-יבנה";
+        if (loc.startsWith("IL-Mitzpe Ramon")) return "IL-מצפה רמון";
 
         if (loc.startsWith("IL-Modiin Ilit")) return "IL-מודיעין עילית";
         if (loc.startsWith("IL-Betar Ilit")) return "IL-ביתר עילית";
@@ -196,6 +203,8 @@ object Utils {
 
 	// special treatment
         if (loc == "IL-יבנה") return "IL-Yavne";
+        if (loc == "IL-מצפה רמון") return "IL-Mitzpe Ramon";
+
         if (loc == "IL-ביתר עילית") return "IL-Betar Ilit";
         if (loc == "IL-מודיעין עילית") return "IL-Modiin Ilit";
         if (loc == "IL-צפת") return "IL-Zefat";

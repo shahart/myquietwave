@@ -28,6 +28,9 @@
 
     <string name="close_alert">סגור</string>
 
+    <string name="current_song">כעת מנגן..</string>
+    <string name="next_song">השיר הבא: </string>
+
     <string name="share">שתף</string>
     <string name="rate">דרג</string>
     <string name="share_text"> כדאי לך לנסות את האפליקציה </string>

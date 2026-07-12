@@ -142,5 +142,6 @@ Failed
 - short locations list. TODO equalize
 - no icon
 - Dark theme
+- Stops when lost focus
 
 

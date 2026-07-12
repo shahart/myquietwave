@@ -321,6 +321,15 @@
                 android:textSize="20sp" />
 
             <TextView
+                android:id="@+id/textViewClock2_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/heading_text"
+                android:textSize="20sp" />
+
+            <TextView
                 android:id="@+id/textViewPad12"
                 android:layout_width="match_parent"
                 android:layout_height="12dp"

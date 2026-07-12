@@ -50,6 +50,8 @@ import com.shahartal.myquietchannel.parasha.HebCalZmanimModel
 import com.shahartal.myquietchannel.parasha.RetrofitInstance
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.offsetAt
 import retrofit2.Call
@@ -97,6 +99,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var textViewClock_2nd : TextView
     private lateinit var textViewClock_3rd : TextView
     private lateinit var textViewClock2 : TextView
+    private lateinit var textViewClock2_2 : TextView
     private lateinit var textViewDate : TextView
 
     private lateinit var textViewClockH : TextView
@@ -194,6 +197,7 @@ class MainActivity : ComponentActivity() {
                 "קול חי"  -> stationsSpinner.setSelection(7)
                 "קול חי מיוזיק" -> stationsSpinner.setSelection(8)
                 "קול ברמה" -> stationsSpinner.setSelection(9)
+                "כאן מורשת" -> stationsSpinner.setSelection(10)
             }
         }
 
@@ -399,6 +403,9 @@ class MainActivity : ComponentActivity() {
                     if (loc.lowercase(getDefault()).contains("il-yavne")) {
                         RetrofitInstance.api.getShabbatPerGeoNameId("293222", Utils.getUe(loc))
                     }
+                    else if (loc.lowercase(getDefault()).contains("il-mitzpe ramon")) {
+                        RetrofitInstance.api.getShabbatPerGeoNameId("294166", Utils.getUe(loc))
+                    }
                     else if (loc.lowercase(getDefault()).contains("il-zefat")) {
                         RetrofitInstance.api.getShabbatPerGeoNameId("293100", Utils.getUe(loc))
                     }
@@ -545,6 +552,9 @@ class MainActivity : ComponentActivity() {
                 }
                 else if (loc.lowercase(getDefault()).contains("il-zefat")) {
                     RetrofitInstance.api.getZmanimPerGeoNameId("293100", Utils.getUe(loc))
+                }
+                else if (loc.lowercase(getDefault()).contains("il-mitzpe ramon")) {
+                    RetrofitInstance.api.getZmanimPerGeoNameId("294166", Utils.getUe(loc))
                 }
                 else if (loc.lowercase(getDefault()).contains("il-modiin ilit")) {
                     RetrofitInstance.api.getZmanimPerGeoNameId("8199378", Utils.getUe(loc))
@@ -695,7 +705,7 @@ class MainActivity : ComponentActivity() {
         hebrew = hebrew.replace("Amos", "עמוס");
         hebrew = hebrew.replace("Obadiah", "עובדיה")
         hebrew = hebrew.replace("Jonah", "יונה");
-        hebrew = hebrew.replace("Micha", "מיכה");
+        hebrew = hebrew.replace("Micah", "מיכה");
         hebrew = hebrew.replace("Nachum", "נחום");
         hebrew = hebrew.replace("Habakkuk", "חבקוק");
         hebrew = hebrew.replace("Zephaniah", "צפניה");
@@ -791,25 +801,52 @@ class MainActivity : ComponentActivity() {
                            else if (it.category == "parashat") {
                                 // return it.hebrew;
 
-                                val fullText =  " שבת " + it.hebrew
+                                var str: String = it.hebrew
+                                var str2: String = ""
+
+                                if (str.contains("-")) {
+                                    str2 = "פרשת " + str.split("-")[1]
+                                    str = str.split("-")[0]
+                                }
+
+                                if (str.contains("־")) {
+                                    str2 = "פרשת " + str.split("־")[1]
+                                    str = str.split("־")[0]
+                                }
+
+                                val fullText =  " שבת " + str
                                 val spannableString = SpannableString(fullText)
                                 spannableString.setSpan(UnderlineSpan(), " שבת ".length, fullText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                 textViewClock2.text = spannableString
 
-                                editor.putString("parashat", " שבת " + it.hebrew)
+                                editor.putString("parashat", " שבת " + str)
                                 editor.apply()
 
-                                var str: String = it.hebrew
-								
-				if (str.contains("-"))
-					str = str.split("-")[0]
-								
                                 textViewClock2.setOnClickListener {
                                     val browserIntent = Intent(
                                         Intent.ACTION_VIEW,
                                         ("https://he.wikipedia.org/wiki/" + str.replace(" ", "_")).toUri()
                                     )
                                     startActivity(browserIntent)
+                                }
+
+                                if (str2.length >= 1) {
+
+                                    val fullText =  str2
+                                    val spannableString = SpannableString(fullText)
+                                    spannableString.setSpan(UnderlineSpan(), 0, fullText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                    textViewClock2_2.text = spannableString
+
+                                    textViewClock2_2.setOnClickListener {
+                                        val browserIntent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            ("https://he.wikipedia.org/wiki/" + str2.replace(
+                                                " ",
+                                                "_"
+                                            )).toUri()
+                                        )
+                                        startActivity(browserIntent)
+                                    }
                                 }
 
                                 val hebName = convertEng(it.leyning.haftarah.replace("|", "\n"))
@@ -928,6 +965,7 @@ class MainActivity : ComponentActivity() {
                 "קול חי"  -> stationsSpinner.setSelection(7)
                 "קול חי מיוזיק" -> stationsSpinner.setSelection(8)
                 "קול ברמה" -> stationsSpinner.setSelection(9)
+                "כאן מורשת" -> stationsSpinner.setSelection(10)
             }
         }
 
@@ -1119,6 +1157,7 @@ class MainActivity : ComponentActivity() {
         textViewClock_3rd = findViewById(R.id.textViewClock_3rd)
 
         textViewClock2 = findViewById(R.id.textViewClock2)
+        textViewClock2_2 = findViewById(R.id.textViewClock2_2)
         textViewDate = findViewById(R.id.textViewDate)
 
         textViewClock_2nd.text = TimeZone.currentSystemDefault().id
@@ -1238,6 +1277,11 @@ class MainActivity : ComponentActivity() {
                 serviceIntent.putExtra("location", editTextLocation.text.toString())
                 serviceIntent.putExtra("radioPlayer", if (radioPlayer.isChecked()) "true" else "false" )
 
+                val selectedStation = stationsSpinner.selectedItem.toString()
+                if (Utils.getStationUrl(selectedStation).contains("glglz") || Utils.getStationUrl(selectedStation).contains("glz")) {
+                    fetchGlgltzSong(if (Utils.getStationUrl(selectedStation).contains("glglz")) "glglz" else "glz")
+                }
+
                 if (true) {
 
                     startForegroundService(serviceIntent)
@@ -1329,6 +1373,72 @@ class MainActivity : ComponentActivity() {
             this,
             RC_APP_UPDATE
         )
+    }
+
+    private fun fetchGlgltzSong(station: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val url = "https://glzxml.blob.core.windows.net/dalet/" + station + "-onair/onair.xml"
+                val connection = java.net.URL(url).openConnection() as java.net.HttpURLConnection
+                val xml = connection.inputStream.bufferedReader().use { it.readText() }
+                val title = xml.substringAfter("<titleName>").substringBefore("</titleName>")
+
+                if (title.length >= 1) {
+                    withContext(Dispatchers.Main) {
+                        if (! isFinishing) {
+                            var current = title
+
+                            var artist = xml.substringAfter("<artistName>").substringBefore("</artistName>")
+                            var year = xml.substringAfter("<year>").substringBefore("</year>")
+                            if (artist.startsWith("<?xml")) {
+                                artist = ""
+                                year = ""
+                            }
+                            else {
+                                current += " . $artist . $year"
+                            }
+
+                            val titleNext = xml.substringAfterLast("<titleName>").substringBeforeLast("</titleName>")
+                            var artistNext = xml.substringAfterLast("<artistName>").substringBeforeLast("</artistName>")
+                            var yearNext = xml.substringAfterLast("<year>").substringBeforeLast("</year>")
+                            if (artistNext.startsWith("<?xml")) {
+                                artistNext = ""
+                                yearNext = ""
+                            }
+                            var next = ""
+                            if (titleNext.length >= 1 && titleNext != title) {
+                                next = "\n\n" + getString(R.string.next_song) + " $titleNext"
+                                if (artistNext.length >= 1 && artistNext != artist) {
+                                    next += ". $artistNext"
+                                }
+                                if (yearNext.length >= 1 && yearNext != year) {
+                                    next += ". $yearNext"
+                                }
+                            }
+
+                            val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
+                                .setMessage(current + next)
+                                .setTitle(getString(R.string.current_song))
+                            alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
+                                if (! this@MainActivity.isFinishing) {
+                                    dialog!!.cancel()
+                                }
+                            }
+                            val alertDialog = alertDialogBuilder.create()
+                            alertDialog.show()
+                            lifecycleScope.launch {
+                                delay(5_000)
+                                if (alertDialog.isShowing) {
+                                    alertDialog.dismiss()
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.w("myquietwave", "Error fetching Galgalatz song info", e)
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

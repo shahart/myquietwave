@@ -1,6 +1,12 @@
 # Changelog
 
-# 1.56
+## 1.60
+
+Add the current and next playing song(s) for Glz stations
+Handle connected parashot
+Add Kan-Moreshet
+
+## 1.56
 
 show the hebrew name of the haftarah's book
 

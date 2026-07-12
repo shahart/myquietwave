@@ -27,6 +27,8 @@
     <string name="alert_message">L\'application n\'allume pas la radio elle-même, vous devez d\'abord activer l\'application appropriée.</string>
 
     <string name="close_alert">Fermer</string>
+    <string name="current_song">Now playing..</string>
+    <string name="next_song">Next playing: </string>
 
     <string name="share">Partager</string>
     <string name="rate">Taux</string>

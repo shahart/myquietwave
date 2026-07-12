@@ -33,6 +33,9 @@
 
     <string name="close_alert">Close</string>
 
+    <string name="current_song">Now playing..</string>
+    <string name="next_song">Next playing: </string>
+
     <string name="share">Share</string>
     <string name="rate">Rate</string>
     <string name="share_text">Check out this nice app:</string>
@@ -80,6 +83,7 @@
         <item>קול חי</item>
         <item>קול חי מיוזיק</item>
         <item>קול ברמה</item>
+        <item>כאן מורשת</item>
     </string-array>
 
     <string-array name="locations">
@@ -106,6 +110,7 @@
         <item>IL-לוד</item>
         <item>IL-מודיעין</item>
         <item>IL-מודיעין עילית</item>
+        <item>IL-מצפה רמון</item>
         <item>IL-נצרת</item>
         <item>IL-נתניה</item>
         <item>IL-פתח תקוה</item>

@@ -26,7 +26,9 @@
     <string name="alert_message">Приложение не включает радио само по себе, сначала вы должны включить соответствующее приложение.</string>
  
     <string name="close_alert">Закрыть</string>
- 
+    <string name="current_song">Now playing..</string>
+    <string name="next_song">Next playing: </string>
+
     <string name="share">Поделиться</string>
     <string name="rate">Оценить</string>
     <string name="share_text">Посмотрите это отличное приложение:</string>
