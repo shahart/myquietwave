@@ -765,6 +765,10 @@ class MainActivity : ComponentActivity() {
                                     )
                                     textViewClock6rosh.text = spannableStringH
                                 }
+
+                                if (! memo.contains(it.memo)) {
+                                    memo += "\n\n" + it.hebrew + ": " + it.memo
+                                }
                             }
                             else if (it.category == "holiday") {
                                 val holidayDate = it.date

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.61
+
+Add rosh-chodesh memo help.
+Add instrumentation test.
+
 ## 1.60
 
 Add the current and next playing song(s) for Glz stations
