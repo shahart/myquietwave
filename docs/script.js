@@ -478,7 +478,53 @@ document.getElementById('dat').innerHTML = d.getDate() + "/" + (d.getMonth()+1) 
 
 let myWindow;
 let countdownInterval;
+let nowPlayingInterval;
 let isRadioPending = false;
+
+function fetchOnAirXml() {
+  const target = "http://glzxml.blob.core.windows.net/dalet/glglz-onair/onair.xml";
+  const proxy = "https://myquietwave.lat-shahar.workers.dev/?url=" + encodeURIComponent(target);
+  return fetch(proxy, { signal: AbortSignal.timeout(8000) })
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
+}
+
+function fetchAndShowNowPlaying() {
+  fetchOnAirXml()
+    .then(xml => {
+      const doc = new DOMParser().parseFromString(xml, "text/xml");
+      const title = doc.querySelector("Current > titleName");
+      const artist = doc.querySelector("Current > artistName");
+      const year = doc.querySelector("Current > year");
+      if (title) {
+        let msg = "🎵 " + (artist ? artist.textContent + " - " : "") + title.textContent + " " + (year ? year.textContent : "");
+          const ntitle = doc.querySelector("Next > titleName");
+          const nartist = doc.querySelector("Next > artistName");
+          const nyear = doc.querySelector("Next > year");
+          if (ntitle) {
+              const nel = document.getElementById("next-title");
+              const nmsg = " " + (nartist ? nartist.textContent + " - " : "") + ntitle.textContent + " " + (nyear ? nyear.textContent : "");
+              nel.textContent = "השיר הבא: " + nmsg;
+          }
+        const el = document.getElementById("now-title");
+        el.textContent = msg;
+      }
+    })
+    .catch(() => {
+        console.error("failed");
+    });
+}
+
+function showGlglzNowPlaying() {
+  const url = document.getElementById("stationSelect").value;
+  if (url !== "https://glzwizzlv.bynetcdn.com/glglz_mp3") return;
+  clearInterval(nowPlayingInterval);
+  fetchAndShowNowPlaying();
+  nowPlayingInterval = setInterval(fetchAndShowNowPlaying, 90000);
+}
+
+function stopNowPlaying() {
+  clearInterval(nowPlayingInterval);
+}
 
 function openWin() {
   const url = document.getElementById("stationSelect").value;
@@ -491,6 +537,7 @@ function listenNow() {
     alert("A window is already open. Close it first.");
     return;
   }
+  showGlglzNowPlaying();
   openWin();
   clearInterval(countdownInterval);
   document.getElementById("status").textContent = "Playing";
@@ -499,6 +546,9 @@ function listenNow() {
   document.getElementById("radioButton").disabled = true;
   let checkInterval = setInterval(() => {
     if (myWindow && myWindow.closed) {
+      stopNowPlaying();
+      document.getElementById("now-title").textContent = '';
+      document.getElementById("next-title").textContent = '';
       document.getElementById("listenNowButton").disabled = false;
       document.getElementById("radioButton").disabled = false;
       document.getElementById("status").textContent = "";
@@ -566,6 +616,7 @@ function listenToNextNews() {
     document.getElementById("radioButton").disabled = false;
     return;
   }
+  // showGlglzNowPlaying();
   openWin(); // Opens the window first to ensure we have a reference to it
   isRadioPending = false;
   if (myWindow) {
@@ -574,6 +625,9 @@ function listenToNextNews() {
     sleep(newsLength).then(() => {
         // console.log(new Date() + " close");
         myWindow.close(); // Closes the referenced window
+        stopNowPlaying();
+        document.getElementById("now-title").textContent = '';
+        document.getElementById("next-title").textContent = '';
         document.getElementById("status").textContent = "Closed";
         document.getElementById("timer").textContent = "";
         document.getElementById("radioButton").disabled = false;

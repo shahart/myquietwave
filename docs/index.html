@@ -459,6 +459,7 @@
                             <option value="https://live.kcm.fm/live-new">קול חי</option>
                             <option value="https://live.kcm.fm/livemusic">קול חי מיוזיק</option>
                             <option value="https://cdn.cybercdn.live/Kol_Barama/Live_Audio/icecast.audio">קול ברמה</option>
+                            <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_MORESHET.mp3">מורשת</option>
                         </select>
                     </div>
                     <div class="actions">
@@ -477,6 +478,8 @@
                         <span id="timer" class="timer"></span>
                     </div>
                 </div>
+                <div id="now-title"></div>
+                <div id="next-title"></div>
 
             </article>
 
@@ -783,5 +786,22 @@
     </main>
 
     <script src="script.js"></script>
+    <script>
+        function fetchOnAir() {
+            var target = "http://glzxml.blob.core.windows.net/dalet/glglz-onair/onair.xml";
+            var proxy = "https://myquietwave.lat-shahar.workers.dev/?url=" + encodeURIComponent(target);
+            fetch(proxy, {signal: AbortSignal.timeout(8000)})
+                .then(function(response) {
+                    if (!response.ok) throw new Error("HTTP " + response.status);
+                    return response.text();
+                })
+                .then(function(xml) {
+                    alert(xml);
+                })
+                .catch(function(error) {
+                    alert("Error: " + error.message);
+                });
+        }
+    </script>
 </body>
 </html>
