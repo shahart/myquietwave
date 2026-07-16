@@ -117,6 +117,32 @@
                 android:textAlignment="center"
                 android:textDirection="ltr" />
 
+
+            <TextView
+                android:id="@+id/textViewCurrentSong"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textDirection="ltr" />
+
+            <TextView
+                android:id="@+id/textViewNextSong"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textDirection="ltr" />
+
+
+            <TextView
+                android:id="@+id/textViewPad21"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textDirection="ltr" />
+
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="match_parent"
@@ -126,8 +152,9 @@
                 android:textColor="@color/body_text"
                 android:textSize="20sp" />
 
+
             <TextView
-                android:id="@+id/textViewPad21"
+                android:id="@+id/textViewPad23"
                 android:layout_width="match_parent"
                 android:layout_height="12dp"
                 android:text=""
@@ -144,6 +171,14 @@
 
             <TextView
                 android:id="@+id/textViewPad19"
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textDirection="ltr" />
+
+            <TextView
+                android:id="@+id/textViewPad26"
                 android:layout_width="match_parent"
                 android:layout_height="12dp"
                 android:text=""

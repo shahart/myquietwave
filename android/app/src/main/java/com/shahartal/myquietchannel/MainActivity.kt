@@ -117,6 +117,9 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var editTextTodo : TextView
 
+    private lateinit var currentSong : TextView
+    private lateinit var nextSong : TextView
+
     private lateinit var spinner : Spinner
     private lateinit var stationsSpinner : Spinner
 
@@ -217,6 +220,8 @@ class MainActivity : ComponentActivity() {
         if (! VolumeCycleService.isRunning) {
             stopService(serviceIntent)
             isServiceRunning = false
+            currentSong.text = ""
+            nextSong.text = ""
         }
 
         if (justRadio == "true") {
@@ -1062,6 +1067,9 @@ class MainActivity : ComponentActivity() {
         statusText = findViewById(R.id.statusText)
         toggleButton = findViewById(R.id.toggleButton)
 
+        currentSong = findViewById(R.id.textViewCurrentSong)
+        nextSong = findViewById(R.id.textViewNextSong)
+
         editTextNumberNewsDuration = findViewById(R.id.editTextDuration)
         textViewNextNews = findViewById(R.id.textViewNextNewsStr)
 
@@ -1248,6 +1256,8 @@ class MainActivity : ComponentActivity() {
                 stopService(serviceIntent)
 
                 isServiceRunning = false
+                currentSong.text = ""
+                nextSong.text = ""
                 updateServiceUi()
 
                 getSystemService(NotificationManager::class.java).cancel(1)
@@ -1282,7 +1292,7 @@ class MainActivity : ComponentActivity() {
                 serviceIntent.putExtra("radioPlayer", if (radioPlayer.isChecked()) "true" else "false" )
 
                 val selectedStation = stationsSpinner.selectedItem.toString()
-                if (Utils.getStationUrl(selectedStation).contains("glglz") || Utils.getStationUrl(selectedStation).contains("glz")) {
+                if (Utils.getStationUrl(selectedStation).contains("glglz") /* || Utils.getStationUrl(selectedStation).contains("glz") */) {
                     fetchGlgltzSong(if (Utils.getStationUrl(selectedStation).contains("glglz")) "glglz" else "glz")
                 }
 
@@ -1348,6 +1358,22 @@ class MainActivity : ComponentActivity() {
 
         checkForAppUpdate()
 
+        lifecycleScope.launch {
+            while (true) {
+                delay(90_000)
+                try {
+                    if (isServiceRunning) {
+                        val selectedStation = stationsSpinner.selectedItem.toString()
+                        // Log.i("myquietwave", "periodic fetchGlgltzSong" + selectedStation)
+                        if (Utils.getStationUrl(selectedStation).contains("glglz") /* || Utils.getStationUrl(selectedStation).contains("glz") */ ) {
+                            fetchGlgltzSong(if (Utils.getStationUrl(selectedStation).contains("glglz")) "glglz" else "glz")
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.w("myquietwave", "Error in periodic fetchGlgltzSong", e)
+                }
+            }
+        }
     }
 
     private lateinit var appUpdateManager: AppUpdateManager
@@ -1411,31 +1437,23 @@ class MainActivity : ComponentActivity() {
                             }
                             var next = ""
                             if (titleNext.length >= 1 && titleNext != title) {
-                                next = "\n\n" + getString(R.string.next_song) + " $titleNext"
+                                next = " $titleNext"
                                 if (artistNext.length >= 1 && artistNext != artist) {
                                     next += ". $artistNext"
                                 }
                                 if (yearNext.length >= 1 && yearNext != year) {
                                     next += ". $yearNext"
                                 }
+                                if (next.trim().length >= 1) {
+                                    nextSong.text = getString(R.string.next_song) + " " + next
+                                }
+                            }
+                            else {
+                                nextSong.text = ""
                             }
 
-                            val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
-                                .setMessage(current + next)
-                                .setTitle(getString(R.string.current_song))
-                            alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
-                                if (! this@MainActivity.isFinishing) {
-                                    dialog!!.cancel()
-                                }
-                            }
-                            val alertDialog = alertDialogBuilder.create()
-                            alertDialog.show()
-                            lifecycleScope.launch {
-                                delay(5_000)
-                                if (alertDialog.isShowing) {
-                                    alertDialog.dismiss()
-                                }
-                            }
+                            currentSong.text = current
+
                         }
                     }
                 }

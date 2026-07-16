@@ -141,4 +141,46 @@ class ShabbathApiUnitTest {
         val res = fetchYomZmanim()
         assertTrue("res: '$res'", res.contains(", "))
     }
+
+    @Test
+    fun getUe_defaultsToOn() {
+        assertEquals("on", Utils.getUe("IL-Jerusalem"))
+        assertEquals("on", Utils.getUe("32.0853, 34.7818"))
+    }
+
+    @Test
+    fun getUe_detectsExplicitUeOffSuffix() {
+        assertEquals("off", Utils.getUe("IL-Jerusalem, ue"))
+        assertEquals("off", Utils.getUe("IL-Jerusalem,ue"))
+        assertEquals("off", Utils.getUe("IL-Jerusalem, UE"))
+    }
+
+    @Test
+    fun getCity_stripsApiOptionSuffix() {
+        assertEquals("IL-Jerusalem", Utils.getCity("IL-Jerusalem, ue"))
+        assertEquals("293222", Utils.getCity("293222, ue"))
+    }
+
+    @Test
+    fun getCity_leavesPlainLocationUnchanged() {
+        assertEquals("IL-Ramat Gan", Utils.getCity("IL-Ramat Gan"))
+    }
+
+    @Test
+    fun convertLocationIL_handlesSpecialShabbathApiCities() {
+        assertEquals("IL-יבנה", Utils.convertLocationIL("IL-Yavne"))
+        assertEquals("IL-מצפה רמון", Utils.convertLocationIL("IL-Mitzpe Ramon"))
+        assertEquals("IL-מודיעין עילית", Utils.convertLocationIL("IL-Modiin Ilit"))
+        assertEquals("IL-ביתר עילית", Utils.convertLocationIL("IL-Betar Ilit"))
+        assertEquals("IL-צפת", Utils.convertLocationIL("IL-Zefat"))
+    }
+
+    @Test
+    fun convertFromLocationIL_handlesSpecialShabbathApiCities() {
+        assertEquals("IL-Yavne", Utils.convertFromLocationIL("IL-יבנה"))
+        assertEquals("IL-Mitzpe Ramon", Utils.convertFromLocationIL("IL-מצפה רמון"))
+        assertEquals("IL-Modiin Ilit", Utils.convertFromLocationIL("IL-מודיעין עילית"))
+        assertEquals("IL-Betar Ilit", Utils.convertFromLocationIL("IL-ביתר עילית"))
+        assertEquals("IL-Zefat", Utils.convertFromLocationIL("IL-צפת"))
+    }
 }

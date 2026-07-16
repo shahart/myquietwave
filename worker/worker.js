@@ -18,6 +18,11 @@ export default {
 
             const body = await resp.text();
 
+            // const match = body.match(/<titleName>(.*?)<\/titleName>/);
+            // if (match) {
+                // console.log("onair title:", match[1]);
+            // }
+
             return new Response(body, {
                 status: resp.status,
                 headers: {

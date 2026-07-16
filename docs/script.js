@@ -481,15 +481,15 @@ let countdownInterval;
 let nowPlayingInterval;
 let isRadioPending = false;
 
-function fetchOnAirXml() {
-  const target = "http://glzxml.blob.core.windows.net/dalet/glglz-onair/onair.xml";
+function fetchOnAirXml(station) {
+  const target = "http://glzxml.blob.core.windows.net/dalet/" + station + "-onair/onair.xml";
   const proxy = "https://myquietwave.lat-shahar.workers.dev/?url=" + encodeURIComponent(target);
   return fetch(proxy, { signal: AbortSignal.timeout(8000) })
     .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
 }
 
-function fetchAndShowNowPlaying() {
-  fetchOnAirXml()
+function fetchAndShowNowPlaying(station) {
+  fetchOnAirXml(station)
     .then(xml => {
       const doc = new DOMParser().parseFromString(xml, "text/xml");
       const title = doc.querySelector("Current > titleName");
@@ -516,10 +516,13 @@ function fetchAndShowNowPlaying() {
 
 function showGlglzNowPlaying() {
   const url = document.getElementById("stationSelect").value;
-  if (url !== "https://glzwizzlv.bynetcdn.com/glglz_mp3") return;
+  let station = null;
+  if (url === "https://glzwizzlv.bynetcdn.com/glglz_mp3") station = "glglz";
+  else if (url === "https://glzwizzlv.bynetcdn.com/glz_mp3") station = "glz";
+  if (!station) return;
   clearInterval(nowPlayingInterval);
-  fetchAndShowNowPlaying();
-  nowPlayingInterval = setInterval(fetchAndShowNowPlaying, 90000);
+  fetchAndShowNowPlaying(station);
+  nowPlayingInterval = setInterval(() => fetchAndShowNowPlaying(station), 90000);
 }
 
 function stopNowPlaying() {

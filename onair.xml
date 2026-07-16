@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BroadcastMonitor>
+  <updated>2026-07-12T02:18:43.995+03:00</updated>
+  <stationName>גלגלצ</stationName>
+  <Current>
+    <startTime>2026-07-12T02:18:36.791</startTime>
+    <titleName>אור הירח</titleName>
+    <artistName>יסמין מועלם,טונה</artistName>
+    <albumName>צו השעה: צו שני</albumName>
+    <year>2020</year>
+  </Current>
+  <Next>
+    <startTime>2026-07-12T02:22:04.991</startTime>
+    <titleName>עוקף מלמעלה</titleName>
+    <artistName>מוקי</artistName>
+    <albumName>עוקף מלמעלה</albumName>
+    <year>2005</year>
+  </Next>
+</BroadcastMonitor>
+
+
