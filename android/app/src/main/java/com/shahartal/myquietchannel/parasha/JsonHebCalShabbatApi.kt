@@ -32,7 +32,7 @@ interface JsonHebCalShabbatApi {
     @GET("zmanim?cfg=json")
     fun getZmanimPerGeoNameId(@Query("geonameid") geonameid: String, @Query("ue") ue: String): Call<HebCalZmanimModel>
 
-    @GET("zmanim?cfg=json")
+    @GET("zmanim?cfg=json&tzid=Asia/Jerusalem")
     fun getZmanimByLoc(@Query("latitude") latitude: String,
                        @Query("longitude") longitude: String, @Query("ue") ue: String): Call<HebCalZmanimModel>
 

@@ -137,6 +137,23 @@ class ShabbathApiUnitTest {
     }
 
     @Test
+    fun fetchYomZmanimLoc() {
+        var res = ""
+        val city = "IL-Jerusalem"
+        val response =
+            RetrofitInstance.api.getZmanimByLoc("32", "35", "off").execute()
+        if (response.isSuccessful) {
+            val hebcal = response.body()
+            if (hebcal != null) {
+                res = hebcal.times.sunrise + ", " + hebcal.times.chatzot + ", " + hebcal.times.sunset
+            }
+        }
+        else {
+            fail(response.toString() + response.body())
+        }
+    }
+
+    @Test
     fun fetchYomZmanim_works() {
         val res = fetchYomZmanim()
         assertTrue("res: '$res'", res.contains(", "))

@@ -4,7 +4,7 @@ import android.Manifest
 import android.app.AlertDialog
 //import android.app.Notification
 import android.app.NotificationManager
-import android.content.Context
+
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -236,6 +236,18 @@ class MainActivity : ComponentActivity() {
         if (mediaPlayer?.isPlaying == true)
             stationsSpinner.setEnabled(false)
 
+        try {
+            if (isServiceRunning) {
+                val selectedStation = stationsSpinner.selectedItem.toString()
+                // Log.i("myquietwave", "periodic fetchGlgltzSong" + selectedStation)
+                if (Utils.getStationUrl(selectedStation).contains("glglz") /* || Utils.getStationUrl(selectedStation).contains("glz") */ ) {
+                    fetchGlgltzSong(if (Utils.getStationUrl(selectedStation).contains("glglz")) "glglz" else "glz")
+                }
+            }
+        } catch (e: Exception) {
+            Log.w("myquietwave", "Error in periodic fetchGlgltzSong", e)
+        }
+
     }
 
     override fun onPause() {
@@ -398,8 +410,8 @@ class MainActivity : ComponentActivity() {
 
             val call = // if (loc.get(0).isDigit()) RetrofitInstance.api.getShabbatByLoc(loc.split(",")[0].trim(), loc.split(",")[1].trim())
                 // else
-                if (Character.isDigit(loc.trim().get(0))) {
-                    if (loc.contains(",") && Character.isDigit(loc.split(",")[1].trim().get(0)))
+                if (Character.isDigit(loc.trim().get(0)) || loc.trim().get(0) == '-') {
+                    if (loc.contains(",") && (Character.isDigit(loc.split(",")[1].trim().get(0)) || loc.split(",")[1].trim().get(0) == '-'))
                         RetrofitInstance.api.getShabbatByLoc(loc.split(",")[0].trim(), loc.split(",")[1].trim(), Utils.getUe(loc))
                     else
                         RetrofitInstance.api.getShabbatPerGeoNameId(Utils.getCity(loc), Utils.getUe(loc))
@@ -484,7 +496,7 @@ class MainActivity : ComponentActivity() {
                         editor.apply()
                     }
                     else {
-                        Log.w("myquietwave", "MainActivity fetchParasha Error: ${response.code()}")
+                        Log.w("myquietwave", "MainActivity fetchZmanim Error: ${response.code()}")
                         // textViewClock3.text = "" // ""Not found " + response.code()
                         res += " " + sharedPreferences.getString("candles", "") + " " + sharedPreferences.getString("havdalah", "")
                         textViewClock3.text = res
@@ -537,8 +549,8 @@ class MainActivity : ComponentActivity() {
 
             val call =
 
-                if (Character.isDigit(loc.trim().get(0)))  {
-                    if (loc.contains(",") && Character.isDigit(loc.split(",")[1].trim().get(0)))
+                if (Character.isDigit(loc.trim().get(0)) || loc.trim().get(0) == '-')  {
+                    if (loc.contains(",") && (Character.isDigit(loc.split(",")[1].trim().get(0)) || loc.split(",")[1].trim().get(0) == '-'))
                         RetrofitInstance.api.getZmanimByLoc(
                             loc.split(",")[0].trim(),
                             loc.split(",")[1].trim(),

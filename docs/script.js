@@ -158,7 +158,10 @@ async function calc() {
             postfix = "city=" + postfix;
         }
     }
-    const url = `https://www.hebcal.com/zmanim?cfg=json&` + postfix + useElevationParam; 
+    var url = `https://www.hebcal.com/zmanim?cfg=json&` + postfix + useElevationParam;
+    if (postfix.startsWith('latitude=')) {
+        url += "&tzid=Asia/Jerusalem";
+    }
 
     const url2 = `https://www.hebcal.com/shabbat?cfg=json&` + postfix + useElevationParam;
 
@@ -488,7 +491,7 @@ function fetchOnAirXml(station) {
     .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
 }
 
-function fetchAndShowNowPlaying(station) {
+function fetchAndShowNowPlaying(station, isNewWin) {
   fetchOnAirXml(station)
     .then(xml => {
       const doc = new DOMParser().parseFromString(xml, "text/xml");
@@ -501,12 +504,22 @@ function fetchAndShowNowPlaying(station) {
           const nartist = doc.querySelector("Next > artistName");
           const nyear = doc.querySelector("Next > year");
           if (ntitle) {
-              const nel = document.getElementById("next-title");
-              const nmsg = " " + (nartist ? nartist.textContent + " - " : "") + ntitle.textContent + " " + (nyear ? nyear.textContent : "");
-              nel.textContent = "השיר הבא: " + nmsg;
+              const nmsg =  "השיר הבא: " + " " + (nartist ? nartist.textContent + " - " : "") + ntitle.textContent + " " + (nyear ? nyear.textContent : "");
+              if (isNewWin) {
+                  msg += "\n\n" + nmsg;
+              }
+              else {
+                  const nel = document.getElementById("next-title");
+                  nel.textContent = nmsg;
+              }
           }
-        const el = document.getElementById("now-title");
-        el.textContent = msg;
+        if (isNewWin) {
+            window.alert(msg);
+        }
+        else {
+            const el = document.getElementById("now-title");
+            el.textContent = msg;
+        }
       }
     })
     .catch(() => {
@@ -521,8 +534,8 @@ function showGlglzNowPlaying() {
   else if (url === "https://glzwizzlv.bynetcdn.com/glz_mp3") station = "glz";
   if (!station) return;
   clearInterval(nowPlayingInterval);
-  fetchAndShowNowPlaying(station);
-  nowPlayingInterval = setInterval(() => fetchAndShowNowPlaying(station), 90000);
+  fetchAndShowNowPlaying(station, false);
+  nowPlayingInterval = setInterval(() => fetchAndShowNowPlaying(station, false), 90000);
 }
 
 function stopNowPlaying() {
@@ -532,6 +545,10 @@ function stopNowPlaying() {
 function openWin() {
   const url = document.getElementById("stationSelect").value;
   myWindow = window.open(url, "_blank", "width=500,height=500");
+}
+
+function whatsNext() {
+    fetchAndShowNowPlaying("glglz", true);
 }
 
 function listenNow() {

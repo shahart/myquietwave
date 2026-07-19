@@ -149,6 +149,7 @@ object Utils {
         if (loc.startsWith("IL-Kfar Saba")) return "IL-כפר סבא";
         if (loc.startsWith("IL-Lod")) return "IL-לוד";
 		
+        if (loc.startsWith("IL-Modiin Ilit")) return "IL-מודיעין עילית";
         if (loc.startsWith("IL-Modiin")) return "IL-מודיעין";
         if (loc.startsWith("IL-Nazareth")) return "IL-נצרת";
         if (loc.startsWith("IL-Netanya")) return "IL-נתניה";
@@ -164,7 +165,6 @@ object Utils {
         if (loc.startsWith("IL-Yavne")) return "IL-יבנה";
         if (loc.startsWith("IL-Mitzpe Ramon")) return "IL-מצפה רמון";
 
-        if (loc.startsWith("IL-Modiin Ilit")) return "IL-מודיעין עילית";
         if (loc.startsWith("IL-Betar Ilit")) return "IL-ביתר עילית";
         if (loc.startsWith("IL-Zefat")) return "IL-צפת";
 
