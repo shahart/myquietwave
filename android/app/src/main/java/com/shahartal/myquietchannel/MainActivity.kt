@@ -45,6 +45,8 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
 import com.google.firebase.crashlytics.crashlytics
+import com.shahartal.myquietchannel.luach.HebrewDate
+import com.shahartal.myquietchannel.luach.Parshios
 import com.shahartal.myquietchannel.parasha.HebCal
 import com.shahartal.myquietchannel.parasha.HebCalZmanimModel
 import com.shahartal.myquietchannel.parasha.RetrofitInstance
@@ -929,7 +931,7 @@ class MainActivity : ComponentActivity() {
                         }
                     } else {
                         Log.w("myquietwave", "MainActivity fetchParasha Error: ${response.code()}")
-                        textViewClock2.text = sharedPreferences.getString("parashat", "")
+                        textViewClock2.text = getParasha()
                         textViewClockH.text = sharedPreferences.getString("haftarah", "")
                         textViewClockHS.text = sharedPreferences.getString("haftarah_sephardic", "")
                     }
@@ -937,19 +939,28 @@ class MainActivity : ComponentActivity() {
 
                 override fun onFailure(call: Call<HebCal>, t: Throwable) {
                     Log.w("myquietwave", "MainActivity fetchParasha unable to fetch hebCal $t", t)
-                    textViewClock2.text = sharedPreferences.getString("parashat", "")
+                    textViewClock2.text = getParasha()
                     textViewClockH.text = sharedPreferences.getString("haftarah", "")
                     textViewClockHS.text = sharedPreferences.getString("haftarah_sephardic", "")
                 }
             })
         } catch (e: Exception) {
             Log.e("myquietwave", "MainActivity fetchParasha Exception $e", e)
-            textViewClock2.text = sharedPreferences.getString("parashat", "")
+            textViewClock2.text = getParasha()
             textViewClockH.text = sharedPreferences.getString("haftarah", "")
             textViewClockHS.text = sharedPreferences.getString("haftarah_sephardic", "")
             Firebase.crashlytics.log("MainActivity fetchParasha Exception")
             Firebase.crashlytics.recordException(e)
         }
+    }
+
+    fun getParasha(): String {
+        val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
+        var res = sharedPreferences.getString("parashat", "").toString();
+        if (res == "") {
+            res = " שבת פרשת " + Parshios.getParshaString(HebrewDate.today())
+        }
+        return res
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
