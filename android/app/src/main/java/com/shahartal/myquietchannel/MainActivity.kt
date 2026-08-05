@@ -70,6 +70,33 @@ import java.util.Date
 import java.util.Locale.getDefault
 import kotlin.time.Clock
 
+internal data class GlglzSongs(val current: String, val next: String?)
+
+internal fun parseGlglzSongs(xml: String): GlglzSongs? {
+    fun first(tag: String) = xml.substringAfter("<$tag>", "").substringBefore("</$tag>", "").trim()
+    fun last(tag: String) = xml.substringAfterLast("<$tag>", "").substringBefore("</$tag>", "").trim()
+
+    val title = first("titleName")
+    if (title.isBlank()) return null
+
+    val artist = first("artistName").takeUnless { it.startsWith("<?xml") }.orEmpty()
+    val year = first("year").takeUnless { artist.isBlank() }.orEmpty()
+    val current = listOf(title, artist, year).filter { it.isNotBlank() }.joinToString(" . ")
+
+    val nextTitle = last("titleName")
+    if (nextTitle.isBlank() || nextTitle == title) return GlglzSongs(current, null)
+
+    val nextArtist = last("artistName").takeUnless { it.startsWith("<?xml") }.orEmpty()
+    val nextYear = last("year").takeUnless { nextArtist.isBlank() }.orEmpty()
+    val next = listOf(
+        nextTitle,
+        nextArtist.takeUnless { it == artist }.orEmpty(),
+        nextYear.takeUnless { it == year }.orEmpty()
+    ).filter { it.isNotBlank() }.joinToString(". ")
+
+    return GlglzSongs(current, next)
+}
+
 class MainActivity : ComponentActivity() {
 
     val hebrewDays = arrayOf("א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ", "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל")
@@ -85,6 +112,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var shabesText: TextView
     private lateinit var toggleButton: Button
     private lateinit var shareButton: Button
+    private lateinit var peekSongsButton: Button
 
     // private lateinit var powerButton: Button
 
@@ -172,7 +200,7 @@ class MainActivity : ComponentActivity() {
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         val savedName = sharedPreferences.getString("todoList", "פלטה, מיחם, שעון שבת, מנורה קטנה במסדרון, מזגן")
         val savedLocation = sharedPreferences.getString("location", "IL-Jerusalem")
-        val savedStation = sharedPreferences.getString("station", "GLZ")
+        val savedStation = sharedPreferences.getString("station", "גלגלצ")
         val justRadio = sharedPreferences.getString("justRadio", "false") // TODO
 
         editTextTodo.text = savedName
@@ -192,8 +220,8 @@ class MainActivity : ComponentActivity() {
 
         if (savedStation != null) {
             when (savedStation) {
-                "גלי צהל"    -> stationsSpinner.setSelection(0)
-                "גלגלצ"  -> stationsSpinner.setSelection(1)
+                "גלגלצ"  -> stationsSpinner.setSelection(0)
+                "גלי צהל"    -> stationsSpinner.setSelection(1)
                 "רשת ב"    -> stationsSpinner.setSelection(2)
                 "רשת ג" -> stationsSpinner.setSelection(3)
                 "FM102"  -> stationsSpinner.setSelection(4)
@@ -241,13 +269,13 @@ class MainActivity : ComponentActivity() {
         try {
             if (isServiceRunning) {
                 val selectedStation = stationsSpinner.selectedItem.toString()
-                // Log.i("myquietwave", "periodic fetchGlgltzSong" + selectedStation)
+                // Log.i("myquietwave", "periodic fetchGlglzSong" + selectedStation)
                 if (Utils.getStationUrl(selectedStation).contains("glglz") /* || Utils.getStationUrl(selectedStation).contains("glz") */ ) {
-                    fetchGlgltzSong(if (Utils.getStationUrl(selectedStation).contains("glglz")) "glglz" else "glz")
+                    fetchGlglzSong(if (Utils.getStationUrl(selectedStation).contains("glglz")) "glglz" else "glz")
                 }
             }
         } catch (e: Exception) {
-            Log.w("myquietwave", "Error in periodic fetchGlgltzSong", e)
+            Log.w("myquietwave", "Error in periodic fetchGlglzSong", e)
         }
 
     }
@@ -976,7 +1004,7 @@ class MainActivity : ComponentActivity() {
 
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         val savedLocation = sharedPreferences.getString("location", "IL-Jerusalem")
-        val savedStation = sharedPreferences.getString("station", "GLZ")
+        val savedStation = sharedPreferences.getString("station", "גלגלצ")
         val justRadio = sharedPreferences.getString("justRadio", "false")
 
         editTextLocation.text = savedLocation
@@ -984,11 +1012,14 @@ class MainActivity : ComponentActivity() {
 
         spinner = findViewById(R.id.editTextLocationSpinner)
         stationsSpinner = findViewById(R.id.editTextStationSpinner)
+        peekSongsButton = findViewById(R.id.peekSongsButton)
+        currentSong = findViewById(R.id.textViewCurrentSong)
+        nextSong = findViewById(R.id.textViewNextSong)
 
         if (savedStation != null) {
             when (savedStation) {
-                "גלי צהל"    -> stationsSpinner.setSelection(0)
-                "גלגלצ"  -> stationsSpinner.setSelection(1)
+                "גלגלצ"  -> stationsSpinner.setSelection(0)
+                "גלי צהל"    -> stationsSpinner.setSelection(1)
                 "רשת ב"    -> stationsSpinner.setSelection(2)
                 "רשת ג" -> stationsSpinner.setSelection(3)
                 "FM102"  -> stationsSpinner.setSelection(4)
@@ -1022,6 +1053,34 @@ class MainActivity : ComponentActivity() {
                 android.R.layout.simple_spinner_item, stations)
 
             stationsSpinner.adapter = stationsAdapter
+
+            savedStation?.let { station ->
+                stations.indexOf(station).takeIf { it >= 0 }?.let(stationsSpinner::setSelection)
+            }
+
+            fun updatePeekSongsButton() {
+                val isGlglzSelected = isGlglzStation(stationsSpinner.selectedItem?.toString())
+                peekSongsButton.visibility = if (isGlglzSelected) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+                if (!isGlglzSelected) {
+                    currentSong.text = ""
+                    nextSong.text = ""
+                }
+            }
+
+            stationsSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                    updatePeekSongsButton()
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>) {
+                    peekSongsButton.visibility = View.GONE
+                }
+            }
+            updatePeekSongsButton()
 
             lifecycleScope.launch {
                 delay(200)
@@ -1090,8 +1149,9 @@ class MainActivity : ComponentActivity() {
         statusText = findViewById(R.id.statusText)
         toggleButton = findViewById(R.id.toggleButton)
 
-        currentSong = findViewById(R.id.textViewCurrentSong)
-        nextSong = findViewById(R.id.textViewNextSong)
+        peekSongsButton.setOnClickListener {
+            fetchGlglzSong("glglz")
+        }
 
         editTextNumberNewsDuration = findViewById(R.id.editTextDuration)
         textViewNextNews = findViewById(R.id.textViewNextNewsStr)
@@ -1316,7 +1376,7 @@ class MainActivity : ComponentActivity() {
 
                 val selectedStation = stationsSpinner.selectedItem.toString()
                 if (Utils.getStationUrl(selectedStation).contains("glglz") /* || Utils.getStationUrl(selectedStation).contains("glz") */) {
-                    fetchGlgltzSong(if (Utils.getStationUrl(selectedStation).contains("glglz")) "glglz" else "glz")
+                    fetchGlglzSong(if (Utils.getStationUrl(selectedStation).contains("glglz")) "glglz" else "glz")
                 }
 
                 if (true) {
@@ -1387,13 +1447,13 @@ class MainActivity : ComponentActivity() {
                 try {
                     if (isServiceRunning) {
                         val selectedStation = stationsSpinner.selectedItem.toString()
-                        // Log.i("myquietwave", "periodic fetchGlgltzSong" + selectedStation)
+                        // Log.i("myquietwave", "periodic fetchGlglzSong" + selectedStation)
                         if (Utils.getStationUrl(selectedStation).contains("glglz") /* || Utils.getStationUrl(selectedStation).contains("glz") */ ) {
-                            fetchGlgltzSong(if (Utils.getStationUrl(selectedStation).contains("glglz")) "glglz" else "glz")
+                            fetchGlglzSong(if (Utils.getStationUrl(selectedStation).contains("glglz")) "glglz" else "glz")
                         }
                     }
                 } catch (e: Exception) {
-                    Log.w("myquietwave", "Error in periodic fetchGlgltzSong", e)
+                    Log.w("myquietwave", "Error in periodic fetchGlglzSong", e)
                 }
             }
         }
@@ -1428,60 +1488,31 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    private fun fetchGlgltzSong(station: String) {
+    private fun isGlglzStation(station: String?): Boolean = station != null &&
+        Utils.getStationUrl(station).contains("glglz")
+
+    private fun fetchGlglzSong(station: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val url = "https://glzxml.blob.core.windows.net/dalet/" + station + "-onair/onair.xml"
                 val connection = java.net.URL(url).openConnection() as java.net.HttpURLConnection
-                val xml = connection.inputStream.bufferedReader().use { it.readText() }
-                val title = xml.substringAfter("<titleName>").substringBefore("</titleName>")
+                connection.connectTimeout = 15_000
+                connection.readTimeout = 15_000
+                val xml = try {
+                    connection.inputStream.bufferedReader().use { it.readText() }
+                } finally {
+                    connection.disconnect()
+                }
+                val songs = parseGlglzSongs(xml)
 
-                if (title.length >= 1) {
-                    withContext(Dispatchers.Main) {
-                        if (! isFinishing) {
-                            var current = title
-
-                            var artist = xml.substringAfter("<artistName>").substringBefore("</artistName>")
-                            var year = xml.substringAfter("<year>").substringBefore("</year>")
-                            if (artist.startsWith("<?xml")) {
-                                artist = ""
-                                year = ""
-                            }
-                            else {
-                                current += " . $artist . $year"
-                            }
-
-                            val titleNext = xml.substringAfterLast("<titleName>").substringBeforeLast("</titleName>")
-                            var artistNext = xml.substringAfterLast("<artistName>").substringBeforeLast("</artistName>")
-                            var yearNext = xml.substringAfterLast("<year>").substringBeforeLast("</year>")
-                            if (artistNext.startsWith("<?xml")) {
-                                artistNext = ""
-                                yearNext = ""
-                            }
-                            var next = ""
-                            if (titleNext.length >= 1 && titleNext != title) {
-                                next = " $titleNext"
-                                if (artistNext.length >= 1 && artistNext != artist) {
-                                    next += ". $artistNext"
-                                }
-                                if (yearNext.length >= 1 && yearNext != year) {
-                                    next += ". $yearNext"
-                                }
-                                if (next.trim().length >= 1) {
-                                    nextSong.text = getString(R.string.next_song) + " " + next
-                                }
-                            }
-                            else {
-                                nextSong.text = ""
-                            }
-
-                            currentSong.text = current
-
-                        }
+                withContext(Dispatchers.Main) {
+                    if (!isFinishing && isGlglzStation(stationsSpinner.selectedItem?.toString())) {
+                        currentSong.text = songs?.current.orEmpty()
+                        nextSong.text = songs?.next?.let { getString(R.string.next_song) + " " + it }.orEmpty()
                     }
                 }
             } catch (e: Exception) {
-                Log.w("myquietwave", "Error fetching Galgalatz song info", e)
+                Log.w("myquietwave", "Error fetching Glglz song info", e)
             }
         }
     }

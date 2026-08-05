@@ -30,6 +30,7 @@
 
     <string name="current_song">כעת מנגן..</string>
     <string name="next_song">השיר הבא: </string>
+    <string name="peek_songs">מה מתנגן כעת</string>
 
     <string name="share">שתף</string>
     <string name="rate">דרג</string>

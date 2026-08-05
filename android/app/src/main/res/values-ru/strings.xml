@@ -28,6 +28,7 @@
     <string name="close_alert">Закрыть</string>
     <string name="current_song">Now playing..</string>
     <string name="next_song">Next playing: </string>
+    <string name="peek_songs">Peek at current song</string>
 
     <string name="share">Поделиться</string>
     <string name="rate">Оценить</string>

@@ -35,6 +35,7 @@
 
     <string name="current_song">Now playing..</string>
     <string name="next_song">Next playing: </string>
+    <string name="peek_songs">Peek at current song</string>
 
     <string name="share">Share</string>
     <string name="rate">Rate</string>
@@ -73,8 +74,8 @@
     <string name="instructions2">You can also play the radio right now</string>
 
     <string-array name="stations">
-        <item>גלי צהל</item>
         <item>גלגלצ</item>
+        <item>גלי צהל</item>
         <item>רשת ב</item>
         <item>רשת ג</item>
         <item>FM102</item>

@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
+import android.widget.TextView
 import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.clearText
@@ -20,6 +21,8 @@ import androidx.test.espresso.matcher.ViewMatchers.isNotChecked
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withSpinnerText
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
+import androidx.test.espresso.matcher.ViewMatchers.Visibility
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
@@ -162,6 +165,33 @@ class DialogInstrumentedTest {
             .check(matches(withSpinnerText("US-New York-NY")))
         onView(withId(R.id.editTextLocation))
             .check(matches(withText("US-New York-NY")))
+    }
+
+    @Test
+    fun songPeekButtonOnlyAppearsForGlglz() {
+        launchActivity()
+
+        selectStation("FM102")
+        onView(withId(R.id.peekSongsButton))
+            .check(matches(withEffectiveVisibility(Visibility.GONE)))
+
+        selectStation("גלגלצ")
+        onView(withId(R.id.peekSongsButton))
+            .perform(scrollTo())
+            .check(matches(isDisplayed()))
+
+        activityRule.activity.runOnUiThread {
+            activityRule.activity.findViewById<TextView>(R.id.textViewCurrentSong).text = "Current song"
+            activityRule.activity.findViewById<TextView>(R.id.textViewNextSong).text = "Next song"
+        }
+
+        selectStation("FM102")
+        onView(withId(R.id.peekSongsButton))
+            .check(matches(withEffectiveVisibility(Visibility.GONE)))
+        onView(withId(R.id.textViewCurrentSong))
+            .check(matches(withText("")))
+        onView(withId(R.id.textViewNextSong))
+            .check(matches(withText("")))
     }
 
     @Test

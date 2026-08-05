@@ -109,6 +109,18 @@
                 android:prompt="@string/station"
                 android:textAlignment="center" />
 
+            <Button
+                android:id="@+id/peekSongsButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_button_idle"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/peek_songs"
+                android:textAllCaps="false"
+                android:textColor="@color/button_text_light"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/textViewPad20"
                 android:layout_width="match_parent"

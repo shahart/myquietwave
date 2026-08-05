@@ -29,7 +29,7 @@ object Utils {
     // val N12news = "http://ff_engine.streamgates.net/Ch10News.mp3"
     
     fun getStationUrl(url: String?): String {
-        if (url == null) return GLZ
+        if (url == null) return GLGLZ
         
         if (url == "גלגלצ") return GLGLZ
         if (url == "גלי צהל") return GLZ
@@ -46,7 +46,7 @@ object Utils {
 
         if (url == "כאן מורשת") return MORESHET
 
-        return GLZ
+        return GLGLZ
     }
 
     fun switchDate(date: String): String {

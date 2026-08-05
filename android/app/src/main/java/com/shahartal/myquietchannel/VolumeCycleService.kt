@@ -145,7 +145,7 @@ class VolumeCycleService : Service() {
             val maxVolume = audioManager.getStreamMaxVolume(stream) // usually 15
             Log.i("myquietwave", "VolumeCycleService init volume $origVolume out of $maxVolume")
 
-            var station: String? = "GLZ"
+            var station: String? = "GLGLZ"
             var newsDuration = 4
             var radioPlayer: Boolean = false
             var nextHours: String? = MainActivity.NEXT_HOURS
@@ -157,7 +157,7 @@ class VolumeCycleService : Service() {
                 newsDuration = intent.getIntExtra("newsDuration", 4)
                 nextHours = intent.getStringExtra("nextHours")
                 station = intent.getStringExtra("station")
-                if (station == null) station = "GLZ"
+                if (station == null) station = "GLGLZ"
                 val radioPlayerStr = intent.getStringExtra("radioPlayer")
                 if (radioPlayerStr != null && radioPlayerStr == "true") radioPlayer = true
                 Log.i("myquietwave", "VolumeCycleService Initial input: Station $station NewsDuration $newsDuration nextHours $nextHours currentHour " + ZonedDateTime.now(ZoneId.systemDefault()).hour)
@@ -180,7 +180,7 @@ class VolumeCycleService : Service() {
             Log.i("myquietwave", "VolumeCycleService settings: Station $station NewsDuration $newsDuration nextHours $nextHours currentHour " + ZonedDateTime.now(ZoneId.systemDefault()).hour)
 
             if (radioPlayer) {
-                if (! alertMediaIsPlaying("glz")) {
+                if (! alertMediaIsPlaying("glglz")) {
                     if (mediaPlayer?.isPlaying == false) {
                         mediaPlayer = getMediaPlayer(station)
                         mediaPlayer?.start()
@@ -216,7 +216,7 @@ class VolumeCycleService : Service() {
                     "VolumeCycleService started positive volume: $volume50 out of $maxVolume, news duration [minutes] $newsDuration, is near shabbath $isNearShabbath"
                 )
 
-                if (! alertMediaIsPlaying("glz")) {
+                if (! alertMediaIsPlaying("glglz")) {
                     if (mediaPlayer?.isPlaying == false) {
                         mediaPlayer = getMediaPlayer(station)
                         mediaPlayer?.start()
@@ -384,10 +384,9 @@ class VolumeCycleService : Service() {
                 Log.d("myquietwave","VolumeCycleService started zero volume") // , delay till the next news [minutes] $nextDelay") //  + currentVolume)
                 audioManager.setStreamVolume(stream, 0, 0)
 
-                if (! alertMediaIsPlaying("glz")) {
+                if (! alertMediaIsPlaying("glglz")) {
                     if (mediaPlayer?.isPlaying == true)
                         mediaPlayer?.stop()
-
                 }
 
                 if (mediaPlayer?.isPlaying == true)
