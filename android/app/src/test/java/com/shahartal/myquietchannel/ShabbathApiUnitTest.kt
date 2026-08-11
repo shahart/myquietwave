@@ -64,9 +64,26 @@ class ShabbathApiUnitTest {
 
         var res = ""
 
-        val response =
+        var response =
             RetrofitInstance.api.getShabbatPerCity(
                 city,
+                ue = Utils.getUe(city)
+            ).execute()
+
+        if (/*! */response.isSuccessful) {
+            val hebcal = response.body()
+            hebcal?.items?.forEach {
+                if (it.category == "candles" && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat") || it.memo.contains("Parashat"))) {
+                    res += (it.date + " הדלקת נרות ")
+                }
+                else if (it.category == "havdalah" && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbath"))) {
+                    res += (it.date + " הבדלה ")
+                }
+            }
+        }
+
+        response =
+            RetrofitInstance.api.getShabbatByLoc("31.77", "35.19",
                 ue = Utils.getUe(city)
             ).execute()
 

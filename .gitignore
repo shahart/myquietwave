@@ -28,3 +28,5 @@ android/app/google-services.json
 !**/.build/
 !**/.DS_Store
 ios-new/.build/
+
+node_modules/

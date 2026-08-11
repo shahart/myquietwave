@@ -162,8 +162,10 @@ async function calc() {
     if (postfix.startsWith('latitude=')) {
         url += "&tzid=Asia/Jerusalem";
     }
-
-    const url2 = `https://www.hebcal.com/shabbat?cfg=json&` + postfix + useElevationParam;
+    var url2 = `https://www.hebcal.com/shabbat?cfg=json&` + postfix + useElevationParam;
+    if (postfix.startsWith('latitude=')) {
+        url2 += "&tzid=Asia/Jerusalem";
+    }
 
     const date = new Date();
     const year = date.getFullYear();

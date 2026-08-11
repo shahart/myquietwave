@@ -12,7 +12,7 @@ interface JsonHebCalShabbatApi {
     @GET("shabbat?cfg=json")
     fun getShabbatPerCity(@Query("city") city: String, @Query("ue") ue: String): Call<HebCal>
 
-    @GET("shabbat?cfg=json")
+    @GET("shabbat?cfg=json&tzid=Asia/Jerusalem")
     fun getShabbatByLoc(@Query("latitude") latitude: String,
                         @Query("longitude") longitude: String, @Query("ue") ue: String): Call<HebCal>
 

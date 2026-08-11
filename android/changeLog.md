@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.62
+
+Add peek the currently playing song button, in case of Glglz radio station. 
+Shows the current parasha even without hebCal, credits to PyLuach (and Sol).
+
 ## 1.61
 
 Add rosh-chodesh memo help.
