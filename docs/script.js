@@ -262,14 +262,22 @@ async function calc() {
                         parasha2Url = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.split("-")[1];
                         document.getElementById('parasha2').innerHTML = 'פרשת ' + data.items[i].hebrew.split("-")[1];
                     }
+                    // acc. to https://github.com/hebcal/hebcal-swift/blob/main/Sources/Hebcal/Translations.swift
+                    else if (data.items[i].hebrew.includes("כי־תצא") ||
+                        data.items[i].hebrew.includes("כי־תבוא") ||
+                        data.items[i].hebrew.includes("שלח־לך") ||
+                        data.items[i].hebrew.includes("לך־לך")) {
+                        parashaUrl += data.items[i].hebrew.replace("־", "_");
+                    }
                     else if (data.items[i].hebrew.includes("־")) {
                         document.getElementById('parasha').innerHTML = data.items[i].hebrew.split("־")[0] + "<br>";
                         parashaUrl += data.items[i].hebrew.split("־")[0];
                         parasha2Url = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.split("־")[1];
                         document.getElementById('parasha2').innerHTML = 'פרשת ' + data.items[i].hebrew.split("־")[1];
                     }
-                    else 
+                    else {
                         parashaUrl += data.items[i].hebrew;
+                    }
                     document.getElementById('parashaUrl').href = parashaUrl;
                     if (parasha2Url != "") {
                         document.getElementById('parasha2Url').href = parasha2Url;

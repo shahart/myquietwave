@@ -224,13 +224,13 @@ class MainActivity : ComponentActivity() {
                 "גלי צהל"    -> stationsSpinner.setSelection(1)
                 "רשת ב"    -> stationsSpinner.setSelection(2)
                 "רשת ג" -> stationsSpinner.setSelection(3)
-                "FM102"  -> stationsSpinner.setSelection(4)
-                "גלי ישראל" -> stationsSpinner.setSelection(5)
-                "כאן 88" -> stationsSpinner.setSelection(6)
-                "קול חי"  -> stationsSpinner.setSelection(7)
-                "קול חי מיוזיק" -> stationsSpinner.setSelection(8)
-                "קול ברמה" -> stationsSpinner.setSelection(9)
-                "כאן מורשת" -> stationsSpinner.setSelection(10)
+                // "FM102"  -> stationsSpinner.setSelection(4)
+                "גלי ישראל" -> stationsSpinner.setSelection(4)
+                "כאן 88" -> stationsSpinner.setSelection(5)
+                "קול חי"  -> stationsSpinner.setSelection(6)
+                "קול חי מיוזיק" -> stationsSpinner.setSelection(7)
+                "קול ברמה" -> stationsSpinner.setSelection(8)
+                "כאן מורשת" -> stationsSpinner.setSelection(9)
             }
         }
 
@@ -1022,13 +1022,13 @@ class MainActivity : ComponentActivity() {
                 "גלי צהל"    -> stationsSpinner.setSelection(1)
                 "רשת ב"    -> stationsSpinner.setSelection(2)
                 "רשת ג" -> stationsSpinner.setSelection(3)
-                "FM102"  -> stationsSpinner.setSelection(4)
-                "גלי ישראל" -> stationsSpinner.setSelection(5)
-                "כאן 88" -> stationsSpinner.setSelection(6)
-                "קול חי"  -> stationsSpinner.setSelection(7)
-                "קול חי מיוזיק" -> stationsSpinner.setSelection(8)
-                "קול ברמה" -> stationsSpinner.setSelection(9)
-                "כאן מורשת" -> stationsSpinner.setSelection(10)
+                // "FM102"  -> stationsSpinner.setSelection(4)
+                "גלי ישראל" -> stationsSpinner.setSelection(4)
+                "כאן 88" -> stationsSpinner.setSelection(5)
+                "קול חי"  -> stationsSpinner.setSelection(6)
+                "קול חי מיוזיק" -> stationsSpinner.setSelection(7)
+                "קול ברמה" -> stationsSpinner.setSelection(8)
+                "כאן מורשת" -> stationsSpinner.setSelection(9)
             }
         }
 
