@@ -120,6 +120,30 @@ function trim(n) {
     return n;
 }
 
+let haftarahConnectionUrl = "";
+
+function getKolKoreParashaUrl(parashaName) {
+    const parashaSlug = parashaName
+        .replace(/^פרשת\s+/, "")
+        .replace(/[\u0591-\u05BD\u05BF\u05C1-\u05C2\u05C4-\u05C5\u05C7]/g, "")
+        .replace(/[־‐\-‒–—―\s]+/g, "-")
+        .replace(/^-|-$/g, "");
+
+    return "https://kol-kore.org/פרשות/" +
+        encodeURIComponent("הפטרה-פרשת-" + parashaSlug) + "/";
+}
+
+function setHaftarahConnectionParasha(parashaName) {
+    haftarahConnectionUrl = getKolKoreParashaUrl(parashaName);
+    document.getElementById('haftarahConnectionButton').disabled = false;
+}
+
+function openHaftarahConnectionPage() {
+    if (haftarahConnectionUrl) {
+        window.open(haftarahConnectionUrl, "_blank", "noopener");
+    }
+}
+
 async function calc() {
     var postfix = document.getElementById('locationSelect').value;
     saveInput("zmanim-location", postfix);
@@ -177,6 +201,8 @@ async function calc() {
     document.getElementById('fast').innerHTML = '';
     document.getElementById('special').innerHTML = '';
     document.getElementById('roshchodesh').innerHTML = '';
+    haftarahConnectionUrl = '';
+    document.getElementById('haftarahConnectionButton').disabled = true;
 
     try {
         const [resp1, resp2, resp3] = await Promise.all([
@@ -246,6 +272,7 @@ async function calc() {
             for (let i = 0; i < data.items.length; i++) {
                 if (data.items[i].category === 'parashat') {
                     document.getElementById('parasha').innerHTML = data.items[i].hebrew;
+                    setHaftarahConnectionParasha(data.items[i].hebrew);
                     document.getElementById('haftarahUrl').innerHTML = 'הפטרה: ';
                     document.getElementById('haftarah').innerHTML = convertEng(data.items[i].leyning.haftarah.replaceAll('|', ' <br>')); // for example: "Pinchas occurring after 17 Tammuz"
                     document.getElementById('haftarahUrl').href = "https://shahart.github.io/heb-bible/index.html?b=" + data.items[i].leyning.haftarah.split(':')[0];

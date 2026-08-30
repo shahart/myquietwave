@@ -860,7 +860,13 @@ class MainActivity : ComponentActivity() {
                                     str = str.split("-")[0]
                                 }
 
-                                if (str.contains("־")) {
+                                if (str.contains("כי־תצא") ||
+                                    str.contains("כי־תבוא") ||
+                                    str.contains("שלח־לך") ||
+                                    str.contains("לך־לך")) {
+                                    str = str.replace("־", "_")
+                                }
+                                else if (str.contains("־")) {
                                     str2 = "פרשת " + str.split("־")[1]
                                     str = str.split("־")[0]
                                 }
