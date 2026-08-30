@@ -121,6 +121,7 @@ function trim(n) {
 }
 
 let haftarahConnectionUrl = "";
+const haftarahConnectionCache = new Map();
 
 function getKolKoreParashaUrl(parashaName) {
     const parashaSlug = parashaName
@@ -138,9 +139,79 @@ function setHaftarahConnectionParasha(parashaName) {
     document.getElementById('haftarahConnectionButton').disabled = false;
 }
 
-function openHaftarahConnectionPage() {
-    if (haftarahConnectionUrl) {
-        window.open(haftarahConnectionUrl, "_blank", "noopener");
+function extractHaftarahConnection(html) {
+    const page = new DOMParser().parseFromString(html, "text/html");
+    const heading = Array.from(page.querySelectorAll("h1, h2, h3, h4"))
+        .find(element => element.textContent.replace(/\s+/g, " ").trim() ===
+            "על הקשר בין ההפטרה לפרשה");
+    const content = heading && heading.closest(".row_four")?.querySelector(".content_right");
+
+    if (!content) {
+        throw new Error("The requested section was not found");
+    }
+
+    const textContent = content.cloneNode(true);
+    textContent.querySelectorAll("br").forEach(element => element.replaceWith("\n"));
+    textContent.querySelectorAll("p, li").forEach(element => element.append("\n\n"));
+
+    let text = textContent.textContent
+        .replace(/\u00a0/g, " ")
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+    const start = text.indexOf("נושאים בפרשה:");
+    if (start >= 0) {
+        text = text.substring(start);
+    }
+
+    return text;
+}
+
+function openHaftarahConnectionDialog() {
+    const dialog = document.getElementById('haftarahConnectionDialog');
+    if (typeof dialog.showModal === 'function') {
+        if (!dialog.open) dialog.showModal();
+    } else {
+        dialog.setAttribute('open', '');
+    }
+}
+
+function closeHaftarahConnection() {
+    const dialog = document.getElementById('haftarahConnectionDialog');
+    if (typeof dialog.close === 'function') {
+        dialog.close();
+    } else {
+        dialog.removeAttribute('open');
+    }
+}
+
+async function showHaftarahConnection() {
+    if (!haftarahConnectionUrl) return;
+
+    var targetUrl = haftarahConnectionUrl;
+    const button = document.getElementById('haftarahConnectionButton');
+    const content = document.getElementById('haftarahConnectionContent');
+    document.getElementById('haftarahConnectionSource').href = targetUrl;
+    content.textContent = 'טוען...';
+    button.disabled = true;
+    openHaftarahConnectionDialog();
+
+    try {
+        let text = haftarahConnectionCache.get(targetUrl);
+        if (!text) {
+            const proxyUrl = "https://myquietwave.lat-shahar.workers.dev/?url=" +
+                encodeURIComponent(targetUrl);
+            const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
+            if (!response.ok) throw new Error("HTTP " + response.status);
+            text = extractHaftarahConnection(await response.text());
+            haftarahConnectionCache.set(targetUrl, text);
+        }
+        content.textContent = text;
+    } catch (error) {
+        console.error("Failed to fetch the haftarah connection", error);
+        content.textContent = 'לא הצלחנו לטעון את התוכן. אפשר לפתוח את המקור בקישור למטה.';
+    } finally {
+        if (haftarahConnectionUrl === targetUrl) button.disabled = false;
     }
 }
 
@@ -474,7 +545,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     document.getElementById("todo").addEventListener("focusout", function () {
         saveInput("todo", document.getElementById('todo').value);
-}   );
+    });
+
+    const haftarahDialog = document.getElementById('haftarahConnectionDialog');
+    haftarahDialog.addEventListener('click', function(event) {
+        if (event.target === haftarahDialog) closeHaftarahConnection();
+    });
 })
 
 let cookieInput = this.loadInput("zmanim-location");

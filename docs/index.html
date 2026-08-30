@@ -425,6 +425,49 @@
         #shabbathExists {
             font-weight: 700;
         }
+
+        .content-dialog {
+            width: min(720px, calc(100% - 24px));
+            max-height: min(80vh, 760px);
+            padding: 0;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            color: var(--text);
+            background: var(--panel-strong);
+            box-shadow: var(--shadow);
+        }
+
+        .content-dialog::backdrop {
+            background: rgba(35, 22, 15, 0.58);
+            backdrop-filter: blur(3px);
+        }
+
+        .dialog-header {
+            position: sticky;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--panel-strong);
+        }
+
+        .dialog-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .dialog-content {
+            padding: 20px;
+            white-space: pre-wrap;
+            line-height: 1.8;
+        }
+
+        .dialog-footer {
+            padding: 0 20px 20px;
+        }
     </style>
 </head>
 
@@ -743,7 +786,7 @@
                         </a>
                         <div style="margin-top: 12px;">
                             <button id="haftarahConnectionButton" class="buttonSecondary" type="button"
-                                onClick="openHaftarahConnectionPage()" disabled>
+                                onClick="showHaftarahConnection()" disabled>
                                 על הקשר בין ההפטרה לפרשה
                             </button>
                         </div>
@@ -802,6 +845,18 @@
             </article>
         </section>
     </main>
+
+    <dialog id="haftarahConnectionDialog" class="content-dialog" aria-labelledby="haftarahConnectionTitle">
+        <div class="dialog-header">
+            <h2 id="haftarahConnectionTitle">על הקשר בין ההפטרה לפרשה</h2>
+            <button class="buttonSecondary buttonIcon" type="button"
+                onClick="closeHaftarahConnection()" aria-label="סגירה">✕</button>
+        </div>
+        <div id="haftarahConnectionContent" class="dialog-content" aria-live="polite"></div>
+        <div class="dialog-footer">
+            <a id="haftarahConnectionSource" href="" target="_blank" rel="noopener">למקור באתר כל קורא</a>
+        </div>
+    </dialog>
 
     <script src="script.js"></script>
     <script>
