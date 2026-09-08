@@ -136,7 +136,23 @@ function getKolKoreParashaUrl(parashaName) {
 
 function setHaftarahConnectionParasha(parashaName) {
     haftarahConnectionUrl = getKolKoreParashaUrl(parashaName);
-    document.getElementById('haftarahConnectionButton').disabled = false;
+    setHaftarahConnectionButtonState(true);
+}
+
+function setHaftarahConnectionButtonState(enabled, disabledReason = '') {
+    const button = document.getElementById('haftarahConnectionButton');
+    const wrapper = document.getElementById('haftarahConnectionButtonWrapper');
+    const tooltip = document.getElementById('haftarahConnectionDisabledReason');
+
+    button.disabled = !enabled;
+    tooltip.textContent = enabled ? '' : disabledReason;
+    if (enabled) {
+        wrapper.removeAttribute('tabindex');
+        wrapper.removeAttribute('aria-describedby');
+    } else {
+        wrapper.tabIndex = 0;
+        wrapper.setAttribute('aria-describedby', tooltip.id);
+    }
 }
 
 function extractHaftarahConnection(html) {
@@ -273,7 +289,7 @@ async function calc() {
     document.getElementById('special').innerHTML = '';
     document.getElementById('roshchodesh').innerHTML = '';
     haftarahConnectionUrl = '';
-    document.getElementById('haftarahConnectionButton').disabled = true;
+    setHaftarahConnectionButtonState(false, 'טוען את נתוני השבת...');
 
     try {
         const [resp1, resp2, resp3] = await Promise.all([
@@ -333,12 +349,14 @@ async function calc() {
         try {
             const data = resp2;
             if (data.error) {
+                setHaftarahConnectionButtonState(false, 'לא הצלחנו לטעון את נתוני השבת.');
                 alert("Error in Shabbat data: " + data.error);
                 return;
             }
             let ttip = '';
             let shabbatExists = false;
             let yomTovExists = false;
+            let yomTovName = '';
             let days = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת";
             for (let i = 0; i < data.items.length; i++) {
                 if (data.items[i].category === 'parashat') {
@@ -450,11 +468,16 @@ async function calc() {
                     }
                     if (data.items[i].yomtov && data.items[i].yomtov === true) {
                         yomTovExists = true;
+                        if (!yomTovName) yomTovName = data.items[i].hebrew;
                     }
                 } 
             }
             if (! shabbatExists) {
                 document.getElementById('shabbathExists').innerText = '';
+                const reason = yomTovName
+                    ? 'השבת חל ' + yomTovName + ', ולכן אין פרשת שבוע רגילה.'
+                    : 'אין פרשת שבוע רגילה בשבת הקרובה.';
+                setHaftarahConnectionButtonState(false, reason);
                 if (yomTovExists) {
                     // document.getElementById('shabbathExists').innerText = '🕯🕯 יום טוב';
                 }
@@ -470,6 +493,7 @@ async function calc() {
             }
                 
         } catch (error) {
+            setHaftarahConnectionButtonState(false, 'לא הצלחנו לטעון את נתוני השבת.');
             alert("Error fetching Shabbat data " + error);
         }
 
@@ -508,6 +532,7 @@ async function calc() {
         }
     }    
     catch (error) {
+        setHaftarahConnectionButtonState(false, 'לא הצלחנו לטעון את נתוני השבת.');
         alert("General error fetching data from " + url + " >> " + error);
     }
 }

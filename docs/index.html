@@ -269,6 +269,51 @@
             transform: none;
         }
 
+        .disabled-button-explanation {
+            position: relative;
+            display: inline-block;
+        }
+
+        .disabled-button-explanation:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+            border-radius: 14px;
+        }
+
+        .disabled-button-explanation button:disabled {
+            pointer-events: none;
+        }
+
+        .button-tooltip {
+            position: absolute;
+            z-index: 10;
+            bottom: calc(100% + 10px);
+            right: 50%;
+            width: max-content;
+            max-width: min(320px, calc(100vw - 40px));
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            background: var(--panel-strong);
+            box-shadow: var(--shadow);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            text-align: right;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateX(50%) translateY(4px);
+            transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease;
+        }
+
+        .disabled-button-explanation:hover .button-tooltip:not(:empty),
+        .disabled-button-explanation:focus .button-tooltip:not(:empty) {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(50%) translateY(0);
+        }
+
         .buttonRadio {
             color: white;
             background: linear-gradient(180deg, #5aa04a 0%, #447f39 100%);
@@ -785,10 +830,16 @@
                             <strong id="parasha2"></strong>
                         </a>
                         <div style="margin-top: 12px;">
-                            <button id="haftarahConnectionButton" class="buttonSecondary" type="button"
-                                onClick="showHaftarahConnection()" disabled>
-                                על הקשר בין ההפטרה לפרשה
-                            </button>
+                            <span id="haftarahConnectionButtonWrapper" class="disabled-button-explanation"
+                                tabindex="0" aria-describedby="haftarahConnectionDisabledReason">
+                                <button id="haftarahConnectionButton" class="buttonSecondary" type="button"
+                                    onClick="showHaftarahConnection()" disabled>
+                                    על הקשר בין ההפטרה לפרשה
+                                </button>
+                                <span id="haftarahConnectionDisabledReason" class="button-tooltip" role="tooltip">
+                                    טוען את נתוני השבת...
+                                </span>
+                            </span>
                         </div>
                     </div>
                     <div class="info-block">
