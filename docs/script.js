@@ -404,7 +404,12 @@ async function calc() {
                     document.getElementById('havdala').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
                 }
                 else if (data.items[i].category === 'candles') {
-                    document.getElementById('lighting').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
+                    if (document.getElementById('lighting').innerHTML === '') {
+                        document.getElementById('lighting').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
+                    }
+                    else {
+                        document.getElementById('lighting').innerHTML += "/ " + data.items[i].date.split('T')[1].substring(0,5);
+                    }
                 } 
                 else if (data.items[i].category === 'roshchodesh') {
                     let parts = data.items[i].date.split('-');
