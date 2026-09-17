@@ -249,6 +249,8 @@ async function showHaftarahConnection() {
 }
 
 async function calc() {
+    document.getElementById('havdala').innerHTML = '';
+    document.getElementById('lighting').innerHTML = '';
     var postfix = document.getElementById('locationSelect').value;
     saveInput("zmanim-location", postfix);
 
@@ -418,7 +420,12 @@ async function calc() {
                     shabbatExists = true;
                 }
                 else if (data.items[i].category === 'havdalah') {
-                    document.getElementById('havdala').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
+                    if (document.getElementById('havdala').innerHTML === '') {
+                        document.getElementById('havdala').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
+                    }
+                    else {
+                        document.getElementById('havdala').innerHTML += "/ " + data.items[i].date.split('T')[1].substring(0,5);
+                    }
                 }
                 else if (data.items[i].category === 'candles') {
                     if (document.getElementById('lighting').innerHTML === '') {
