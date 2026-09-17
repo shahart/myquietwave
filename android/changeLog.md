@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.63
+
+Fix two 'lighting' times
+Pop-up the Parasha-Haftarah connection
+
 ## 1.62
 
 Add peek the currently playing song button, in case of Glglz radio station. 

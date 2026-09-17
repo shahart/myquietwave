@@ -429,6 +429,7 @@ class MainActivity : ComponentActivity() {
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
 
         var res: String
+        var resH: String = " "
 
         if ((loc.trim().get(0).isLetter())) {
             res = loc + "\n"
@@ -478,12 +479,28 @@ class MainActivity : ComponentActivity() {
                         var mevarchimHebrew: String? = null
                         hebcal?.items?.forEach {
                             // Check 'res' (local) instead of 'textViewClock3.text' (shared UI state)
-                            if (it.category == "candles" && !res.contains(getString(R.string.candleLighting))) {
-                                res += "\n" + getString(R.string.candleLighting) + " " + truncDate(it.date) + "\n"
+                            if (it.category == "candles") {
+                                if (!res.contains(getString(R.string.candleLighting))) {
+                                    res = "\n" + getString(R.string.candleLighting) + " " + truncDate(
+                                        it.date)
+                                }
+                                else {
+                                    res += " " + truncDate(
+                                        it.date
+                                    ) + "\n"
+                                }
                                 editor.putString("candles", getString(R.string.candleLighting) + " " + truncDate(it.date))
                             }
-                            else if (it.category == "havdalah" && !res.contains(getString(R.string.havdalah))) {
-                                res += "\n" + getString(R.string.havdalah) + " " +  truncDate(it.date) + "\n"
+                            else if (it.category == "havdalah") {
+                                if (!resH.contains(getString(R.string.havdalah))) {
+                                    resH = "\n" + getString(R.string.havdalah) + " " + truncDate(
+                                        it.date)
+                                }
+                                else {
+                                    resH += " " + truncDate(
+                                        it.date
+                                    ) + "\n"
+                                }
                                 editor.putString("havdalah", getString(R.string.havdalah) + " " +  truncDate(it.date))
                             }
                             else if (it.category == "mevarchim") {
@@ -514,14 +531,14 @@ class MainActivity : ComponentActivity() {
                         }
                         // Final UI Update: Handle Spannable formatting once building is complete
                         if (mevarchimHebrew != null) {
-                            val spannable = SpannableString(res)
+                            val spannable = SpannableString(res + resH)
                             val start = res.indexOf(mevarchimHebrew!!)
                             if (start != -1) {
                                 spannable.setSpan(UnderlineSpan(), start, start + mevarchimHebrew!!.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                             }
                             textViewClock3.text = spannable
                     } else {
-                            textViewClock3.text = res
+                            textViewClock3.text = res + resH
                         }
                         editor.apply()
                     }
@@ -529,7 +546,7 @@ class MainActivity : ComponentActivity() {
                         Log.w("myquietwave", "MainActivity fetchZmanim Error: ${response.code()}")
                         // textViewClock3.text = "" // ""Not found " + response.code()
                         res += " " + sharedPreferences.getString("candles", "") + " " + sharedPreferences.getString("havdalah", "")
-                        textViewClock3.text = res
+                        textViewClock3.text = res + resH
                     }
                 }
 
