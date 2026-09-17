@@ -130,8 +130,26 @@ function getKolKoreParashaUrl(parashaName) {
         .replace(/[־‐\-‒–—―\s]+/g, "-")
         .replace(/^-|-$/g, "");
 
-    return "https://kol-kore.org/פרשות/" +
+    return "https://kol-kore.org/" + encodeURIComponent("פרשות") + "/" +
         encodeURIComponent("הפטרה-פרשת-" + parashaSlug) + "/";
+}
+
+async function fetchWithRetry(url, attempts = 2) {
+    let lastError;
+
+    for (let attempt = 0; attempt < attempts; attempt++) {
+        try {
+            const response = await fetch(url, { signal: AbortSignal.timeout(30000) });
+            if (response.ok) return response;
+
+            lastError = new Error("HTTP " + response.status);
+            if (response.status < 500) break;
+        } catch (error) {
+            lastError = error;
+        }
+    }
+
+    throw lastError;
 }
 
 function setHaftarahConnectionParasha(parashaName) {
@@ -217,8 +235,7 @@ async function showHaftarahConnection() {
         if (!text) {
             const proxyUrl = "https://myquietwave.lat-shahar.workers.dev/?url=" +
                 encodeURIComponent(targetUrl);
-            const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
-            if (!response.ok) throw new Error("HTTP " + response.status);
+            const response = await fetchWithRetry(proxyUrl);
             text = extractHaftarahConnection(await response.text());
             haftarahConnectionCache.set(targetUrl, text);
         }
