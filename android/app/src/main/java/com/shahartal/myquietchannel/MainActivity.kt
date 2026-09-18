@@ -251,6 +251,27 @@ class MainActivity : ComponentActivity() {
         return intent to newsDuration
     }
 
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED ||
+            shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
+        ) {
+            return
+        }
+
+        try {
+            Log.i("myquietwave", "request notifications permission")
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                NOTIFICATION_PERMISSION_REQUEST_CODE,
+            )
+            Log.i("myquietwave", "MainActivity Done. request notifications permission")
+        } catch (error: Exception) {
+            Log.e("myquietwave", "MainActivity failed request notifications permission $error")
+        }
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -1084,22 +1105,7 @@ class MainActivity : ComponentActivity() {
         shareButton.setAllCaps(false)
         updateServiceUi()
 
-        // Android 13+ needs to ask for notifications permission
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (!shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                try {
-                    Log.i("myquietwave", "request notifications permission")
-                    ActivityCompat.requestPermissions(
-                        this,
-                        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                        NOTIFICATION_PERMISSION_REQUEST_CODE,
-                    )
-                    Log.i("myquietwave", "MainActivity Done. request notifications permission")
-                } catch (e: Exception) {
-                    Log.e("myquietwave", "MainActivity failed request notifications permission $e")
-                }
-            }
-        }
+        requestNotificationPermissionIfNeeded()
 
         radioPlayer.setOnClickListener {
             updateServiceUi()
