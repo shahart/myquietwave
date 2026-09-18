@@ -60,14 +60,10 @@ import kotlinx.datetime.offsetAt
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.SimpleDateFormat
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Date
 import kotlin.time.Clock
 
 internal data class GlglzSongs(val current: String, val next: String?)
@@ -318,7 +314,7 @@ class MainActivity : ComponentActivity() {
         textViewClock7special = binding.textViewClock7special
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         try {
-            val start = SimpleDateFormat("yyyy-MM-dd").format(Date())
+            val start = LocalDate.now().toString()
             hebcalRepository.dailyLearning(start).enqueue(object : Callback<HebCal> {
 
                 override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
@@ -1126,9 +1122,9 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             while (true) {
-                textViewClock.text = LocalDateTime.now().format(DateTimeFormatter.ofPattern("H:mm:ss"))
-                textViewDate.text = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת,ראשון".split(",")
-                    .get(LocalDate.now().dayOfWeek.value) + " " + SimpleDateFormat("d/M/yyyy").format(Date())
+                val now = java.time.LocalDateTime.now()
+                textViewClock.text = DateDisplay.clockTime(now)
+                textViewDate.text = DateDisplay.calendarLabel(now.toLocalDate())
                 delay(500)
             }
         }
