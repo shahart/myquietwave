@@ -377,51 +377,36 @@ class MainActivity : ComponentActivity() {
         textViewOmer.text = ""
         textViewClock4dafYomi.text = ""
         textViewClock7special = binding.textViewClock7special
-        try {
-            val start = LocalDate.now().toString()
-            hebcalRepository.dailyLearning(start).enqueue(object : Callback<HebCal> {
-
-                override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
-                    if (response.isSuccessful) {
-                        val summary = HebcalPresentation.dailyLearning(
-                            response.body()?.items.orEmpty(),
-                            start,
-                        )
-                        summary.selichotText?.let { textViewClock7special.text = it }
-                        summary.omer?.let { omer ->
-                            textViewOmer.text = omer.text
-                            textViewOmer.setOnClickListener { openUrl(omer.link) }
-                        }
-                        summary.dafYomi?.let { dafYomi ->
-                            textViewClock4dafYomi.text = underlined(dafYomi.text)
-                            displayCache.put("dafYomi", dafYomi.text)
-                            val tooltip = buildString {
-                                append("עוד לימודים יומיים:\n\n")
-                                summary.additionalLearning.forEach { append(it).append('\n') }
-                            }
-                            textViewClock4dafYomiTitle.setOnClickListener {
-                                showMessageDialog(tooltip)
-                            }
-                            textViewClock4dafYomi.setOnClickListener {
-                                openUrl("https://daf-yomi.com/Dafyomi_Page.aspx")
-                            }
-                        }
-                    } else {
-                        Log.w("myquietwave", "MainActivity fetchDafYomi Error: ${response.code()}")
-                        textViewClock4dafYomi.text = displayCache.get("dafYomi")
+        val start = LocalDate.now().toString()
+        lifecycleScope.launch {
+            try {
+                val hebcal = withContext(Dispatchers.IO) {
+                    hebcalRepository.dailyLearning(start)
+                }
+                val summary = HebcalPresentation.dailyLearning(hebcal.items, start)
+                summary.selichotText?.let { textViewClock7special.text = it }
+                summary.omer?.let { omer ->
+                    textViewOmer.text = omer.text
+                    textViewOmer.setOnClickListener { openUrl(omer.link) }
+                }
+                summary.dafYomi?.let { dafYomi ->
+                    textViewClock4dafYomi.text = underlined(dafYomi.text)
+                    displayCache.put("dafYomi", dafYomi.text)
+                    val tooltip = buildString {
+                        append("עוד לימודים יומיים:\n\n")
+                        summary.additionalLearning.forEach { append(it).append('\n') }
+                    }
+                    textViewClock4dafYomiTitle.setOnClickListener { showMessageDialog(tooltip) }
+                    textViewClock4dafYomi.setOnClickListener {
+                        openUrl("https://daf-yomi.com/Dafyomi_Page.aspx")
                     }
                 }
-
-                override fun onFailure(call: Call<HebCal>, t: Throwable) {
-                    Log.w("myquietwave", "MainActivity fetchDafYomi unable to fetch hebCal $t", t)
-                    textViewClock4dafYomi.text = displayCache.get("dafYomi")
-                }
-            })
-        } catch (e: Exception) {
-            Log.e("myquietwave", "MainActivity fetchDafYomi Exception $e", e)
-            textViewClock4dafYomi.text = displayCache.get("dafYomi")
-            Firebase.crashlytics.log("MainActivity fetchDafYomi Exception")
-            Firebase.crashlytics.recordException(e)
+            } catch (error: Exception) {
+                Log.e("myquietwave", "MainActivity fetchDafYomi failed", error)
+                textViewClock4dafYomi.text = displayCache.get("dafYomi")
+                Firebase.crashlytics.log("MainActivity fetchDafYomi Exception")
+                Firebase.crashlytics.recordException(error)
+            }
         }
     }
 

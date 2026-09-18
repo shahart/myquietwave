@@ -6,26 +6,27 @@ import com.shahartal.myquietchannel.parasha.JsonHebCalShabbatApi
 import retrofit2.Call
 
 internal interface HebcalRepository {
-    fun dailyLearning(isoDate: String): Call<HebCal>
+    suspend fun dailyLearning(isoDate: String): HebCal
     fun parasha(): Call<HebCal>
-    fun shabbat(query: LocationQuery): Call<HebCal>
+    suspend fun shabbat(query: LocationQuery): HebCal
     fun zmanim(query: LocationQuery): Call<HebCalZmanimModel>
 }
 
 internal class NetworkHebcalRepository(
     private val api: JsonHebCalShabbatApi,
 ) : HebcalRepository {
-    override fun dailyLearning(isoDate: String): Call<HebCal> = api.getDafYomi(isoDate, isoDate)
+    override suspend fun dailyLearning(isoDate: String): HebCal = api.getDafYomi(isoDate, isoDate)
 
     override fun parasha(): Call<HebCal> = api.getShabbatPerCity("IL-Jerusalem", "off")
 
-    override fun shabbat(query: LocationQuery): Call<HebCal> {
+    override suspend fun shabbat(query: LocationQuery): HebCal {
         val ue = LocationQueryParser.ue(query)
-        return when (query) {
+        val call = when (query) {
             is LocationQuery.City -> api.getShabbatPerCity(query.name, ue)
             is LocationQuery.GeoName -> api.getShabbatPerGeoNameId(query.id, ue)
             is LocationQuery.Coordinates -> api.getShabbatByLoc(query.latitude, query.longitude, ue)
         }
+        return call.executeBody()
     }
 
     override fun zmanim(query: LocationQuery): Call<HebCalZmanimModel> {
@@ -36,4 +37,10 @@ internal class NetworkHebcalRepository(
             is LocationQuery.Coordinates -> api.getZmanimByLoc(query.latitude, query.longitude, ue)
         }
     }
+}
+
+private fun <T> Call<T>.executeBody(): T {
+    val response = execute()
+    if (!response.isSuccessful) throw retrofit2.HttpException(response)
+    return requireNotNull(response.body()) { "Empty Hebcal response (${response.code()})" }
 }

@@ -6,6 +6,7 @@ import org.junit.Test
 
 import org.junit.Assert.*
 import org.junit.Assume.assumeTrue
+import kotlinx.coroutines.runBlocking
 //import retrofit2.Call
 //import retrofit2.Callback
 //import retrofit2.Response
@@ -116,21 +117,13 @@ class ShabbathApiUnitTest {
     }
 
     fun fetchDafYomi(): String {
-        var res = ""
-        val response =
-            RetrofitInstance.api.getDafYomi("2025-10-20", "2025-10-20").execute()
-        if (/*! */response.isSuccessful) {
-            val hebcal = response.body()
-            hebcal?.items?.forEach {
-                if (it.category == "dafyomi") {
-                    res = it.hebrew
-                }
-            }
+        return runBlocking {
+            RetrofitInstance.api.getDafYomi("2025-10-20", "2025-10-20")
+                .items
+                .firstOrNull { it.category == "dafyomi" }
+                ?.hebrew
+                .orEmpty()
         }
-        else {
-            fail(response.toString() + response.body())
-        }
-        return res
     }
 
     @Test

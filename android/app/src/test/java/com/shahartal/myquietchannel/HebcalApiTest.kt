@@ -9,6 +9,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import kotlinx.coroutines.runBlocking
 
 class HebcalApiTest {
     private lateinit var server: MockWebServer
@@ -39,6 +40,19 @@ class HebcalApiTest {
         assertEquals("פרשת וילך", response.body()?.items?.single()?.hebrew)
         assertEquals(
             "/shabbat?cfg=json&city=IL-Jerusalem&ue=off",
+            server.takeRequest().path,
+        )
+    }
+
+    @Test
+    fun dailyLearningSuspendRequestUsesExpectedPathAndParsesResponse() = runBlocking {
+        server.enqueue(jsonResponse("""{"title":"","date":"","items":[]}"""))
+        val api = RetrofitInstance.createApi(server.url("/").toString())
+
+        api.getDafYomi("2026-09-18", "2026-09-18")
+
+        assertEquals(
+            "/hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&o=on&min=on&start=2026-09-18&end=2026-09-18",
             server.takeRequest().path,
         )
     }
