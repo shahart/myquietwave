@@ -49,7 +49,6 @@ import com.google.firebase.crashlytics.crashlytics
 import com.shahartal.myquietchannel.luach.HebrewDate
 import com.shahartal.myquietchannel.luach.Parshios
 import com.shahartal.myquietchannel.databinding.ActivityMainBinding
-import com.shahartal.myquietchannel.parasha.HebCal
 import com.shahartal.myquietchannel.parasha.RetrofitInstance
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -58,9 +57,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.offsetAt
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
@@ -555,17 +551,13 @@ class MainActivity : ComponentActivity() {
         textViewClock7special = binding.textViewClock7special
         textViewClock8fast = binding.textViewClock8fast
 
-        try {
-
-            hebcalRepository.parasha().enqueue(object : Callback<HebCal> {
-
-                override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
-                    if (response.isSuccessful) {
+        lifecycleScope.launch {
+            try {
+                val hebcal = withContext(Dispatchers.IO) { hebcalRepository.parasha() }
                         // val str = response.body()
                         // Log.i("myquietwave", "MainActivity fetchParasha " + str)
-                        val hebcal = response.body()
                         var memo = ""
-                        hebcal?.items?.forEach {
+                        hebcal.items.forEach {
                             if (it.category == "roshchodesh") {
 
                                 textViewClock6rosh.text = textViewClock6rosh.text.toString() +
@@ -741,28 +733,14 @@ class MainActivity : ComponentActivity() {
                             textViewClock7special.setOnClickListener {
                             }
                         }
-                    } else {
-                        Log.w("myquietwave", "MainActivity fetchParasha Error: ${response.code()}")
-                        textViewClock2.text = getParasha()
-                        textViewClockH.text = displayCache.get("haftarah")
-                        textViewClockHS.text = displayCache.get("haftarah_sephardic")
-                    }
-                }
-
-                override fun onFailure(call: Call<HebCal>, t: Throwable) {
-                    Log.w("myquietwave", "MainActivity fetchParasha unable to fetch hebCal $t", t)
-                    textViewClock2.text = getParasha()
-                    textViewClockH.text = displayCache.get("haftarah")
-                    textViewClockHS.text = displayCache.get("haftarah_sephardic")
-                }
-            })
-        } catch (e: Exception) {
+            } catch (e: Exception) {
             Log.e("myquietwave", "MainActivity fetchParasha Exception $e", e)
             textViewClock2.text = getParasha()
             textViewClockH.text = displayCache.get("haftarah")
             textViewClockHS.text = displayCache.get("haftarah_sephardic")
             Firebase.crashlytics.log("MainActivity fetchParasha Exception")
             Firebase.crashlytics.recordException(e)
+            }
         }
     }
 

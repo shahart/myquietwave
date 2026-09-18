@@ -7,6 +7,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import kotlinx.coroutines.runBlocking
@@ -26,7 +27,7 @@ class HebcalApiTest {
     }
 
     @Test
-    fun shabbatCityRequestUsesExpectedPathAndParsesResponse() {
+    fun shabbatCityRequestUsesExpectedPathAndParsesResponse() = runBlocking {
         server.enqueue(jsonResponse("""
             {"title":"Shabbat","date":"2026-09-18","items":[
               {"title":"Parashat","date":"2026-09-19","category":"parashat","hebrew":"פרשת וילך","link":"https://example.test","memo":"","subcat":"","leyning":{"torah":"","haftarah":""}}
@@ -34,10 +35,9 @@ class HebcalApiTest {
         """))
         val api = RetrofitInstance.createApi(server.url("/").toString())
 
-        val response = api.getShabbatPerCity("IL-Jerusalem", "off").execute()
+        val response = api.getShabbatPerCity("IL-Jerusalem", "off")
 
-        assertTrue(response.isSuccessful)
-        assertEquals("פרשת וילך", response.body()?.items?.single()?.hebrew)
+        assertEquals("פרשת וילך", response.items.single().hebrew)
         assertEquals(
             "/shabbat?cfg=json&city=IL-Jerusalem&ue=off",
             server.takeRequest().path,
@@ -58,11 +58,11 @@ class HebcalApiTest {
     }
 
     @Test
-    fun coordinateRequestEncodesCoordinatesAndElevationChoice() {
+    fun coordinateRequestEncodesCoordinatesAndElevationChoice() = runBlocking {
         server.enqueue(jsonResponse("""{"title":"","date":"","items":[]}"""))
         val api = RetrofitInstance.createApi(server.url("/").toString())
 
-        api.getShabbatByLoc("-33.9", "151.2", "on").execute()
+        api.getShabbatByLoc("-33.9", "151.2", "on")
 
         assertEquals(
             "/shabbat?cfg=json&tzid=Asia/Jerusalem&latitude=-33.9&longitude=151.2&ue=on",
@@ -71,14 +71,16 @@ class HebcalApiTest {
     }
 
     @Test
-    fun httpFailureIsReturnedWithoutThrowing() {
+    fun httpFailureIsReportedAsException() = runBlocking {
         server.enqueue(MockResponse().setResponseCode(503).setBody("unavailable"))
         val api = RetrofitInstance.createApi(server.url("/").toString())
 
-        val response = api.getShabbat().execute()
-
-        assertFalse(response.isSuccessful)
-        assertEquals(503, response.code())
+        try {
+            api.getShabbat()
+            fail("Expected HTTP failure")
+        } catch (error: retrofit2.HttpException) {
+            assertEquals(503, error.code())
+        }
     }
 
     @Test

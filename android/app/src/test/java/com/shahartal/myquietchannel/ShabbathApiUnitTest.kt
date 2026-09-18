@@ -19,35 +19,17 @@ import kotlinx.coroutines.runBlocking
 class ShabbathApiUnitTest {
 
     // this is not a real unit test as there's no mockWebServer
-    fun fetchParasha(): String {
+    fun fetchParasha(): String = runBlocking {
 
         var res = ""
 
-        val response =
-        RetrofitInstance.api.getShabbat().execute()// enqueue(object : Callback<HebCal> {
-
-//            override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
-                if (/*! */response.isSuccessful) {
-                    // val str = response.body()
-                    // Log.i("myquietwave", "MainActivity fetchParasha " + str)
-                    val hebcal = response.body()
-                    hebcal?.items?.forEach {
+        val hebcal = RetrofitInstance.api.getShabbat()
+                    hebcal.items.forEach {
                         if (it.category == "parashat") {
                             res = it.hebrew
                         }
                     }
-                }
-//            }
-
-//            override fun onFailure(call: Call<HebCal>, t: Throwable) {
-//            }
-//        })
-
-        else {
-            fail(response.toString() + response.body())
-        }
-
-        return res
+        res
     }
 
     @Test
@@ -57,7 +39,7 @@ class ShabbathApiUnitTest {
         assertTrue("res: '$res'", res.contains("פרשת"))
     }
 
-    fun fetchZmanim(): String {
+    fun fetchZmanim(): String = runBlocking {
 
         val city = "il-ramat gan"
 
@@ -67,15 +49,12 @@ class ShabbathApiUnitTest {
 
         var res = ""
 
-        var response =
-            RetrofitInstance.api.getShabbatPerCity(
+        var hebcal = RetrofitInstance.api.getShabbatPerCity(
                 city,
                 ue = Utils.getUe(city)
-            ).execute()
+            )
 
-        if (/*! */response.isSuccessful) {
-            val hebcal = response.body()
-            hebcal?.items?.forEach {
+            hebcal.items.forEach {
                 if (it.category == "candles" && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat") || it.memo.contains("Parashat"))) {
                     res += (it.date + " הדלקת נרות ")
                 }
@@ -83,16 +62,11 @@ class ShabbathApiUnitTest {
                     res += (it.date + " הבדלה ")
                 }
             }
-        }
-
-        response =
-            RetrofitInstance.api.getShabbatByLoc("31.77", "35.19",
+        hebcal = RetrofitInstance.api.getShabbatByLoc("31.77", "35.19",
                 ue = Utils.getUe(city)
-            ).execute()
+            )
 
-        if (/*! */response.isSuccessful) {
-            val hebcal = response.body()
-            hebcal?.items?.forEach {
+            hebcal.items.forEach {
                 if (it.category == "candles" && (it.memo.isNullOrEmpty() || it.memo.contains("Shabbat") || it.memo.contains("Parashat"))) {
                     res += (it.date + " הדלקת נרות ")
                 }
@@ -100,13 +74,7 @@ class ShabbathApiUnitTest {
                     res += (it.date + " הבדלה ")
                 }
             }
-        }
-
-        else {
-            fail(response.toString() + response.body())
-        }
-
-        return res
+        res
     }
 
     @Test

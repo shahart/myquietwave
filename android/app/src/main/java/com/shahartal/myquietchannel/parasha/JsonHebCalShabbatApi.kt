@@ -7,17 +7,17 @@ import retrofit2.http.Query
 interface JsonHebCalShabbatApi {
 
     @GET("shabbat?cfg=json")
-    fun getShabbat(): Call<HebCal>
+    suspend fun getShabbat(): HebCal
 
     @GET("shabbat?cfg=json")
-    fun getShabbatPerCity(@Query("city") city: String, @Query("ue") ue: String): Call<HebCal>
+    suspend fun getShabbatPerCity(@Query("city") city: String, @Query("ue") ue: String): HebCal
 
     @GET("shabbat?cfg=json&tzid=Asia/Jerusalem")
-    fun getShabbatByLoc(@Query("latitude") latitude: String,
-                        @Query("longitude") longitude: String, @Query("ue") ue: String): Call<HebCal>
+    suspend fun getShabbatByLoc(@Query("latitude") latitude: String,
+                                @Query("longitude") longitude: String, @Query("ue") ue: String): HebCal
 
     @GET("shabbat?cfg=json")
-    fun getShabbatPerGeoNameId(@Query("geonameid") geonameid: String, @Query("ue") ue: String): Call<HebCal>
+    suspend fun getShabbatPerGeoNameId(@Query("geonameid") geonameid: String, @Query("ue") ue: String): HebCal
 
     // https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&start=2025-10-20&end=2025-10-20
 
