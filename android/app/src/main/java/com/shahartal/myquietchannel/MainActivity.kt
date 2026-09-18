@@ -288,16 +288,19 @@ class MainActivity : ComponentActivity() {
             while (isActive) {
                 delay(90_000)
                 try {
-                    if (isServiceRunning) {
-                        Station.fromPersistedValue(stationsSpinner.selectedItem?.toString())
-                            .takeIf { it.songFeedName != null }
-                            ?.let(::fetchGlglzSong)
-                    }
+                    refreshCurrentSongIfNeeded()
                 } catch (error: Exception) {
                     Log.w("myquietwave", "Error in periodic fetchGlglzSong", error)
                 }
             }
         }
+    }
+
+    private fun refreshCurrentSongIfNeeded() {
+        if (!isServiceRunning) return
+        Station.fromPersistedValue(stationsSpinner.selectedItem?.toString())
+            .takeIf { it.songFeedName != null }
+            ?.let(::fetchGlglzSong)
     }
 
     override fun onResume() {
@@ -342,16 +345,12 @@ class MainActivity : ComponentActivity() {
 
         updateServiceUi()
 
-        getSystemService(NotificationManager::class.java).cancel(1)
+        getSystemService(NotificationManager::class.java).cancel(VolumeCycleService.NOTIFICATION_ID)
         if (mediaPlayer?.isPlaying == true)
             stationsSpinner.setEnabled(false)
 
         try {
-            if (isServiceRunning) {
-                Station.fromPersistedValue(stationsSpinner.selectedItem?.toString())
-                    .takeIf { it.songFeedName != null }
-                    ?.let(::fetchGlglzSong)
-            }
+            refreshCurrentSongIfNeeded()
         } catch (e: Exception) {
             Log.w("myquietwave", "Error in periodic fetchGlglzSong", e)
         }
