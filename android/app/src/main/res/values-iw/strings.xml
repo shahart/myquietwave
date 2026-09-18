@@ -26,6 +26,9 @@
     <string name="alert_title">המוזיקה מהרדיו השתתקה?!</string>
     <string name="alert_message">האם אפליקציית הרדיו מנגנת? ואולי עוצמת השמע היא אפס?!תוכל להפעיל תחנת רדיו כרצונך באפליקציה מתאימה; אחרת כברירת מחדל התחנה שנבחרה תשודר</string>
 
+    <string name="haftarah_connection">הקשר בין הפרשה להפטרה</string>
+    <string name="haftarah_connection_loading">טוען...</string>
+
     <string name="close_alert">סגור</string>
 
     <string name="current_song">כעת מנגן..</string>

@@ -25,6 +25,9 @@
     <string name="alert_title">¿Está reproduciendo la aplicación de radio? ¿Quizás el volumen está en cero?!</string>
     <string name="alert_message">La aplicación no enciende la radio por sí sola, primero debes activar la aplicación correspondiente.</string>
 
+    <string name="haftarah_connection">Parasha-Haftara connection</string>
+    <string name="haftarah_connection_loading">Loading...</string>
+
     <string name="close_alert">Cerrar</string>
     <string name="current_song">Now playing..</string>
     <string name="next_song">Next playing: </string>

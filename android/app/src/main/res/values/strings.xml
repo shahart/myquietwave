@@ -32,6 +32,10 @@
     <string name="alert_message">You should turn on the appropriate radio app by yourself, otherwise, by default, the selected station will be used</string>
 
     <string name="close_alert">Close</string>
+    <string name="haftarah_connection">Parasha-Haftara connection</string>
+    <string name="haftarah_connection_loading">Loading...</string>
+<!--    <string name="haftarah_connection_error">לא הצלחנו לטעון את התוכן. אפשר לפתוח את המקור בקישור למטה.</string>-->
+<!--    <string name="haftarah_connection_source">למקור באתר כל קורא</string>-->
 
     <string name="current_song">Now playing..</string>
     <string name="next_song">Next playing: </string>

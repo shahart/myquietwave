@@ -1,9 +1,10 @@
 # Changelog
 
-## 1.63
+## 1.70
 
 Fix two 'lighting' times
 Pop-up the Parasha-Haftarah connection
+Kickoff for Leil Slihot
 
 ## 1.62
 

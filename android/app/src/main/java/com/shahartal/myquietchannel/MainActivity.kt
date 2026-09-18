@@ -68,6 +68,8 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale.getDefault
+import java.net.HttpURLConnection
+import java.net.URL
 import kotlin.time.Clock
 
 internal data class GlglzSongs(val current: String, val next: String?)
@@ -134,6 +136,10 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var textViewClockH : TextView
     private lateinit var textViewClockHS : TextView
+    private lateinit var haftarahConnectionButton: Button
+
+    private var haftarahConnectionSourceUrl: String? = null
+    private val haftarahConnectionCache = mutableMapOf<String, String>()
 
     private lateinit var textViewClock3 : TextView
     private lateinit var textViewClock4dafYomi : TextView
@@ -309,15 +315,19 @@ class MainActivity : ComponentActivity() {
         textViewOmer = findViewById(R.id.textViewOmer)
         textViewOmer.text = ""
         textViewClock4dafYomi.text = ""
+        textViewClock7special = findViewById(R.id.textViewClock7special)
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         var res = ""
         try {
-            val start = SimpleDateFormat("yyyy-MM-dd").format(Date())
+            var start = SimpleDateFormat("yyyy-MM-dd").format(Date())
+            // start = "2026-09-05"
             RetrofitInstance.api.getDafYomi(start, start).enqueue(object : Callback<HebCal> {
 
                 override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
                     if (response.isSuccessful) {
                         val hebcal = response.body()
+                        var ttip = "עוד לימודים יומיים:\n\n"
+
                         hebcal?.items?.forEach {
                             if (it.category == "dafyomi") {
 
@@ -332,10 +342,12 @@ class MainActivity : ComponentActivity() {
                                 editor.putString("dafYomi", it.hebrew)
                                 editor.apply()
                             }
+                            else if (it.category == "holiday" && it.subcat == "minor" && it.title == "Leil Selichot") {
+                                textViewClock7special.text = "ליל סליחות" + " " + Utils.switchDate(start) + "\n"
+                            }
                         }
                         if (res.isNotEmpty()) {
 
-                            var ttip = "עוד לימודים יומיים:\n\n"
                             var omerLink: String
 
                             hebcal?.items?.forEach {
@@ -471,7 +483,7 @@ class MainActivity : ComponentActivity() {
             call.enqueue(object : Callback<HebCal> {
 
                 override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
-                    if (response.isSuccessful) {
+                    if (    response.isSuccessful) {
 
                         val editor = sharedPreferences.edit()
 
@@ -869,6 +881,9 @@ class MainActivity : ComponentActivity() {
                            else if (it.category == "parashat") {
                                 // return it.hebrew;
 
+                                haftarahConnectionSourceUrl = HaftarahConnection.sourceUrl(it.hebrew)
+                                haftarahConnectionButton.isEnabled = true
+
                                 var str: String = it.hebrew
                                 var str2: String = ""
 
@@ -1014,9 +1029,70 @@ class MainActivity : ComponentActivity() {
         return res
     }
 
+    private fun showHaftarahConnection() {
+        val sourceUrl = haftarahConnectionSourceUrl ?: return
+        haftarahConnectionButton.isEnabled = false
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.haftarah_connection)
+            .setMessage(R.string.haftarah_connection_loading)
+            .setNegativeButton(R.string.close_alert, null)
+//            .setNeutralButton(R.string.haftarah_connection_source) { _, _ ->
+//                startActivity(Intent(Intent.ACTION_VIEW, sourceUrl.toUri()))
+//            }
+            .create()
+        dialog.show()
+
+        lifecycleScope.launch {
+            val content = try {
+                haftarahConnectionCache[sourceUrl] ?: withContext(Dispatchers.IO) {
+                    HaftarahConnection.extract(fetchHaftarahConnectionPage(sourceUrl))
+                }.also { haftarahConnectionCache[sourceUrl] = it }
+            } catch (error: Exception) {
+                Log.w("myquietwave", "Unable to fetch the haftarah connection", error)
+                "" // getString(R.string.haftarah_connection_error)
+            }
+
+            if (content.isNotEmpty()) {
+                if (dialog.isShowing) dialog.setMessage(content)
+                if (haftarahConnectionSourceUrl == sourceUrl) {
+                    haftarahConnectionButton.isEnabled = true
+                }
+            }
+        }
+    }
+
+    private fun fetchHaftarahConnectionPage(sourceUrl: String): String {
+        var lastError: Exception? = null
+
+        repeat(2) {
+            val connection = URL(/*HaftarahConnection.proxyUrl*/(sourceUrl)).openConnection() as HttpURLConnection
+            try {
+                connection.connectTimeout = 30_000
+                connection.readTimeout = 30_000
+                val status = connection.responseCode
+                if (status in 200..299) {
+                    return connection.inputStream.bufferedReader().use { it.readText() }
+                }
+                val statusError = IllegalStateException("HTTP $status")
+                lastError = statusError
+                if (status < 500) throw statusError
+            } catch (error: Exception) {
+                lastError = error
+            } finally {
+                connection.disconnect()
+            }
+        }
+
+        throw lastError ?: IllegalStateException("Unable to fetch the haftarah connection")
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        haftarahConnectionButton = findViewById(R.id.haftarahConnectionButton)
+        haftarahConnectionButton.setOnClickListener { showHaftarahConnection() }
 
         firebaseAnalytics = Firebase.analytics
 

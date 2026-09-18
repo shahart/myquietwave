@@ -24,7 +24,10 @@
  
     <string name="alert_title">Воспроизводит ли приложение радио? Может быть, громкость установлена на ноль?!</string>
     <string name="alert_message">Приложение не включает радио само по себе, сначала вы должны включить соответствующее приложение.</string>
- 
+
+    <string name="haftarah_connection">Parasha-Haftara connection</string>
+    <string name="haftarah_connection_loading">Loading...</string>
+
     <string name="close_alert">Закрыть</string>
     <string name="current_song">Now playing..</string>
     <string name="next_song">Next playing: </string>

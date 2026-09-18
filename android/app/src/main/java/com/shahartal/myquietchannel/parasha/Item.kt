@@ -7,6 +7,7 @@ data class Item(
     val memo: String,
     val date: String,
     val title: String,
+    val subcat: String,
     // val title_orig: String,
     val link: String // https://www.sefaria.org/Zevachim.36a?lang=bi&utm_source=hebcal.com&utm_medium=api
 

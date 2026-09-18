@@ -376,6 +376,20 @@
                 android:textColor="@color/heading_text"
                 android:textSize="20sp" />
 
+            <Button
+                android:id="@+id/haftarahConnectionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_button_secondary"
+                android:enabled="false"
+                android:fontFamily="sans-serif-medium"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp"
+                android:text="@string/haftarah_connection"
+                android:textAllCaps="false"
+                android:textColor="@color/button_text_dark" />
+
             <TextView
                 android:id="@+id/textViewPad12"
                 android:layout_width="match_parent"

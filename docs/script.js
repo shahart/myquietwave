@@ -301,8 +301,8 @@ async function calc() {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
     const day = date.getDate().toString().padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
-    const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&o=on&start=` + formattedDate + `&end=` + formattedDate;
+    var formattedDate = `${year}-${month}-${day}`;
+    const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&min=on&o=on&start=` + formattedDate + `&end=` + formattedDate;
 
     document.getElementById('fast').innerHTML = '';
     document.getElementById('special').innerHTML = '';
@@ -527,7 +527,6 @@ async function calc() {
         }
 
         try {
-            document.getElementById('dafYomi').innerHTML = resp3.items[0].hebrew;
             document.getElementById('dafYomiUrl').href = "https://daf-yomi.com/Dafyomi_Page.aspx"; // resp3.items[0].link;
             ttip = 'עוד לימודים יומיים:\n\n';
             for (let i = 0; i < resp3.items.length; i++) {
@@ -551,6 +550,12 @@ async function calc() {
                     document.getElementById('fast').onclick = function() {
                         window.open(resp3.items[i].link, "_blank");
                     }   
+                }
+                else if (resp3.items[i].category === 'holiday' && resp3.items[i].subcat === "minor" && resp3.items[i].title == "Leil Selichot") {
+                    document.getElementById('fast').innerHTML = "ליל סליחות אשכנז/ ספרד" + " " + formattedDate;
+                }
+                else if (resp3.items[i].category === 'dafyomi') {
+                    document.getElementById('dafYomi').innerHTML = resp3.items[1].hebrew;
                 }
             }
             document.getElementById('dafYomi').onclick = function() {
