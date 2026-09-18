@@ -87,10 +87,10 @@ function getYY(no) {
 function convertEng(hebrew) {
     hebrew = hebrew.replace("Joshua", "יהושע");
     hebrew = hebrew.replace("Judges", "שופטים");
-    hebrew = hebrew.replace("I Samuel", "שמואל א");
     hebrew = hebrew.replace("II Samuel", "שמואל ב");
-    hebrew = hebrew.replace("I Kings", "מלכים א");
+    hebrew = hebrew.replace("I Samuel", "שמואל א");
     hebrew = hebrew.replace("II Kings", "מלכים ב");
+    hebrew = hebrew.replace("I Kings", "מלכים א");
     hebrew = hebrew.replace("Isaiah", "ישעיהו");
     hebrew = hebrew.replace("Jeremiah", "ירמיהו");
     hebrew = hebrew.replace("Ezekiel", "יחזקאל");
@@ -113,4 +113,3 @@ function trim(n) {
     if (n.startsWith('0')) return n.substring(1);
     return n;
 }
-
