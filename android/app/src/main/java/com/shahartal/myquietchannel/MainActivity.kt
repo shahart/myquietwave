@@ -232,20 +232,27 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun buildServiceIntent(): Pair<Intent, Int> {
-        val newsDuration = normalizedNewsDuration()
         if (textViewNextNews.text.toString().isEmpty()) {
             textViewNextNews.text = NEXT_HOURS
         }
 
+        val request = PlaybackStartRequest.fromUiValues(
+            station = stationsSpinner.selectedItem?.toString(),
+            newsDuration = editTextNumberNewsDuration.text.toString(),
+            schedule = textViewNextNews.text.toString(),
+            todo = editTextTodo.text.toString(),
+            location = editTextLocation.text.toString(),
+            radioOnly = radioPlayer.isChecked,
+        )
         val intent = Intent(this, VolumeCycleService::class.java).apply {
-            putExtra(VolumeCycleService.EXTRA_NEWS_DURATION, newsDuration)
-            putExtra(VolumeCycleService.EXTRA_NEXT_HOURS, textViewNextNews.text.toString())
-            putExtra(VolumeCycleService.EXTRA_STATION, stationsSpinner.selectedItem?.toString().orEmpty())
-            putExtra(VolumeCycleService.EXTRA_TODO_LIST, editTextTodo.text.toString())
-            putExtra(VolumeCycleService.EXTRA_LOCATION, editTextLocation.text.toString())
-            putExtra(VolumeCycleService.EXTRA_RADIO_PLAYER, radioPlayer.isChecked)
+            putExtra(VolumeCycleService.EXTRA_NEWS_DURATION, request.newsDurationMinutes)
+            putExtra(VolumeCycleService.EXTRA_NEXT_HOURS, request.scheduleText)
+            putExtra(VolumeCycleService.EXTRA_STATION, request.station.displayName)
+            putExtra(VolumeCycleService.EXTRA_TODO_LIST, request.todo)
+            putExtra(VolumeCycleService.EXTRA_LOCATION, request.location)
+            putExtra(VolumeCycleService.EXTRA_RADIO_PLAYER, request.radioOnly)
         }
-        return intent to newsDuration
+        return intent to request.newsDurationMinutes
     }
 
     private fun requestNotificationPermissionIfNeeded() {
