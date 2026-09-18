@@ -272,6 +272,34 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun startClockUpdates() {
+        lifecycleScope.launch {
+            while (isActive) {
+                val now = java.time.LocalDateTime.now()
+                textViewClock.text = DateDisplay.clockTime(now)
+                textViewDate.text = DateDisplay.calendarLabel(now.toLocalDate())
+                delay(500)
+            }
+        }
+    }
+
+    private fun startPeriodicSongRefresh() {
+        lifecycleScope.launch {
+            while (isActive) {
+                delay(90_000)
+                try {
+                    if (isServiceRunning) {
+                        Station.fromPersistedValue(stationsSpinner.selectedItem?.toString())
+                            .takeIf { it.songFeedName != null }
+                            ?.let(::fetchGlglzSong)
+                    }
+                } catch (error: Exception) {
+                    Log.w("myquietwave", "Error in periodic fetchGlglzSong", error)
+                }
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -1088,14 +1116,7 @@ class MainActivity : ComponentActivity() {
         val hebrewDay = hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH) // switches at midnight by-design
         textViewHebDate.text = HebrewDateDisplay.format(hebY, hebrewMonth, hebrewDay)
 
-        lifecycleScope.launch {
-            while (isActive) {
-                val now = java.time.LocalDateTime.now()
-                textViewClock.text = DateDisplay.clockTime(now)
-                textViewDate.text = DateDisplay.calendarLabel(now.toLocalDate())
-                delay(500)
-            }
-        }
+        startClockUpdates()
 
         // align UI if needed
 
@@ -1194,20 +1215,7 @@ class MainActivity : ComponentActivity() {
 
         checkForAppUpdate()
 
-        lifecycleScope.launch {
-            while (isActive) {
-                delay(90_000)
-                try {
-                    if (isServiceRunning) {
-                        Station.fromPersistedValue(stationsSpinner.selectedItem?.toString())
-                            .takeIf { it.songFeedName != null }
-                            ?.let(::fetchGlglzSong)
-                    }
-                } catch (e: Exception) {
-                    Log.w("myquietwave", "Error in periodic fetchGlglzSong", e)
-                }
-            }
-        }
+        startPeriodicSongRefresh()
     }
 
     private val appUpdateManager: AppUpdateManager by lazy {
