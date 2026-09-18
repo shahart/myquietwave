@@ -217,6 +217,24 @@ class MainActivity : ComponentActivity() {
         isNearShabbat = false,
     ).also { editTextNumberNewsDuration.text = it.toString() }
 
+    private fun underlined(text: String, start: Int = 0): SpannableString =
+        SpannableString(text).apply {
+            if (start in 0 until text.length) {
+                setSpan(UnderlineSpan(), start, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+
+    private fun openUrl(url: String) {
+        startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+    }
+
+    private fun showMessageDialog(message: CharSequence) {
+        AlertDialog.Builder(this)
+            .setMessage(message)
+            .setNegativeButton(R.string.close_alert, null)
+            .show()
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -299,89 +317,33 @@ class MainActivity : ComponentActivity() {
         textViewClock4dafYomi.text = ""
         textViewClock7special = binding.textViewClock7special
         val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
-        var res = ""
         try {
-            var start = SimpleDateFormat("yyyy-MM-dd").format(Date())
-            // start = "2026-09-05"
+            val start = SimpleDateFormat("yyyy-MM-dd").format(Date())
             hebcalRepository.dailyLearning(start).enqueue(object : Callback<HebCal> {
 
                 override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
                     if (response.isSuccessful) {
-                        val hebcal = response.body()
-                        var ttip = "עוד לימודים יומיים:\n\n"
-
-                        hebcal?.items?.forEach {
-                            if (it.category == "dafyomi") {
-
-                                val fullTextYomi = it.hebrew
-                                val spannableStringYomi = SpannableString(fullTextYomi)
-                                spannableStringYomi.setSpan(UnderlineSpan(), 0, fullTextYomi.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-                                textViewClock4dafYomi.text = spannableStringYomi
-                                res = it.link // "https://daf-yomi.com/Dafyomi_Page.aspx" // it.link
-
-                                val editor = sharedPreferences.edit()
-                                editor.putString("dafYomi", it.hebrew)
-                                editor.apply()
-                            }
-                            else if (it.category == "holiday" && it.subcat == "minor" && it.title == "Leil Selichot") {
-                                textViewClock7special.text = "ליל סליחות" + " " + Utils.switchDate(start) + "\n"
-                            }
+                        val summary = HebcalPresentation.dailyLearning(
+                            response.body()?.items.orEmpty(),
+                            start,
+                        )
+                        summary.selichotText?.let { textViewClock7special.text = it }
+                        summary.omer?.let { omer ->
+                            textViewOmer.text = omer.text
+                            textViewOmer.setOnClickListener { openUrl(omer.link) }
                         }
-                        if (res.isNotEmpty()) {
-
-                            var omerLink: String
-
-                            hebcal?.items?.forEach {
-
-                                if (it.category == "mishnayomi") {
-                                    ttip +=  "משנה יומית: " + it.hebrew + "\n"
-                                }
-                                else if (it.category == "nachyomi") {
-                                    ttip +=  "נ'ך יומי: " + it.hebrew + "\n"
-                                }
-                                else if (it.category == "dailyPsalms") {
-                                    ttip +=  "תהלים יומי: " + it.hebrew + "\n"
-                                }
-                                else if (it.category == "tanakhYomi") {
-                                    ttip +=  "תנ'ך יומי: " + it.hebrew + "\n"
-                                }
-                                else if (it.category == "omer") {
-
-                                    val fullTextYomi = "ספירת העומר (בבוקר): " + "\n" + it.hebrew.replace("עומר", "")
-                                    textViewOmer.text = fullTextYomi
-
-                                    omerLink = it.link
-                                    textViewOmer.setOnClickListener {
-
-                                        val browserIntent = Intent(
-                                            Intent.ACTION_VIEW,
-                                            omerLink.toUri()
-                                        )
-                                        startActivity(browserIntent)
-                                    }
-                                }
+                        summary.dafYomi?.let { dafYomi ->
+                            textViewClock4dafYomi.text = underlined(dafYomi.text)
+                            sharedPreferences.edit().putString("dafYomi", dafYomi.text).apply()
+                            val tooltip = buildString {
+                                append("עוד לימודים יומיים:\n\n")
+                                summary.additionalLearning.forEach { append(it).append('\n') }
                             }
-
                             textViewClock4dafYomiTitle.setOnClickListener {
-                                val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
-                                alertDialogBuilder.setMessage(
-                                    ttip
-                                )
-                                alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
-                                    dialog!!.cancel()
-                                }
-                                val alertDialog = alertDialogBuilder.create()
-                                alertDialog.show()
+                                showMessageDialog(tooltip)
                             }
-
                             textViewClock4dafYomi.setOnClickListener {
-
-                                val browserIntent = Intent(
-                                    Intent.ACTION_VIEW,
-                                    "https://daf-yomi.com/Dafyomi_Page.aspx".toUri() // res.toUri()
-                                )
-                                startActivity(browserIntent)
+                                openUrl("https://daf-yomi.com/Dafyomi_Page.aspx")
                             }
                         }
                     } else {
@@ -443,66 +405,35 @@ class MainActivity : ComponentActivity() {
 
                         val editor = sharedPreferences.edit()
 
-                        val hebcal = response.body()
-                        var mevarchimHebrew: String? = null
-                        hebcal?.items?.forEach {
-                            // Check 'res' (local) instead of 'textViewClock3.text' (shared UI state)
-                            if (it.category == "candles") {
-                                if (!res.contains(getString(R.string.candleLighting))) {
-                                    res = "\n" + getString(R.string.candleLighting) + " " + truncDate(
-                                        it.date)
-                                }
-                                else {
-                                    res += " " + truncDate(
-                                        it.date
-                                    ) + "\n"
-                                }
-                                editor.putString("candles", getString(R.string.candleLighting) + " " + truncDate(it.date))
-                            }
-                            else if (it.category == "havdalah") {
-                                if (!resH.contains(getString(R.string.havdalah))) {
-                                    resH = "\n" + getString(R.string.havdalah) + " " + truncDate(
-                                        it.date)
-                                }
-                                else {
-                                    resH += " " + truncDate(
-                                        it.date
-                                    ) + "\n"
-                                }
-                                editor.putString("havdalah", getString(R.string.havdalah) + " " +  truncDate(it.date))
-                            }
-                            else if (it.category == "mevarchim") {
-                                mevarchimHebrew = it.hebrew
-                                res += "\n" + it.hebrew + " " +  "\nהמולד: " + it.memo.
-                                    substring(it.memo.indexOf(": ") + 2).
-                                        replace("chalakim", "חלקים").
-                                    replace("and", "ו-").
-                                        replace("Sunday", "ראשון").
-                                        replace("Monday", "שני").
-                                        replace("Tuesday", "שלישי").
-                                        replace("Wednesday", "רביעי").
-                                        replace("Thursday", "חמישי").
-                                        replace("Friday", "שישי").
-                                        replace("Saturday", "שבת") + "\n"
-
-                                // Set the listener for the whole text view if mevarchim exists
-
-
-                                val str: String = it.hebrew
-                                textViewClock3.setOnClickListener {
-                                    val browserIntent = Intent(Intent.ACTION_VIEW,
-                                        ("https://he.wikipedia.org/wiki/" + str.substring(" מברכים חודש ".length-1).replace("סיון", "סיוון") + (if (str.contains("שבט"))  "_(חודש)" else "")).toUri()
-                                    )
-                                    startActivity(browserIntent)
-                                }
-                            }
+                        val summary = HebcalPresentation.shabbat(response.body()?.items.orEmpty())
+                        if (summary.candleTimes.isNotEmpty()) {
+                            res = "\n${getString(R.string.candleLighting)} ${summary.candleTimes.joinToString(" ")}"
+                            if (summary.candleTimes.size > 1) res += "\n"
+                            editor.putString(
+                                "candles",
+                                getString(R.string.candleLighting) + " " + summary.candleTimes.last(),
+                            )
                         }
-                        // Final UI Update: Handle Spannable formatting once building is complete
-                        mevarchimHebrew?.let { mevarchim ->
+                        if (summary.havdalahTimes.isNotEmpty()) {
+                            resH = "\n${getString(R.string.havdalah)} ${summary.havdalahTimes.joinToString(" ")}"
+                            if (summary.havdalahTimes.size > 1) resH += "\n"
+                            editor.putString(
+                                "havdalah",
+                                getString(R.string.havdalah) + " " + summary.havdalahTimes.last(),
+                            )
+                        }
+                        summary.mevarchim?.let { mevarchim ->
+                            res += "\n${mevarchim.title} \nהמולד: ${mevarchim.molad}\n"
+                            textViewClock3.setOnClickListener { openUrl(mevarchim.wikiUrl) }
                             val spannable = SpannableString(res + resH)
-                            val start = res.indexOf(mevarchim)
+                            val start = res.indexOf(mevarchim.title)
                             if (start != -1) {
-                                spannable.setSpan(UnderlineSpan(), start, start + mevarchim.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                spannable.setSpan(
+                                    UnderlineSpan(),
+                                    start,
+                                    start + mevarchim.title.length,
+                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                                )
                             }
                             textViewClock3.text = spannable
                         } ?: run {
@@ -575,12 +506,12 @@ class MainActivity : ComponentActivity() {
                         val hebcal = response.body()
                         if (hebcal != null) {
                             res =
-                                "\n" + getString(R.string.sunrise) + " " + truncDate(hebcal.times.sunrise)
+                                "\n" + getString(R.string.sunrise) + " " + HebcalPresentation.displayTime(hebcal.times.sunrise)
                             editor.putString(
                                 "sunrise",
-                                getString(R.string.sunrise) + " " + truncDate(hebcal.times.sunrise)
+                                getString(R.string.sunrise) + " " + HebcalPresentation.displayTime(hebcal.times.sunrise)
                             )
-                            res += "\n" + getString(R.string.sunset) + " " + truncDate(hebcal.times.sunset) + " "
+                            res += "\n" + getString(R.string.sunset) + " " + HebcalPresentation.displayTime(hebcal.times.sunset) + " "
 
                             if (DateDisplay.hasTimePassed(hebcal.times.sunset)) {
                                 val hebrewCalendar = HebrewCalendar()
@@ -610,33 +541,33 @@ class MainActivity : ComponentActivity() {
                             textViewClock5suns.text = res
                             editor.putString(
                                 "sunset",
-                                getString(R.string.sunset) + " " + truncDate(hebcal.times.sunset)
+                                getString(R.string.sunset) + " " + HebcalPresentation.displayTime(hebcal.times.sunset)
                             )
 
                             textViewClock5suns.setOnClickListener {
                                 val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
                                 alertDialogBuilder.setMessage(
-                                    "chatzot Night חצות הלילה: " + truncDate(hebcal.times.chatzotNight) + "\n" +
-                                    "alot HaShahar עלות השחר: " + truncDate(hebcal.times.alotHaShachar) + "\n" +
-                                    "dawn: " + truncDate(hebcal.times.dawn) + "\n" +
+                                    "chatzot Night חצות הלילה: " + HebcalPresentation.displayTime(hebcal.times.chatzotNight) + "\n" +
+                                    "alot HaShahar עלות השחר: " + HebcalPresentation.displayTime(hebcal.times.alotHaShachar) + "\n" +
+                                    "dawn: " + HebcalPresentation.displayTime(hebcal.times.dawn) + "\n" +
 
-                                    "sof Zman Shma מגן אברהם: " + truncDate(hebcal.times.sofZmanShmaMGA) + "\n" +
-                                    "sof Zman Shma: " + truncDate(hebcal.times.sofZmanShma) + "\n" +
-                                    "sof Zman Tfilla מגן אברהם: " + truncDate(hebcal.times.sofZmanTfillaMGA) + "\n" +
-                                    "sof Zman Tfilla: " + truncDate(hebcal.times.sofZmanTfilla) + "\n" +
+                                    "sof Zman Shma מגן אברהם: " + HebcalPresentation.displayTime(hebcal.times.sofZmanShmaMGA) + "\n" +
+                                    "sof Zman Shma: " + HebcalPresentation.displayTime(hebcal.times.sofZmanShma) + "\n" +
+                                    "sof Zman Tfilla מגן אברהם: " + HebcalPresentation.displayTime(hebcal.times.sofZmanTfillaMGA) + "\n" +
+                                    "sof Zman Tfilla: " + HebcalPresentation.displayTime(hebcal.times.sofZmanTfilla) + "\n" +
 
-                                    "chatzot חצות היום: " + truncDate(hebcal.times.chatzot) + "\n" +
+                                    "chatzot חצות היום: " + HebcalPresentation.displayTime(hebcal.times.chatzot) + "\n" +
 
                                             "\n" +
 
-                                    "mincha Gedola מנחה גדולה: " + truncDate(hebcal.times.minchaGedola) + "\n" +
-                                    "mincha Ketana מנחה קטנה: " + truncDate(hebcal.times.minchaKetana) + "\n" +
-                                    "plag HaMincha פלג המנחה: " + truncDate(hebcal.times.plagHaMincha) + "\n" +
+                                    "mincha Gedola מנחה גדולה: " + HebcalPresentation.displayTime(hebcal.times.minchaGedola) + "\n" +
+                                    "mincha Ketana מנחה קטנה: " + HebcalPresentation.displayTime(hebcal.times.minchaKetana) + "\n" +
+                                    "plag HaMincha פלג המנחה: " + HebcalPresentation.displayTime(hebcal.times.plagHaMincha) + "\n" +
 
-                                    "bein HaShmashos בין השמשות: " + truncDate(hebcal.times.beinHaShmashos) + "\n" +
-                                    "Dusk חשיכה: " + truncDate(hebcal.times.dusk) + "\n" +
-                                    "Tzeit צאת הכוכבים: " + truncDate(hebcal.times.tzeit7083deg) + "\n" +
-                                    "Tzeit 72' צאת הכוכבים רבינו תם: " + truncDate(hebcal.times.tzeit72min)
+                                    "bein HaShmashos בין השמשות: " + HebcalPresentation.displayTime(hebcal.times.beinHaShmashos) + "\n" +
+                                    "Dusk חשיכה: " + HebcalPresentation.displayTime(hebcal.times.dusk) + "\n" +
+                                    "Tzeit צאת הכוכבים: " + HebcalPresentation.displayTime(hebcal.times.tzeit7083deg) + "\n" +
+                                    "Tzeit 72' צאת הכוכבים רבינו תם: " + HebcalPresentation.displayTime(hebcal.times.tzeit72min)
                                 )
                                 alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
                                     dialog!!.cancel()
@@ -671,40 +602,6 @@ class MainActivity : ComponentActivity() {
             Firebase.crashlytics.log("MainActivity fetchSunsZmanim Exception")
             Firebase.crashlytics.recordException(e)
         }
-    }
-
-
-    fun truncDate(date: String): String {
-        var res = date.substring(date.indexOf("T")+1, date.indexOf("T")+1 +5)
-        if (res.startsWith('0'))
-            res = res.substring(1)
-        return " " + res + " "
-    }
-
-    fun convertEng(hebre: String): String {
-        var hebrew = hebre
-        hebrew = hebrew.replace("Joshua", "יהושע");
-        hebrew = hebrew.replace("Judges", "שופטים");
-        hebrew = hebrew.replace("I Samuel", "שמואל א");
-        hebrew = hebrew.replace("II Samuel", "שמואל ב");
-        hebrew = hebrew.replace("I Kings", "מלכים א");
-        hebrew = hebrew.replace("II Kings", "מלכים ב");
-        hebrew = hebrew.replace("Isaiah", "ישעיהו");
-        hebrew = hebrew.replace("Jeremiah", "ירמיהו");
-        hebrew = hebrew.replace("Ezekiel", "יחזקאל");
-        hebrew = hebrew.replace("Hosea", "הושע");
-        hebrew = hebrew.replace("Joel", "יואל");
-        hebrew = hebrew.replace("Amos", "עמוס");
-        hebrew = hebrew.replace("Obadiah", "עובדיה")
-        hebrew = hebrew.replace("Jonah", "יונה");
-        hebrew = hebrew.replace("Micah", "מיכה");
-        hebrew = hebrew.replace("Nachum", "נחום");
-        hebrew = hebrew.replace("Habakkuk", "חבקוק");
-        hebrew = hebrew.replace("Zephaniah", "צפניה");
-        hebrew = hebrew.replace("Haggai", "חגי");
-        hebrew = hebrew.replace("Zechariah", "זכריה");
-        hebrew = hebrew.replace("Malachi", "מלאכי");
-        return hebrew;
     }
     fun fetchParasha() { // }: String {
 
@@ -850,7 +747,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
 
-                                val hebName = convertEng(it.leyning.haftarah.replace("|", "\n"))
+                                val hebName = HebcalPresentation.translateBookNames(it.leyning.haftarah.replace("|", "\n"))
                                 val fullTextH =  " הפטרה " + hebName
                                 val spannableStringH = SpannableString(fullTextH)
                                 spannableStringH.setSpan(UnderlineSpan(), " הפטרה ".length, fullTextH.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -870,7 +767,7 @@ class MainActivity : ComponentActivity() {
 
                                 // it.leyning.haftarah_sephardic = "Ezekiel 8:25-29:21"
                                 it.leyning.haftarah_sephardic?.let { sephardicHaftarah ->
-                                    val hebName = convertEng(sephardicHaftarah.replace("|", "\n"))
+                                    val hebName = HebcalPresentation.translateBookNames(sephardicHaftarah.replace("|", "\n"))
                                     val fullTextHS =  " הפטרה ספרדים " + hebName
                                     val spannableStringHS = SpannableString(fullTextHS)
                                     spannableStringHS.setSpan(UnderlineSpan(), " הפטרה ספרדים ".length, fullTextHS.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

@@ -1,0 +1,112 @@
+package com.shahartal.myquietchannel
+
+import com.shahartal.myquietchannel.parasha.Item
+
+internal data class LinkedText(val text: String, val link: String)
+
+internal data class DailyLearningSummary(
+    val dafYomi: LinkedText?,
+    val additionalLearning: List<String>,
+    val omer: LinkedText?,
+    val selichotText: String?,
+)
+
+internal data class MevarchimSummary(
+    val title: String,
+    val molad: String,
+    val wikiUrl: String,
+)
+
+internal data class ShabbatSummary(
+    val candleTimes: List<String>,
+    val havdalahTimes: List<String>,
+    val mevarchim: MevarchimSummary?,
+)
+
+internal object HebcalPresentation {
+    private val dailyLearningLabels = linkedMapOf(
+        "mishnayomi" to "משנה יומית",
+        "nachyomi" to "נ'ך יומי",
+        "dailyPsalms" to "תהלים יומי",
+        "tanakhYomi" to "תנ'ך יומי",
+    )
+
+    private val bookNames = linkedMapOf(
+        "Joshua" to "יהושע",
+        "Judges" to "שופטים",
+        "I Samuel" to "שמואל א",
+        "II Samuel" to "שמואל ב",
+        "I Kings" to "מלכים א",
+        "II Kings" to "מלכים ב",
+        "Isaiah" to "ישעיהו",
+        "Jeremiah" to "ירמיהו",
+        "Ezekiel" to "יחזקאל",
+        "Hosea" to "הושע",
+        "Joel" to "יואל",
+        "Amos" to "עמוס",
+        "Obadiah" to "עובדיה",
+        "Jonah" to "יונה",
+        "Micah" to "מיכה",
+        "Nachum" to "נחום",
+        "Habakkuk" to "חבקוק",
+        "Zephaniah" to "צפניה",
+        "Haggai" to "חגי",
+        "Zechariah" to "זכריה",
+        "Malachi" to "מלאכי",
+    )
+
+    fun dailyLearning(items: List<Item>, isoDate: String): DailyLearningSummary {
+        val daf = items.firstOrNull { it.category == "dafyomi" }
+            ?.let { LinkedText(it.hebrew, it.link) }
+        val additional = items.mapNotNull { item ->
+            dailyLearningLabels[item.category]?.let { label -> "$label: ${item.hebrew}" }
+        }
+        val omer = items.firstOrNull { it.category == "omer" }?.let {
+            LinkedText("ספירת העומר (בבוקר): \n${it.hebrew.replace("עומר", "")}", it.link)
+        }
+        val selichot = items.firstOrNull {
+            it.category == "holiday" && it.subcat == "minor" && it.title == "Leil Selichot"
+        }?.let { "ליל סליחות ${Utils.switchDate(isoDate)}\n" }
+        return DailyLearningSummary(daf, additional, omer, selichot)
+    }
+
+    fun shabbat(items: List<Item>): ShabbatSummary {
+        val mevarchim = items.firstOrNull { it.category == "mevarchim" }?.let { item ->
+            MevarchimSummary(
+                title = item.hebrew,
+                molad = translateMolad(item.memo.substringAfter(": ", item.memo)),
+                wikiUrl = "https://he.wikipedia.org/wiki/${monthWikiTitle(item.hebrew)}",
+            )
+        }
+        return ShabbatSummary(
+            candleTimes = items.filter { it.category == "candles" }.map { displayTime(it.date) },
+            havdalahTimes = items.filter { it.category == "havdalah" }.map { displayTime(it.date) },
+            mevarchim = mevarchim,
+        )
+    }
+
+    fun displayTime(isoDateTime: String): String {
+        val rawValue = isoDateTime.substringAfter('T').take(5)
+        val value = rawValue.removePrefix("0")
+        return " $value "
+    }
+
+    fun translateBookNames(value: String): String =
+        bookNames.entries.fold(value) { result, (english, hebrew) -> result.replace(english, hebrew) }
+
+    private fun translateMolad(value: String): String = value
+        .replace("chalakim", "חלקים")
+        .replace("and", "ו-")
+        .replace("Sunday", "ראשון")
+        .replace("Monday", "שני")
+        .replace("Tuesday", "שלישי")
+        .replace("Wednesday", "רביעי")
+        .replace("Thursday", "חמישי")
+        .replace("Friday", "שישי")
+        .replace("Saturday", "שבת")
+
+    private fun monthWikiTitle(title: String): String {
+        val month = title.substringAfter("מברכים חודש", title).trim().replace("סיון", "סיוון")
+        return if (month.contains("שבט")) "${month}_(חודש)" else month
+    }
+}
