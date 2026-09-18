@@ -337,11 +337,7 @@ class MainActivity : ComponentActivity() {
             nextSong.text = ""
         }
 
-        if (settings.radioOnly) {
-            editTextNumberNewsDuration.isEnabled = false
-            textViewNextNews.isEnabled = false
-            radioPlayer.isChecked = true
-        }
+        radioPlayer.isChecked = settings.radioOnly
 
         updateServiceUi()
 
@@ -445,11 +441,12 @@ class MainActivity : ComponentActivity() {
 
         textViewClock3 = binding.textViewClock3
 
+        val trimmedLocation = loc.trim()
         var res: String
         var resH: String = " "
 
-        if ((loc.trim().get(0).isLetter())) {
-            res = loc + "\n"
+        if (trimmedLocation.firstOrNull()?.isLetter() == true) {
+            res = trimmedLocation + "\n"
         } else {
             res = " "
         }
@@ -829,7 +826,7 @@ class MainActivity : ComponentActivity() {
 
     fun getParasha(): String {
         var res = displayCache.get("parashat")
-        if (res == "") {
+        if (res.isBlank()) {
             res = " שבת פרשת " + Parshios.getParshaString(HebrewDate.today())
         }
         return res
