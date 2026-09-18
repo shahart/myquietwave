@@ -103,6 +103,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var settingsRepository: SettingsRepository
+    private lateinit var displayCache: DisplayCache
 
     private var isServiceRunning = false
 
@@ -311,7 +312,6 @@ class MainActivity : ComponentActivity() {
         textViewOmer.text = ""
         textViewClock4dafYomi.text = ""
         textViewClock7special = binding.textViewClock7special
-        val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
         try {
             val start = LocalDate.now().toString()
             hebcalRepository.dailyLearning(start).enqueue(object : Callback<HebCal> {
@@ -329,7 +329,7 @@ class MainActivity : ComponentActivity() {
                         }
                         summary.dafYomi?.let { dafYomi ->
                             textViewClock4dafYomi.text = underlined(dafYomi.text)
-                            sharedPreferences.edit().putString("dafYomi", dafYomi.text).apply()
+                            displayCache.put("dafYomi", dafYomi.text)
                             val tooltip = buildString {
                                 append("עוד לימודים יומיים:\n\n")
                                 summary.additionalLearning.forEach { append(it).append('\n') }
@@ -343,18 +343,18 @@ class MainActivity : ComponentActivity() {
                         }
                     } else {
                         Log.w("myquietwave", "MainActivity fetchDafYomi Error: ${response.code()}")
-                        textViewClock4dafYomi.text = sharedPreferences.getString("dafYomi", "")
+                        textViewClock4dafYomi.text = displayCache.get("dafYomi")
                     }
                 }
 
                 override fun onFailure(call: Call<HebCal>, t: Throwable) {
                     Log.w("myquietwave", "MainActivity fetchDafYomi unable to fetch hebCal $t", t)
-                    textViewClock4dafYomi.text = sharedPreferences.getString("dafYomi", "")
+                    textViewClock4dafYomi.text = displayCache.get("dafYomi")
                 }
             })
         } catch (e: Exception) {
             Log.e("myquietwave", "MainActivity fetchDafYomi Exception $e", e)
-            textViewClock4dafYomi.text = sharedPreferences.getString("dafYomi", "")
+            textViewClock4dafYomi.text = displayCache.get("dafYomi")
             Firebase.crashlytics.log("MainActivity fetchDafYomi Exception")
             Firebase.crashlytics.recordException(e)
         }
@@ -377,8 +377,6 @@ class MainActivity : ComponentActivity() {
 
         textViewClock3 = binding.textViewClock3
 
-        val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
-
         var res: String
         var resH: String = " "
 
@@ -398,24 +396,16 @@ class MainActivity : ComponentActivity() {
                 override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
                     if (    response.isSuccessful) {
 
-                        val editor = sharedPreferences.edit()
-
                         val summary = HebcalPresentation.shabbat(response.body()?.items.orEmpty())
                         if (summary.candleTimes.isNotEmpty()) {
                             res = "\n${getString(R.string.candleLighting)} ${summary.candleTimes.joinToString(" ")}"
                             if (summary.candleTimes.size > 1) res += "\n"
-                            editor.putString(
-                                "candles",
-                                getString(R.string.candleLighting) + " " + summary.candleTimes.last(),
-                            )
+                            displayCache.put("candles", getString(R.string.candleLighting) + " " + summary.candleTimes.last())
                         }
                         if (summary.havdalahTimes.isNotEmpty()) {
                             resH = "\n${getString(R.string.havdalah)} ${summary.havdalahTimes.joinToString(" ")}"
                             if (summary.havdalahTimes.size > 1) resH += "\n"
-                            editor.putString(
-                                "havdalah",
-                                getString(R.string.havdalah) + " " + summary.havdalahTimes.last(),
-                            )
+                            displayCache.put("havdalah", getString(R.string.havdalah) + " " + summary.havdalahTimes.last())
                         }
                         summary.mevarchim?.let { mevarchim ->
                             res += "\n${mevarchim.title} \nהמולד: ${mevarchim.molad}\n"
@@ -434,12 +424,11 @@ class MainActivity : ComponentActivity() {
                         } ?: run {
                             textViewClock3.text = res + resH
                         }
-                        editor.apply()
                     }
                     else {
                         Log.w("myquietwave", "MainActivity fetchZmanim Error: ${response.code()}")
                         // textViewClock3.text = "" // ""Not found " + response.code()
-                        res += " " + sharedPreferences.getString("candles", "") + " " + sharedPreferences.getString("havdalah", "")
+                        res += " " + displayCache.get("candles") + " " + displayCache.get("havdalah")
                         textViewClock3.text = res + resH
                     }
                 }
@@ -447,14 +436,14 @@ class MainActivity : ComponentActivity() {
                 override fun onFailure(call: Call<HebCal>, t: Throwable) {
                     Log.w("myquietwave", "MainActivity fetchZmanim unable to fetch hebCal $t", t)
                     // textViewClock3.text = "" // ""Failure. Not found " + t
-                    res += " " + sharedPreferences.getString("candles", "") + " " + sharedPreferences.getString("havdalah", "")
+                    res += " " + displayCache.get("candles") + " " + displayCache.get("havdalah")
                     textViewClock3.text = res
                 }
             })
         } catch (e: Exception) {
             Log.e("myquietwave", "MainActivity fetchZmanim Exception $e", e)
             // textViewClock3.text = "" // ""Error. Not found " + e
-            res += " " + sharedPreferences.getString("candles", "") + " " + sharedPreferences.getString("havdalah", "")
+            res += " " + displayCache.get("candles") + " " + displayCache.get("havdalah")
             textViewClock3.text = res
             Firebase.crashlytics.log("MainActivity fetchZmanim Exception")
             Firebase.crashlytics.recordException(e)
@@ -480,8 +469,6 @@ class MainActivity : ComponentActivity() {
         textViewClock5suns = binding.textViewClock5suns
         textViewClock5locTitle = binding.textViewClock5locTitle
 
-        val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
-
         var res: String
 
         res = " "
@@ -496,16 +483,11 @@ class MainActivity : ComponentActivity() {
                 override fun onResponse(call: Call<HebCalZmanimModel>, response: Response<HebCalZmanimModel>) {
                     if (response.isSuccessful) {
 
-                        val editor = sharedPreferences.edit()
-
                         val hebcal = response.body()
                         if (hebcal != null) {
                             res =
                                 "\n" + getString(R.string.sunrise) + " " + HebcalPresentation.displayTime(hebcal.times.sunrise)
-                            editor.putString(
-                                "sunrise",
-                                getString(R.string.sunrise) + " " + HebcalPresentation.displayTime(hebcal.times.sunrise)
-                            )
+                            displayCache.put("sunrise", getString(R.string.sunrise) + " " + HebcalPresentation.displayTime(hebcal.times.sunrise))
                             res += "\n" + getString(R.string.sunset) + " " + HebcalPresentation.displayTime(hebcal.times.sunset) + " "
 
                             if (DateDisplay.hasTimePassed(hebcal.times.sunset)) {
@@ -520,10 +502,7 @@ class MainActivity : ComponentActivity() {
                             textViewClock5locTitle.text = hebcal.location.title
 
                             textViewClock5suns.text = res
-                            editor.putString(
-                                "sunset",
-                                getString(R.string.sunset) + " " + HebcalPresentation.displayTime(hebcal.times.sunset)
-                            )
+                            displayCache.put("sunset", getString(R.string.sunset) + " " + HebcalPresentation.displayTime(hebcal.times.sunset))
 
                             textViewClock5suns.setOnClickListener {
                                 val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
@@ -535,13 +514,12 @@ class MainActivity : ComponentActivity() {
                                 alertDialog.show()
                             }
 
-                            editor.apply()
                             // textViewClock3.text = res
                         }
                     } else {
                         Log.w("myquietwave", "MainActivity fetchSunsZmanim Error: ${response.code()}")
                         // textViewClock3.text = "" // ""Not found " + response.code()
-                        res += " " + sharedPreferences.getString("sunrise", "") + " " + sharedPreferences.getString("sunset", "")
+                        res += " " + displayCache.get("sunrise") + " " + displayCache.get("sunset")
                         textViewClock5suns.text = res
                     }
                 }
@@ -549,22 +527,20 @@ class MainActivity : ComponentActivity() {
                 override fun onFailure(call: Call<HebCalZmanimModel>, t: Throwable) {
                     Log.w("myquietwave", "MainActivity fetchSunsZmanim unable to fetch hebCal $t", t)
                     // textViewClock3.text = "" // ""Failure. Not found " + t
-                    res += " " + sharedPreferences.getString("sunrise", "") + " " + sharedPreferences.getString("sunset", "")
+                    res += " " + displayCache.get("sunrise") + " " + displayCache.get("sunset")
                     textViewClock5suns.text = res
                 }
             })
         } catch (e: Exception) {
             Log.e("myquietwave", "MainActivity fetchSunsZmanim Exception $e", e)
             // textViewClock3.text = "" // ""Error. Not found " + e
-            res += " " + sharedPreferences.getString("sunrise", "") + " " + sharedPreferences.getString("sunset", "")
+            res += " " + displayCache.get("sunrise") + " " + displayCache.get("sunset")
             textViewClock5suns.text = res
             Firebase.crashlytics.log("MainActivity fetchSunsZmanim Exception")
             Firebase.crashlytics.recordException(e)
         }
     }
     fun fetchParasha() { // }: String {
-
-        val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
 
         textViewClockH = binding.textViewClockH
         textViewClockHS = binding.textViewClockHS
@@ -578,7 +554,6 @@ class MainActivity : ComponentActivity() {
 
                 override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
                     if (response.isSuccessful) {
-                        val editor = sharedPreferences.edit()
                         // val str = response.body()
                         // Log.i("myquietwave", "MainActivity fetchParasha " + str)
                         val hebcal = response.body()
@@ -676,8 +651,7 @@ class MainActivity : ComponentActivity() {
                                 spannableString.setSpan(UnderlineSpan(), " שבת ".length, fullText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                 textViewClock2.text = spannableString
 
-                                editor.putString("parashat", " שבת " + str)
-                                editor.apply()
+                                displayCache.put("parashat", " שבת " + str)
 
                                 textViewClock2.setOnClickListener {
                                     val browserIntent = Intent(
@@ -712,8 +686,7 @@ class MainActivity : ComponentActivity() {
                                 spannableStringH.setSpan(UnderlineSpan(), " הפטרה ".length, fullTextH.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                 textViewClockH.text = spannableStringH
 
-                                editor.putString("haftarah", " הפטרה " + hebName)
-                                editor.apply()
+                                displayCache.put("haftarah", " הפטרה " + hebName)
 
                                 val strH: String = it.leyning.haftarah.split(':')[0]
                                 textViewClockH.setOnClickListener {
@@ -732,8 +705,7 @@ class MainActivity : ComponentActivity() {
                                     spannableStringHS.setSpan(UnderlineSpan(), " הפטרה ספרדים ".length, fullTextHS.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                     textViewClockHS.text = spannableStringHS
 
-                                    editor.putString("haftarah_sephardic", " הפטרה ספרדים " + hebName)
-                                    editor.apply()
+                                    displayCache.put("haftarah_sephardic", " הפטרה ספרדים " + hebName)
 
                                     val strHS: String = sephardicHaftarah.split(':')[0]
                                     textViewClockHS.setOnClickListener {
@@ -765,31 +737,30 @@ class MainActivity : ComponentActivity() {
                     } else {
                         Log.w("myquietwave", "MainActivity fetchParasha Error: ${response.code()}")
                         textViewClock2.text = getParasha()
-                        textViewClockH.text = sharedPreferences.getString("haftarah", "")
-                        textViewClockHS.text = sharedPreferences.getString("haftarah_sephardic", "")
+                        textViewClockH.text = displayCache.get("haftarah")
+                        textViewClockHS.text = displayCache.get("haftarah_sephardic")
                     }
                 }
 
                 override fun onFailure(call: Call<HebCal>, t: Throwable) {
                     Log.w("myquietwave", "MainActivity fetchParasha unable to fetch hebCal $t", t)
                     textViewClock2.text = getParasha()
-                    textViewClockH.text = sharedPreferences.getString("haftarah", "")
-                    textViewClockHS.text = sharedPreferences.getString("haftarah_sephardic", "")
+                    textViewClockH.text = displayCache.get("haftarah")
+                    textViewClockHS.text = displayCache.get("haftarah_sephardic")
                 }
             })
         } catch (e: Exception) {
             Log.e("myquietwave", "MainActivity fetchParasha Exception $e", e)
             textViewClock2.text = getParasha()
-            textViewClockH.text = sharedPreferences.getString("haftarah", "")
-            textViewClockHS.text = sharedPreferences.getString("haftarah_sephardic", "")
+            textViewClockH.text = displayCache.get("haftarah")
+            textViewClockHS.text = displayCache.get("haftarah_sephardic")
             Firebase.crashlytics.log("MainActivity fetchParasha Exception")
             Firebase.crashlytics.recordException(e)
         }
     }
 
     fun getParasha(): String {
-        val sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE)
-        var res = sharedPreferences.getString("parashat", "").toString();
+        var res = displayCache.get("parashat")
         if (res == "") {
             res = " שבת פרשת " + Parshios.getParshaString(HebrewDate.today())
         }
@@ -832,6 +803,9 @@ class MainActivity : ComponentActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         settingsRepository = SettingsRepository(
+            getSharedPreferences(SettingsRepository.PREFERENCES_NAME, MODE_PRIVATE)
+        )
+        displayCache = SharedPreferencesDisplayCache(
             getSharedPreferences(SettingsRepository.PREFERENCES_NAME, MODE_PRIVATE)
         )
 

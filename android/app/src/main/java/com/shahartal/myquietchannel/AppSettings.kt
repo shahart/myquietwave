@@ -69,6 +69,21 @@ internal class SettingsRepository(
     }
 }
 
+internal interface DisplayCache {
+    fun get(key: String): String
+    fun put(key: String, value: String)
+}
+
+internal class SharedPreferencesDisplayCache(
+    private val preferences: SharedPreferences,
+) : DisplayCache {
+    override fun get(key: String): String = preferences.getString(key, "").orEmpty()
+
+    override fun put(key: String, value: String) {
+        preferences.edit().putString(key, value).apply()
+    }
+}
+
 internal interface SettingsDataSource {
     fun contains(key: String): Boolean
     fun getString(key: String, default: String): String?
