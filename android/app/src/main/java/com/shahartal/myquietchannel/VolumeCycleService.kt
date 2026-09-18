@@ -131,6 +131,12 @@ class VolumeCycleService : Service() {
         mediaPlayer?.start()
     }
 
+    private fun startStationIfNeeded(station: Station): Boolean {
+        if (isAudioPlaying() || mediaPlayer?.isPlaying == true) return false
+        startStation(station.streamUrl)
+        return true
+    }
+
     // @RequiresApi(Build.VERSION_CODES.O) // Unnecessary; SDK_INT is always >= 26
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         job?.cancel()
@@ -176,11 +182,7 @@ class VolumeCycleService : Service() {
             Log.i("myquietwave", "VolumeCycleService settings: Station ${station.displayName} NewsDuration $newsDuration currentHour ${now.hour}")
 
             if (radioPlayer) {
-                if (!isAudioPlaying()) {
-                    if (mediaPlayer?.isPlaying != true) {
-                        startStation(station.streamUrl)
-                    }
-                }
+                startStationIfNeeded(station)
                 updateNotification(text = null)
             }
             
@@ -204,11 +206,7 @@ class VolumeCycleService : Service() {
                     "VolumeCycleService started positive volume: $volume50 out of $maxVolume, news duration [minutes] $newsDuration, is near shabbath $isNearShabbat"
                 )
 
-                if (!isAudioPlaying()) {
-                    if (mediaPlayer?.isPlaying != true) {
-                        startStation(station.streamUrl)
-                    }
-                }
+                startStationIfNeeded(station)
 
                 audioManager.setStreamVolume(stream, volume50, 0)
 
@@ -259,17 +257,12 @@ class VolumeCycleService : Service() {
                 }
                 else {
 
-                    if (!isAudioPlaying()) {
-                        if (mediaPlayer?.isPlaying != true) {
-                            startStation(station.streamUrl)
-
-                            Firebase.analytics.logEvent("PlayingGlzNews") {
-                                param("currentHour", ZonedDateTime.now(ZoneId.systemDefault()).hour.toString())
-                            }
-                        }
-                    }
-                    else {
+                    if (isAudioPlaying()) {
                         Firebase.analytics.logEvent("PlayingNews") {
+                            param("currentHour", ZonedDateTime.now(ZoneId.systemDefault()).hour.toString())
+                        }
+                    } else if (startStationIfNeeded(station)) {
+                        Firebase.analytics.logEvent("PlayingGlzNews") {
                             param("currentHour", ZonedDateTime.now(ZoneId.systemDefault()).hour.toString())
                         }
                     }
