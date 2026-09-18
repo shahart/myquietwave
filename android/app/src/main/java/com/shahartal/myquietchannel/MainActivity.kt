@@ -234,6 +234,23 @@ class MainActivity : ComponentActivity() {
             .show()
     }
 
+    private fun buildServiceIntent(): Pair<Intent, Int> {
+        val newsDuration = normalizedNewsDuration()
+        if (textViewNextNews.text.toString().isEmpty()) {
+            textViewNextNews.text = NEXT_HOURS
+        }
+
+        val intent = Intent(this, VolumeCycleService::class.java).apply {
+            putExtra(VolumeCycleService.EXTRA_NEWS_DURATION, newsDuration)
+            putExtra(VolumeCycleService.EXTRA_NEXT_HOURS, textViewNextNews.text.toString())
+            putExtra(VolumeCycleService.EXTRA_STATION, stationsSpinner.selectedItem?.toString().orEmpty())
+            putExtra(VolumeCycleService.EXTRA_TODO_LIST, editTextTodo.text.toString())
+            putExtra(VolumeCycleService.EXTRA_LOCATION, editTextLocation.text.toString())
+            putExtra(VolumeCycleService.EXTRA_RADIO_PLAYER, radioPlayer.isChecked)
+        }
+        return intent to newsDuration
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -1069,7 +1086,7 @@ class MainActivity : ComponentActivity() {
 
         // Android 13+ needs to ask for notifications permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (!shouldShowRequestPermissionRationale(NOTIFICATION_PERMISSION_REQUEST_CODE.toString())) {
+            if (!shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
                 try {
                     Log.i("myquietwave", "request notifications permission")
                     ActivityCompat.requestPermissions(
@@ -1113,19 +1130,7 @@ class MainActivity : ComponentActivity() {
 
             } else {
 
-                val serviceIntent = Intent(this, VolumeCycleService::class.java)
-
-                val newsDuration = normalizedNewsDuration()
-                if (textViewNextNews.text.toString() == "") {
-                    textViewNextNews.text = NEXT_HOURS
-                }
-
-                serviceIntent.putExtra(VolumeCycleService.EXTRA_NEWS_DURATION, newsDuration)
-                serviceIntent.putExtra(VolumeCycleService.EXTRA_NEXT_HOURS, textViewNextNews.text.toString())
-                serviceIntent.putExtra(VolumeCycleService.EXTRA_STATION, stationsSpinner.getSelectedItem().toString())
-                serviceIntent.putExtra(VolumeCycleService.EXTRA_TODO_LIST, editTextTodo.text.toString())
-                serviceIntent.putExtra(VolumeCycleService.EXTRA_LOCATION, editTextLocation.text.toString())
-                serviceIntent.putExtra(VolumeCycleService.EXTRA_RADIO_PLAYER, radioPlayer.isChecked)
+                val (serviceIntent, newsDuration) = buildServiceIntent()
 
                 val selectedStation = Station.fromPersistedValue(stationsSpinner.selectedItem?.toString())
                 selectedStation.takeIf { it.songFeedName != null }?.let(::fetchGlglzSong)
