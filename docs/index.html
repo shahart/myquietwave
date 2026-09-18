@@ -5,515 +5,7 @@
     <meta name="description" content="Radio for Shabbat App">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio for Shabbat App 📻</title>
-    <style>
-        :root {
-            color-scheme: light;
-            --bg: #f5f0e7;
-            --bg-alt: #fffaf3;
-            --panel: rgba(255, 255, 255, 0.86);
-            --panel-strong: rgba(255, 255, 255, 0.96);
-            --border: rgba(77, 55, 32, 0.14);
-            --text: #23160f;
-            --muted: #6c5a49;
-            --accent: #b04b16;
-            --accent-2: #1c6a74;
-            --shadow: 0 18px 50px rgba(55, 35, 16, 0.12);
-            --shadow-soft: 0 10px 24px rgba(55, 35, 16, 0.08);
-            --radius-xl: 28px;
-            --radius-lg: 22px;
-            --radius-md: 16px;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            direction: rtl;
-            font-family: "Segoe UI", "Noto Sans Hebrew", "Arial Hebrew", sans-serif;
-            color: var(--text);
-            background:
-                radial-gradient(circle at top left, rgba(176, 75, 22, 0.16), transparent 24%),
-                radial-gradient(circle at top right, rgba(28, 106, 116, 0.14), transparent 28%),
-                linear-gradient(180deg, var(--bg) 0%, #f8f3ea 45%, #f0e8db 100%);
-        }
-
-        a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .page {
-            width: min(1120px, calc(100% - 32px));
-            margin: 0 auto;
-            padding: 24px 0 42px;
-        }
-
-        .hero {
-            display: grid;
-            gap: 18px;
-            padding: 24px;
-            border-radius: var(--radius-xl);
-            border: 1px solid var(--border);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 250, 244, 0.9));
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(8px);
-        }
-
-        .hero-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: rgba(176, 75, 22, 0.12);
-            color: var(--accent);
-            font-size: 0.88rem;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: clamp(2rem, 4vw, 3.25rem);
-            line-height: 1.02;
-        }
-
-        .lead {
-            margin: 0;
-            max-width: 74ch;
-            color: var(--muted);
-            font-size: 1.02rem;
-            line-height: 1.75;
-        }
-
-        .hero-meta {
-            display: grid;
-            gap: 10px;
-            min-width: min(100%, 280px);
-            padding: 16px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.78);
-            box-shadow: var(--shadow-soft);
-        }
-
-        .meta-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 16px;
-            align-items: center;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(77, 55, 32, 0.08);
-        }
-
-        .meta-row:last-child {
-            padding-bottom: 0;
-            border-bottom: 0;
-        }
-
-        .meta-label {
-            color: var(--muted);
-            font-size: 0.88rem;
-        }
-
-        .status {
-            font-weight: 700;
-            color: var(--accent-2);
-        }
-
-        .status:empty,
-        .timer:empty {
-            display: none;
-        }
-
-        .layout {
-            display: grid;
-            gap: 18px;
-            margin-top: 18px;
-        }
-
-        .grid {
-            display: grid;
-            gap: 18px;
-        }
-
-        @media (min-width: 900px) {
-            .grid.two-up {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .grid.three-up {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-        }
-
-        .card {
-            padding: 22px;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            background: var(--panel);
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(8px);
-        }
-
-        .card.strong {
-            background: linear-gradient(180deg, var(--panel-strong), rgba(255, 250, 244, 0.94));
-        }
-
-        .card h2,
-        .card h3 {
-            margin: 0 0 12px;
-            line-height: 1.15;
-        }
-
-        .card h2 {
-            font-size: 1.35rem;
-        }
-
-        .card h3 {
-            font-size: 1.08rem;
-        }
-
-        .section-note {
-            margin: 0;
-            color: var(--muted);
-            line-height: 1.7;
-        }
-
-        .radio-controls {
-            display: grid;
-            gap: 12px;
-        }
-
-        .radio-controls .actions {
-            flex-direction: column;
-        }
-
-        label.field-label {
-            display: inline-block;
-            margin-bottom: 8px;
-            color: var(--muted);
-            font-weight: 600;
-        }
-
-        select,
-        textarea,
-        input[type="text"] {
-            width: 100%;
-            border: 1px solid rgba(77, 55, 32, 0.18);
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.96);
-            color: var(--text);
-            font: inherit;
-            padding: 12px 14px;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
-        }
-
-        textarea {
-            min-height: 96px;
-            resize: vertical;
-        }
-
-        .actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        button {
-            appearance: none;
-            border: 0;
-            border-radius: 14px;
-            padding: 12px 16px;
-            font: inherit;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, opacity 160ms ease;
-        }
-
-        button:hover {
-            transform: translateY(-1px);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .disabled-button-explanation {
-            position: relative;
-            display: inline-block;
-        }
-
-        .disabled-button-explanation:focus {
-            outline: 2px solid var(--accent);
-            outline-offset: 3px;
-            border-radius: 14px;
-        }
-
-        .disabled-button-explanation button:disabled {
-            pointer-events: none;
-        }
-
-        .button-tooltip {
-            position: absolute;
-            z-index: 10;
-            bottom: calc(100% + 10px);
-            right: 50%;
-            width: max-content;
-            max-width: min(320px, calc(100vw - 40px));
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text);
-            background: var(--panel-strong);
-            box-shadow: var(--shadow);
-            font-size: 0.9rem;
-            line-height: 1.5;
-            text-align: right;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transform: translateX(50%) translateY(4px);
-            transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease;
-        }
-
-        .disabled-button-explanation:hover .button-tooltip:not(:empty),
-        .disabled-button-explanation:focus .button-tooltip:not(:empty) {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(50%) translateY(0);
-        }
-
-        .buttonRadio {
-            color: white;
-            background: linear-gradient(180deg, #5aa04a 0%, #447f39 100%);
-            box-shadow: 0 10px 22px rgba(68, 127, 57, 0.22);
-        }
-
-        .buttonSecondary {
-            color: var(--text);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(246, 239, 228, 0.96));
-            border: 1px solid rgba(77, 55, 32, 0.14);
-        }
-
-        .buttonIcon {
-            width: 44px;
-            height: 44px;
-            padding: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: rgba(28, 106, 116, 0.11);
-            color: var(--accent-2);
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        .stack {
-            display: grid;
-            gap: 14px;
-        }
-
-        .info-block {
-            padding: 16px;
-            border-radius: 18px;
-            border: 1px solid rgba(77, 55, 32, 0.12);
-            background: rgba(255, 255, 255, 0.78);
-        }
-
-        .info-block a {
-            word-break: break-word;
-        }
-
-        .muted {
-            color: var(--muted);
-        }
-
-        .mono-ltr {
-            direction: ltr;
-            unicode-bidi: plaintext;
-            word-break: break-word;
-        }
-
-        .image-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 14px;
-            align-items: center;
-        }
-
-        .image-card {
-            display: grid;
-            gap: 10px;
-            padding: 16px;
-            border-radius: 18px;
-            border: 1px solid rgba(77, 55, 32, 0.12);
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .image-card img {
-            display: block;
-            margin-inline: auto;
-        }
-
-        .location-row {
-            display: grid;
-            gap: 14px;
-        }
-
-        @media (min-width: 780px) {
-            .location-row {
-                grid-template-columns: 1fr auto;
-                align-items: end;
-            }
-
-            .radio-controls .actions {
-                flex-direction: row;
-            }
-
-            .radio-controls .actions button {
-                width: auto;
-            }
-        }
-
-        .footer-links {
-            display: grid;
-            gap: 12px;
-        }
-
-        .footer-links a {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            min-height: 48px;
-            padding: 0 14px;
-            border-radius: 14px;
-            border: 1px solid rgba(77, 55, 32, 0.14);
-            background: rgba(255, 255, 255, 0.84);
-            width: fit-content;
-            max-width: 100%;
-        }
-
-        .footer-links a span {
-            word-break: break-word;
-        }
-
-        .divider {
-            height: 1px;
-            margin: 4px 0;
-            background: rgba(77, 55, 32, 0.12);
-        }
-
-        #status,
-        #timer,
-        #foundLoc,
-        #clock,
-        #hdat,
-        #dat,
-        #parasha,
-        #parasha2,
-        #haftarah,
-        #lighting,
-        #havdala,
-        #sunrise,
-        #sunset,
-        #special,
-        #fast,
-        #roshchodesh,
-        #dafYomi {
-            line-height: 1.7;
-        }
-
-        #status,
-        #timer {
-            min-height: 1.5em;
-        }
-
-        #shabbathExists {
-            font-weight: 700;
-        }
-
-        .content-dialog {
-            width: min(720px, calc(100% - 24px));
-            max-height: min(80vh, 760px);
-            padding: 0;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            color: var(--text);
-            background: var(--panel-strong);
-            box-shadow: var(--shadow);
-        }
-
-        .content-dialog::backdrop {
-            background: rgba(35, 22, 15, 0.58);
-            backdrop-filter: blur(3px);
-        }
-
-        .dialog-header {
-            position: sticky;
-            top: 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 18px 20px;
-            border-bottom: 1px solid var(--border);
-            background: var(--panel-strong);
-        }
-
-        .dialog-header h2 {
-            margin: 0;
-            font-size: 1.25rem;
-        }
-
-        .dialog-content {
-            padding: 20px;
-            white-space: pre-wrap;
-            line-height: 1.8;
-        }
-
-        .dialog-footer {
-            padding: 0 20px 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <!-- Google tag (gtag.js) -->
@@ -561,8 +53,8 @@
                         </select>
                     </div>
                     <div class="actions">
-                        <button id="radioButton" class="buttonRadio" onClick="listenToNextNews()">שמע רק את החדשות</button>
-                        <button id="listenNowButton" class="buttonRadio" onClick="listenNow()">שמע כבר עכשיו וללא הפסקה</button>
+                        <button id="radioButton" class="buttonRadio" type="button">שמע רק את החדשות</button>
+                        <button id="listenNowButton" class="buttonRadio" type="button">שמע כבר עכשיו וללא הפסקה</button>
                     </div>
                 </div>
                 <br>
@@ -578,7 +70,7 @@
                 </div>
                 <div id="now-title"></div>
                 <div id="next-title"></div>
-                <button id="whatsNext" class="buttonRadio" onClick="whatsNext()" style="margin-top: 14px;">מה השיר הבא בגלגלצ ?</button>
+                <button id="whatsNext" class="buttonRadio" type="button" style="margin-top: 14px;">מה השיר הבא בגלגלצ ?</button>
             </article>
 
             <article class="card">
@@ -808,8 +300,8 @@
                         </select>
                     </div>
                     <div class="stack">
-                        <button class="buttonSecondary buttonIcon" onClick="getLoc()" aria-label="Use current location">📍</button>
-                        <button class="buttonRadio" onClick="calc()">Refresh</button>
+                        <button id="useCurrentLocationButton" class="buttonSecondary buttonIcon" type="button" aria-label="Use current location">📍</button>
+                        <button id="refreshButton" class="buttonRadio" type="button">Refresh</button>
                     </div>
                 </div>
                 <input type="text" id="otherLocation" value="IL-Jerusalem" name="otherLocation" style="display:none;">
@@ -832,8 +324,7 @@
                         <div style="margin-top: 12px;">
                             <span id="haftarahConnectionButtonWrapper" class="disabled-button-explanation"
                                 tabindex="0" aria-describedby="haftarahConnectionDisabledReason">
-                                <button id="haftarahConnectionButton" class="buttonSecondary" type="button"
-                                    onClick="showHaftarahConnection()" disabled>
+                                <button id="haftarahConnectionButton" class="buttonSecondary" type="button" disabled>
                                     על הקשר בין ההפטרה לפרשה
                                 </button>
                                 <span id="haftarahConnectionDisabledReason" class="button-tooltip" role="tooltip">
@@ -900,8 +391,8 @@
     <dialog id="haftarahConnectionDialog" class="content-dialog" aria-labelledby="haftarahConnectionTitle">
         <div class="dialog-header">
             <h2 id="haftarahConnectionTitle">על הקשר בין ההפטרה לפרשה</h2>
-            <button class="buttonSecondary buttonIcon" type="button"
-                onClick="closeHaftarahConnection()" aria-label="סגירה">✕</button>
+            <button id="closeHaftarahConnectionButton" class="buttonSecondary buttonIcon" type="button"
+                aria-label="סגירה">✕</button>
         </div>
         <div id="haftarahConnectionContent" class="dialog-content" aria-live="polite"></div>
         <div class="dialog-footer">
@@ -909,23 +400,11 @@
         </div>
     </dialog>
 
-    <script src="script.js"></script>
-    <script>
-        function fetchOnAir() {
-            var target = "http://glzxml.blob.core.windows.net/dalet/glglz-onair/onair.xml";
-            var proxy = "https://myquietwave.lat-shahar.workers.dev/?url=" + encodeURIComponent(target);
-            fetch(proxy, {signal: AbortSignal.timeout(8000)})
-                .then(function(response) {
-                    if (!response.ok) throw new Error("HTTP " + response.status);
-                    return response.text();
-                })
-                .then(function(xml) {
-                    alert(xml);
-                })
-                .catch(function(error) {
-                    alert("Error: " + error.message);
-                });
-        }
-    </script>
+    <script src="js/utils.js"></script>
+    <script src="js/haftarah.js"></script>
+    <script src="js/zmanim.js"></script>
+    <script src="js/date-time.js"></script>
+    <script src="js/radio.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>

@@ -1,253 +1,3 @@
-function saveInput(cname, cvalue) {
-    if (typeof (Storage) !== "undefined") {
-        // ~5M max
-        localStorage.setItem(cname, cvalue);
-    } 
-    else
-    {
-        // 4K
-        const d = new Date();
-        let expireInDays = 399;
-        d.setTime(d.getTime() + (expireInDays * 24 * 60 * 60 * 1000));
-        let expires = "expires=" + d.toUTCString();
-        var myCookieValue = cvalue;
-        document.cookie = cname + "=" + myCookieValue + ";" + expires + ";path=/";
-    }
-}
-
-function loadInput(cname) {
-    if (typeof (Storage) !== "undefined") {
-        let res = localStorage.getItem(cname);
-        return res || "";
-    } 
-    else 
-    {
-        let name = cname + "=";
-        let decodedCookie = document.cookie;
-        let ca = decodedCookie.split(';');
-        for (let c of ca) {
-            while (c.charAt(0) === ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) === 0) {
-                return c.substring(name.length, c.length).split('\\').join('\n');
-            }
-        }
-        return "";
-    }
-}
-
-function no2gim(input) {
-    const letters = ["ל\"","כ\"","י\"","ט","ח","ז","ו","ה","ד","ג","ב","א"];
-    const values = [30,20,10,9,8,7,6,5,4,3,2,1];
-    let output = "";
-    while (input > 0) {
-        for (let i = 0; i < letters.length; ++i) {
-            if (input == 16) {
-                return output + "ט\"ז";
-            }
-            if (input == 15) {
-                return output + "ט\"ו";
-            }
-            if (input >= values[i]) {
-                input -= values[i];
-                output += letters[i];
-                break;
-            }
-        }
-    }
-    if (output.endsWith("\""))
-        output = output.slice(0, -1);
-    return output;
-}
-
-function getYY(no) {
-    let input = no
-    const letters = ["ה'","ד'","ג'","ב'","א'","ת","ש","ר","ק","צ","פ","ע","ס","נ","מ","ל","כ","י","ט","ח","ז","ו","ה","ד","ג","ב","א"]
-    const values = [5000,4000,3000,2000,1000,400,300,200,100,90,80,70,60,50,40,30,20,10,9,8,7,6,5,4,3,2,1]
-    let output = "";
-    while (input > 0) {
-        for (let i = 0; i < letters.length; i++) {
-            if (input == 16) {
-                return output + "טז"
-            }
-            if (input == 15) {
-                return output + "טו"
-            }
-            if (input >= values[i]) {
-                input -= values[i]
-                output += letters[i]
-                break
-            }
-        }
-    }
-    return output
-}
-
-let hdateStr = (new Date).toLocaleString('he',{calendar:"hebrew"});
-let hdat = hdateStr.split(',')[0];
-let hebyy = parseInt(hdateStr.split(" ")[2]);
-hdat = hdat.substr(0, hdat.lastIndexOf(' '));
-document.getElementById('hdat').innerHTML = 'היום 📅 ' + no2gim(parseInt(hdat.split(' ')[0])) + ' ' + hdat.split(' ')[1] + ' ' + getYY(hebyy);
-
-function convertEng(hebrew) {
-    hebrew = hebrew.replace("Joshua", "יהושע");
-    hebrew = hebrew.replace("Judges", "שופטים");
-    hebrew = hebrew.replace("I Samuel", "שמואל א");
-    hebrew = hebrew.replace("II Samuel", "שמואל ב");
-    hebrew = hebrew.replace("I Kings", "מלכים א");
-    hebrew = hebrew.replace("II Kings", "מלכים ב");
-    hebrew = hebrew.replace("Isaiah", "ישעיהו");
-    hebrew = hebrew.replace("Jeremiah", "ירמיהו");
-    hebrew = hebrew.replace("Ezekiel", "יחזקאל");
-    hebrew = hebrew.replace("Hosea", "הושע");
-    hebrew = hebrew.replace("Joel", "יואל");
-    hebrew = hebrew.replace("Amos", "עמוס");
-    hebrew = hebrew.replace("Obadiah", "עובדיה")
-    hebrew = hebrew.replace("Jonah", "יונה");
-    hebrew = hebrew.replace("Micah", "מיכה");
-    hebrew = hebrew.replace("Nachum", "נחום");
-    hebrew = hebrew.replace("Habakkuk", "חבקוק");
-    hebrew = hebrew.replace("Zephaniah", "צפניה");
-    hebrew = hebrew.replace("Haggai", "חגי");
-    hebrew = hebrew.replace("Zechariah", "זכריה");
-    hebrew = hebrew.replace("Malachi", "מלאכי");
-    return hebrew;
-}
-
-function trim(n) {
-    if (n.startsWith('0')) return n.substring(1);
-    return n;
-}
-
-let haftarahConnectionUrl = "";
-const haftarahConnectionCache = new Map();
-
-function getKolKoreParashaUrl(parashaName) {
-    const parashaSlug = parashaName
-        .replace(/^פרשת\s+/, "")
-        .replace(/[\u0591-\u05BD\u05BF\u05C1-\u05C2\u05C4-\u05C5\u05C7]/g, "")
-        .replace(/[־‐\-‒–—―\s]+/g, "-")
-        .replace(/^-|-$/g, "");
-
-    return "https://kol-kore.org/" + encodeURIComponent("פרשות") + "/" +
-        encodeURIComponent("הפטרה-פרשת-" + parashaSlug) + "/";
-}
-
-async function fetchWithRetry(url, attempts = 2) {
-    let lastError;
-
-    for (let attempt = 0; attempt < attempts; attempt++) {
-        try {
-            const response = await fetch(url, { signal: AbortSignal.timeout(30000) });
-            if (response.ok) return response;
-
-            lastError = new Error("HTTP " + response.status);
-            if (response.status < 500) break;
-        } catch (error) {
-            lastError = error;
-        }
-    }
-
-    throw lastError;
-}
-
-function setHaftarahConnectionParasha(parashaName) {
-    haftarahConnectionUrl = getKolKoreParashaUrl(parashaName);
-    setHaftarahConnectionButtonState(true);
-}
-
-function setHaftarahConnectionButtonState(enabled, disabledReason = '') {
-    const button = document.getElementById('haftarahConnectionButton');
-    const wrapper = document.getElementById('haftarahConnectionButtonWrapper');
-    const tooltip = document.getElementById('haftarahConnectionDisabledReason');
-
-    button.disabled = !enabled;
-    tooltip.textContent = enabled ? '' : disabledReason;
-    if (enabled) {
-        wrapper.removeAttribute('tabindex');
-        wrapper.removeAttribute('aria-describedby');
-    } else {
-        wrapper.tabIndex = 0;
-        wrapper.setAttribute('aria-describedby', tooltip.id);
-    }
-}
-
-function extractHaftarahConnection(html) {
-    const page = new DOMParser().parseFromString(html, "text/html");
-    const heading = Array.from(page.querySelectorAll("h1, h2, h3, h4"))
-        .find(element => element.textContent.replace(/\s+/g, " ").trim() ===
-            "על הקשר בין ההפטרה לפרשה");
-    const content = heading && heading.closest(".row_four")?.querySelector(".content_right");
-
-    if (!content) {
-        throw new Error("The requested section was not found");
-    }
-
-    const textContent = content.cloneNode(true);
-    textContent.querySelectorAll("br").forEach(element => element.replaceWith("\n"));
-    textContent.querySelectorAll("p, li").forEach(element => element.append("\n\n"));
-
-    let text = textContent.textContent
-        .replace(/\u00a0/g, " ")
-        .replace(/[ \t]+\n/g, "\n")
-        .replace(/\n{3,}/g, "\n\n")
-        .trim();
-    const start = text.indexOf("נושאים בפרשה:");
-    if (start >= 0) {
-        text = text.substring(start);
-    }
-
-    return text;
-}
-
-function openHaftarahConnectionDialog() {
-    const dialog = document.getElementById('haftarahConnectionDialog');
-    if (typeof dialog.showModal === 'function') {
-        if (!dialog.open) dialog.showModal();
-    } else {
-        dialog.setAttribute('open', '');
-    }
-}
-
-function closeHaftarahConnection() {
-    const dialog = document.getElementById('haftarahConnectionDialog');
-    if (typeof dialog.close === 'function') {
-        dialog.close();
-    } else {
-        dialog.removeAttribute('open');
-    }
-}
-
-async function showHaftarahConnection() {
-    if (!haftarahConnectionUrl) return;
-
-    var targetUrl = haftarahConnectionUrl;
-    const button = document.getElementById('haftarahConnectionButton');
-    const content = document.getElementById('haftarahConnectionContent');
-    document.getElementById('haftarahConnectionSource').href = targetUrl;
-    content.textContent = 'טוען...';
-    button.disabled = true;
-    openHaftarahConnectionDialog();
-
-    try {
-        let text = haftarahConnectionCache.get(targetUrl);
-        if (!text) {
-            const proxyUrl = "https://myquietwave.lat-shahar.workers.dev/?url=" +
-                encodeURIComponent(targetUrl);
-            const response = await fetchWithRetry(proxyUrl);
-            text = extractHaftarahConnection(await response.text());
-            haftarahConnectionCache.set(targetUrl, text);
-        }
-        content.textContent = text;
-    } catch (error) {
-        console.error("Failed to fetch the haftarah connection", error);
-        content.textContent = 'לא הצלחנו לטעון את התוכן. אפשר לפתוח את המקור בקישור למטה.';
-    } finally {
-        if (haftarahConnectionUrl === targetUrl) button.disabled = false;
-    }
-}
-
 async function calc() {
     document.getElementById('havdala').innerHTML = '';
     document.getElementById('lighting').innerHTML = '';
@@ -259,7 +9,7 @@ async function calc() {
         saveInput("zmanim-location-other", document.getElementById('otherLocation').value.trim());
     }
 
-    var useElevationParam = "&ue=on"; 
+    var useElevationParam = "&ue=on";
     if (postfix.indexOf(",ue") >= 1 ) {
         useElevationParam = "&ue=off";
         postfix = postfix.replace(",ue", "");
@@ -338,7 +88,7 @@ async function calc() {
                       "chatzot - חצות היום: " + trim(data.times.chatzot.split('T')[1].substring(0,5)));
             }
             document.getElementById('sunset').onclick = function() {
-                //   
+                //
                 alert("mincha Gedola -  מנחה גדולה: " + trim(data.times.minchaGedola.split('T')[1].substring(0,5) )+ "\n" +
                       "mincha Ketana -  מנחה קטנה: " + trim(data.times.minchaKetana.split('T')[1].substring(0,5)) + "\n" +
                       "plag HaMincha -  פלג המנחה: " + trim(data.times.plagHaMincha.split('T')[1].substring(0,5)) + "\n" +
@@ -434,7 +184,7 @@ async function calc() {
                     else {
                         document.getElementById('lighting').innerHTML += "/ " + data.items[i].date.split('T')[1].substring(0,5);
                     }
-                } 
+                }
                 else if (data.items[i].category === 'roshchodesh') {
                     let parts = data.items[i].date.split('-');
                     let reverseYMD = parts[2] + "/" + parts[1] + "/" + parts[0];
@@ -450,9 +200,9 @@ async function calc() {
                     ttip += data.items[i].hebrew + ": " + data.items[i].memo + "\n\n";
                 }
                 else if (data.items[i].category === 'mevarchim') {
-                    document.getElementById('lightingM').innerHTML = 
-                        // document.getElementById('lighting').innerHTML + "<br>" + 
-                        data.items[i].hebrew + "<br> המולד: " + 
+                    document.getElementById('lightingM').innerHTML =
+                        // document.getElementById('lighting').innerHTML + "<br>" +
+                        data.items[i].hebrew + "<br> המולד: " +
                         data.items[i].memo.
                             substring(data.items[i].memo.indexOf(": ") + 2).
                             replace("chalakim", "חלקים").
@@ -471,7 +221,7 @@ async function calc() {
                     if (document.getElementById('fast').innerHTML.indexOf("ספירת העומר") < 0) {
                         document.getElementById('fast').innerHTML += " עלות השחר " + data.items[i].date.split('T')[1].substring(0,5) + "<br>";
                     }
-                } 
+                }
                 else if (data.items[i].title == 'Fast ends') {
                     document.getElementById('fast').innerHTML += " צאת הכוכבים " + data.items[i].date.split('T')[1].substring(0,5) + " <br><br> ";
                     fastDate = data.items[i].date.split('T')[0];
@@ -479,7 +229,7 @@ async function calc() {
                     if (today > fastDate) {
                         document.getElementById('fast').innerHTML = "";
                     }
-                } 
+                }
                 else if (data.items[i].category == 'holiday') {
                     fastDate = data.items[i].date;
                     let today = new Date().toISOString().split('T')[0];
@@ -499,7 +249,7 @@ async function calc() {
                         yomTovExists = true;
                         if (!yomTovName) yomTovName = data.items[i].hebrew;
                     }
-                } 
+                }
             }
             if (! shabbatExists) {
                 document.getElementById('shabbathExists').innerText = '';
@@ -520,7 +270,7 @@ async function calc() {
                 document.getElementById('special').onclick = function() {
                 }
             }
-                
+
         } catch (error) {
             setHaftarahConnectionButtonState(false, 'לא הצלחנו לטעון את נתוני השבת.');
             alert("Error fetching Shabbat data " + error);
@@ -549,7 +299,7 @@ async function calc() {
                     document.getElementById('fast').style.color = "blue";
                     document.getElementById('fast').onclick = function() {
                         window.open(resp3.items[i].link, "_blank");
-                    }   
+                    }
                 }
                 else if (resp3.items[i].category === 'holiday' && resp3.items[i].subcat === "minor" && resp3.items[i].title == "Leil Selichot") {
                     document.getElementById('fast').innerHTML = "ליל סליחות אשכנז/ ספרד" + " " + formattedDate;
@@ -564,7 +314,7 @@ async function calc() {
         } catch (error) {
             alert("Error fetching DafYomi data " + error);
         }
-    }    
+    }
     catch (error) {
         setHaftarahConnectionButtonState(false, 'לא הצלחנו לטעון את נתוני השבת.');
         alert("General error fetching data from " + url + " >> " + error);
@@ -575,8 +325,8 @@ function getLoc() {
     if (navigator.geolocation) {
         alert('הוסף ue, עבור do not use elevation בחישובים - כלומר שקיעה המישורית. אחרת, תוצג השקיעה הנראית');
         navigator.geolocation.getCurrentPosition(function(position) {
-            document.getElementById('otherLocation').value = 
-                position.coords.latitude.toFixed(2) + ", " + 
+            document.getElementById('otherLocation').value =
+                position.coords.latitude.toFixed(2) + ", " +
                 position.coords.longitude.toFixed(2);
             document.getElementById('otherLocation').style.display = 'block';
             document.getElementById('locationSelect').value = 'other';
@@ -587,251 +337,3 @@ function getLoc() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', (event) => {
-    const dropdown = document.getElementById('locationSelect');
-    const otherInput = document.getElementById('otherLocation');
-
-    dropdown.addEventListener('change', function() {
-        if (this.value === 'other') {
-            alert('הוסף ue, עבור do not use elevation בחישובים - כלומר שקיעה המישורית. אחרת, תוצג השקיעה הנראית');
-            otherInput.style.display = 'block';
-            otherInput.focus(); 
-        } else {
-            otherInput.style.display = 'none';
-            otherInput.value = '';
-        }
-    });  
-
-    document.getElementById("todo").addEventListener("focusout", function () {
-        saveInput("todo", document.getElementById('todo').value);
-    });
-
-    const haftarahDialog = document.getElementById('haftarahConnectionDialog');
-    haftarahDialog.addEventListener('click', function(event) {
-        if (event.target === haftarahDialog) closeHaftarahConnection();
-    });
-})
-
-let cookieInput = this.loadInput("zmanim-location");
-if (cookieInput !== "") {
-    document.getElementById('locationSelect').value = cookieInput;
-    if (cookieInput === 'other') {
-        document.getElementById('otherLocation').style.display = 'block';
-        document.getElementById('otherLocation').value = this.loadInput("zmanim-location-other");
-    }
-    else {
-        document.getElementById('otherLocation').style.display = 'none';
-        document.getElementById('otherLocation').value = '';
-    }
-}
-
-let todocookieInput = this.loadInput("todo");
-if (todocookieInput !== "") {
-    document.getElementById('todo').value = todocookieInput;
-}
-
-calc();
-    
-function updateClock() {
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
-    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    document.getElementById('clock').innerHTML = "🕰️ " + formattedTime + "<br>" +
-        Intl.DateTimeFormat().resolvedOptions().timeZone + "<br>offset (Hours) " + 
-        new Date().getTimezoneOffset() / -60;
-}
-
-updateClock();
-
-setInterval(updateClock, 500);
-
-let days = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת";
-let d = new Date();
-document.getElementById('dat').innerHTML = d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear()  + " - " + days.split(",")[d.getDay()];
-
-let myWindow;
-let countdownInterval;
-let nowPlayingInterval;
-let isRadioPending = false;
-
-function fetchOnAirXml(station) {
-  const target = "http://glzxml.blob.core.windows.net/dalet/" + station + "-onair/onair.xml";
-  const proxy = "https://myquietwave.lat-shahar.workers.dev/?url=" + encodeURIComponent(target);
-  return fetch(proxy, { signal: AbortSignal.timeout(8000) })
-    .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
-}
-
-function fetchAndShowNowPlaying(station, isNewWin) {
-  fetchOnAirXml(station)
-    .then(xml => {
-      const doc = new DOMParser().parseFromString(xml, "text/xml");
-      const title = doc.querySelector("Current > titleName");
-      const artist = doc.querySelector("Current > artistName");
-      const year = doc.querySelector("Current > year");
-      if (title) {
-        let msg = "🎵 " + (artist ? artist.textContent + " - " : "") + title.textContent + " " + (year ? year.textContent : "");
-          const ntitle = doc.querySelector("Next > titleName");
-          const nartist = doc.querySelector("Next > artistName");
-          const nyear = doc.querySelector("Next > year");
-          if (ntitle) {
-              const nmsg =  "השיר הבא: " + " " + (nartist ? nartist.textContent + " - " : "") + ntitle.textContent + " " + (nyear ? nyear.textContent : "");
-              if (isNewWin) {
-                  msg += "\n\n" + nmsg;
-              }
-              else {
-                  const nel = document.getElementById("next-title");
-                  nel.textContent = nmsg;
-              }
-          }
-        if (isNewWin) {
-            window.alert(msg);
-        }
-        else {
-            const el = document.getElementById("now-title");
-            el.textContent = msg;
-        }
-      }
-    })
-    .catch(() => {
-        console.error("failed");
-    });
-}
-
-function showGlglzNowPlaying() {
-  const url = document.getElementById("stationSelect").value;
-  let station = null;
-  if (url === "https://glzwizzlv.bynetcdn.com/glglz_mp3") station = "glglz";
-  else if (url === "https://glzwizzlv.bynetcdn.com/glz_mp3") station = "glz";
-  if (!station) return;
-  clearInterval(nowPlayingInterval);
-  fetchAndShowNowPlaying(station, false);
-  nowPlayingInterval = setInterval(() => fetchAndShowNowPlaying(station, false), 90000);
-}
-
-function stopNowPlaying() {
-  clearInterval(nowPlayingInterval);
-}
-
-function openWin() {
-  const url = document.getElementById("stationSelect").value;
-  myWindow = window.open(url, "_blank", "width=500,height=500");
-}
-
-function whatsNext() {
-    fetchAndShowNowPlaying("glglz", true);
-}
-
-function listenNow() {
-  isRadioPending = false;
-  if (myWindow && !myWindow.closed) {
-    alert("A window is already open. Close it first.");
-    return;
-  }
-  showGlglzNowPlaying();
-  openWin();
-  clearInterval(countdownInterval);
-  document.getElementById("status").textContent = "Playing";
-  document.getElementById("timer").textContent = "";
-  document.getElementById("listenNowButton").disabled = true;
-  document.getElementById("radioButton").disabled = true;
-  let checkInterval = setInterval(() => {
-    if (myWindow && myWindow.closed) {
-      stopNowPlaying();
-      document.getElementById("now-title").textContent = '';
-      document.getElementById("next-title").textContent = '';
-      document.getElementById("listenNowButton").disabled = false;
-      document.getElementById("radioButton").disabled = false;
-      document.getElementById("status").textContent = "";
-      document.getElementById("timer").textContent = "";
-      clearInterval(checkInterval);
-    }
-  }, 1000);
-}
-
-function sleep (time) {
-  return new Promise((resolve) => setTimeout(resolve, time));
-}
-
-function setCountdown(label, durationMs) {
-  const statusEl = document.getElementById("status");
-  const timerEl = document.getElementById("timer");
-  const endTime = Date.now() + durationMs;
-
-  clearInterval(countdownInterval);
-
-  function render() {
-    const remainingMs = Math.max(0, endTime - Date.now());
-    const totalSeconds = Math.floor(remainingMs / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    if (remainingMs >= 1000) {
-        statusEl.textContent = label;
-        timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}` + "  ";
-    }
-    else {
-        statusEl.textContent = "";
-        timerEl.textContent = "";
-    }
-
-    if (label === " החדשות יושתקו בעוד " && myWindow && myWindow.closed) {
-        statusEl.textContent = "";
-        timerEl.textContent = "";   
-        document.getElementById("radioButton").disabled = false;
-    }
-
-    if (remainingMs <= 0) {
-      clearInterval(countdownInterval);
-    }
-  }
-
-  render();
-  countdownInterval = setInterval(render, 1000);
-}
-
-function listenToNextNews() {
-  isRadioPending = true;
-  const now = new Date();
-  const minutes = now.getMinutes();
-  let msToNextHour = ((60 - minutes) * 60 - now.getSeconds()) * 1000;
-  document.getElementById("radioButton").disabled = true;
-  setCountdown(" החדשות יושמעו בעוד ", msToNextHour);
-  sleep(msToNextHour).then(() => {
-  if (!isRadioPending) {
-    document.getElementById("radioButton").disabled = false;
-    return;
-  }
-  // console.log(new Date() + " open");
-  if (myWindow && !myWindow.closed) {
-    alert("A window is already open. Close it first.");
-    document.getElementById("radioButton").disabled = false;
-    return;
-  }
-  // showGlglzNowPlaying();
-  openWin(); // Opens the window first to ensure we have a reference to it
-  isRadioPending = false;
-  if (myWindow) {
-    let newsLength = 4*60*1000; // 4 minutes in milliseconds
-    setCountdown(" החדשות יושתקו בעוד ", newsLength);
-    sleep(newsLength).then(() => {
-        // console.log(new Date() + " close");
-        myWindow.close(); // Closes the referenced window
-        stopNowPlaying();
-        document.getElementById("now-title").textContent = '';
-        document.getElementById("next-title").textContent = '';
-        document.getElementById("status").textContent = "Closed";
-        document.getElementById("timer").textContent = "";
-        document.getElementById("radioButton").disabled = false;
-    });
-  }
-  else {
-    console.error("Failed to open pop-up window");
-    window.alert("Failed to open pop-up window");
-    document.getElementById("status").textContent = "Failed to open pop-up window";
-    document.getElementById("timer").textContent = "";
-    document.getElementById("radioButton").disabled = false;
-  }
-  })
-
-}
