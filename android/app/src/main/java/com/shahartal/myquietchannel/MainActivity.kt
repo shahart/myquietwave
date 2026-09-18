@@ -50,7 +50,6 @@ import com.shahartal.myquietchannel.luach.HebrewDate
 import com.shahartal.myquietchannel.luach.Parshios
 import com.shahartal.myquietchannel.databinding.ActivityMainBinding
 import com.shahartal.myquietchannel.parasha.HebCal
-import com.shahartal.myquietchannel.parasha.HebCalZmanimModel
 import com.shahartal.myquietchannel.parasha.RetrofitInstance
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -437,67 +436,51 @@ class MainActivity : ComponentActivity() {
             res = " "
         }
 
-        try {
+        val query = try {
+            requireNotNull(LocationQueryParser.parse(loc))
+        } catch (error: Exception) {
+            Log.e("myquietwave", "MainActivity fetchZmanim invalid location", error)
+            textViewClock3.text = res + " " + displayCache.get("candles") + " " + displayCache.get("havdalah")
+            return
+        }
 
-            val query = requireNotNull(LocationQueryParser.parse(loc))
-            val call = hebcalRepository.shabbat(query)
-
-            call.enqueue(object : Callback<HebCal> {
-
-                override fun onResponse(call: Call<HebCal>, response: Response<HebCal>) {
-                    if (    response.isSuccessful) {
-
-                        val summary = HebcalPresentation.shabbat(response.body()?.items.orEmpty())
-                        if (summary.candleTimes.isNotEmpty()) {
-                            res = "\n${getString(R.string.candleLighting)} ${summary.candleTimes.joinToString(" ")}"
-                            if (summary.candleTimes.size > 1) res += "\n"
-                            displayCache.put("candles", getString(R.string.candleLighting) + " " + summary.candleTimes.last())
-                        }
-                        if (summary.havdalahTimes.isNotEmpty()) {
-                            resH = "\n${getString(R.string.havdalah)} ${summary.havdalahTimes.joinToString(" ")}"
-                            if (summary.havdalahTimes.size > 1) resH += "\n"
-                            displayCache.put("havdalah", getString(R.string.havdalah) + " " + summary.havdalahTimes.last())
-                        }
-                        summary.mevarchim?.let { mevarchim ->
-                            res += "\n${mevarchim.title} \nהמולד: ${mevarchim.molad}\n"
-                            textViewClock3.setOnClickListener { openUrl(mevarchim.wikiUrl) }
-                            val spannable = SpannableString(res + resH)
-                            val start = res.indexOf(mevarchim.title)
-                            if (start != -1) {
-                                spannable.setSpan(
-                                    UnderlineSpan(),
-                                    start,
-                                    start + mevarchim.title.length,
-                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                                )
-                            }
-                            textViewClock3.text = spannable
-                        } ?: run {
-                            textViewClock3.text = res + resH
-                        }
-                    }
-                    else {
-                        Log.w("myquietwave", "MainActivity fetchZmanim Error: ${response.code()}")
-                        // textViewClock3.text = "" // ""Not found " + response.code()
-                        res += " " + displayCache.get("candles") + " " + displayCache.get("havdalah")
-                        textViewClock3.text = res + resH
-                    }
+        lifecycleScope.launch {
+            try {
+                val hebcal = withContext(Dispatchers.IO) { hebcalRepository.shabbat(query) }
+                val summary = HebcalPresentation.shabbat(hebcal.items)
+                if (summary.candleTimes.isNotEmpty()) {
+                    res = "\n${getString(R.string.candleLighting)} ${summary.candleTimes.joinToString(" ")}"
+                    if (summary.candleTimes.size > 1) res += "\n"
+                    displayCache.put("candles", getString(R.string.candleLighting) + " " + summary.candleTimes.last())
                 }
-
-                override fun onFailure(call: Call<HebCal>, t: Throwable) {
-                    Log.w("myquietwave", "MainActivity fetchZmanim unable to fetch hebCal $t", t)
-                    // textViewClock3.text = "" // ""Failure. Not found " + t
-                    res += " " + displayCache.get("candles") + " " + displayCache.get("havdalah")
-                    textViewClock3.text = res
+                if (summary.havdalahTimes.isNotEmpty()) {
+                    resH = "\n${getString(R.string.havdalah)} ${summary.havdalahTimes.joinToString(" ")}"
+                    if (summary.havdalahTimes.size > 1) resH += "\n"
+                    displayCache.put("havdalah", getString(R.string.havdalah) + " " + summary.havdalahTimes.last())
                 }
-            })
-        } catch (e: Exception) {
-            Log.e("myquietwave", "MainActivity fetchZmanim Exception $e", e)
-            // textViewClock3.text = "" // ""Error. Not found " + e
-            res += " " + displayCache.get("candles") + " " + displayCache.get("havdalah")
-            textViewClock3.text = res
-            Firebase.crashlytics.log("MainActivity fetchZmanim Exception")
-            Firebase.crashlytics.recordException(e)
+                summary.mevarchim?.let { mevarchim ->
+                    res += "\n${mevarchim.title} \nהמולד: ${mevarchim.molad}\n"
+                    textViewClock3.setOnClickListener { openUrl(mevarchim.wikiUrl) }
+                    val spannable = SpannableString(res + resH)
+                    val start = res.indexOf(mevarchim.title)
+                    if (start != -1) {
+                        spannable.setSpan(
+                            UnderlineSpan(),
+                            start,
+                            start + mevarchim.title.length,
+                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                        )
+                    }
+                    textViewClock3.text = spannable
+                } ?: run {
+                    textViewClock3.text = res + resH
+                }
+            } catch (error: Exception) {
+                Log.w("myquietwave", "MainActivity fetchZmanim failed", error)
+                textViewClock3.text = res + " " + displayCache.get("candles") + " " + displayCache.get("havdalah")
+                Firebase.crashlytics.log("MainActivity fetchZmanim Exception")
+                Firebase.crashlytics.recordException(error)
+            }
         }
     }
 
@@ -520,22 +503,11 @@ class MainActivity : ComponentActivity() {
         textViewClock5suns = binding.textViewClock5suns
         textViewClock5locTitle = binding.textViewClock5locTitle
 
-        var res: String
-
-        res = " "
-
-        try {
-
-            val query = requireNotNull(LocationQueryParser.parse(loc))
-            val call = hebcalRepository.zmanim(query)
-
-            call.enqueue(object : Callback<HebCalZmanimModel> {
-
-                override fun onResponse(call: Call<HebCalZmanimModel>, response: Response<HebCalZmanimModel>) {
-                    if (response.isSuccessful) {
-
-                        val hebcal = response.body()
-                        if (hebcal != null) {
+        lifecycleScope.launch {
+            var res = " "
+            try {
+                val query = requireNotNull(LocationQueryParser.parse(loc))
+                val hebcal = withContext(Dispatchers.IO) { hebcalRepository.zmanim(query) }
                             res =
                                 "\n" + getString(R.string.sunrise) + " " + HebcalPresentation.displayTime(hebcal.times.sunrise)
                             displayCache.put("sunrise", getString(R.string.sunrise) + " " + HebcalPresentation.displayTime(hebcal.times.sunrise))
@@ -566,29 +538,13 @@ class MainActivity : ComponentActivity() {
                             }
 
                             // textViewClock3.text = res
-                        }
-                    } else {
-                        Log.w("myquietwave", "MainActivity fetchSunsZmanim Error: ${response.code()}")
-                        // textViewClock3.text = "" // ""Not found " + response.code()
-                        res += " " + displayCache.get("sunrise") + " " + displayCache.get("sunset")
-                        textViewClock5suns.text = res
-                    }
-                }
-
-                override fun onFailure(call: Call<HebCalZmanimModel>, t: Throwable) {
-                    Log.w("myquietwave", "MainActivity fetchSunsZmanim unable to fetch hebCal $t", t)
-                    // textViewClock3.text = "" // ""Failure. Not found " + t
-                    res += " " + displayCache.get("sunrise") + " " + displayCache.get("sunset")
-                    textViewClock5suns.text = res
-                }
-            })
-        } catch (e: Exception) {
-            Log.e("myquietwave", "MainActivity fetchSunsZmanim Exception $e", e)
-            // textViewClock3.text = "" // ""Error. Not found " + e
-            res += " " + displayCache.get("sunrise") + " " + displayCache.get("sunset")
-            textViewClock5suns.text = res
-            Firebase.crashlytics.log("MainActivity fetchSunsZmanim Exception")
-            Firebase.crashlytics.recordException(e)
+            } catch (e: Exception) {
+                Log.w("myquietwave", "MainActivity fetchSunsZmanim unable to fetch hebCal $e", e)
+                res += " " + displayCache.get("sunrise") + " " + displayCache.get("sunset")
+                textViewClock5suns.text = res
+                Firebase.crashlytics.log("MainActivity fetchSunsZmanim Exception")
+                Firebase.crashlytics.recordException(e)
+            }
         }
     }
     fun fetchParasha() { // }: String {

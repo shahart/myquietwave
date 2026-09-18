@@ -82,7 +82,7 @@ class HebcalApiTest {
     }
 
     @Test
-    fun repositoryRoutesGeoNameQueriesToMatchingEndpoints() {
+    fun repositoryRoutesGeoNameQueriesToMatchingEndpoints() = runBlocking {
         server.enqueue(jsonResponse("""{"title":"","date":"","items":[]}"""))
         server.enqueue(jsonResponse("""{"date":"","location":{},"times":{}}"""))
         val repository = NetworkHebcalRepository(
@@ -90,8 +90,8 @@ class HebcalApiTest {
         )
         val query = LocationQuery.GeoName("293222", useElevation = false)
 
-        repository.shabbat(query).execute()
-        repository.zmanim(query).execute()
+        repository.shabbat(query)
+        repository.zmanim(query)
 
         assertEquals("/shabbat?cfg=json&geonameid=293222&ue=off", server.takeRequest().path)
         assertEquals("/zmanim?cfg=json&geonameid=293222&ue=off", server.takeRequest().path)

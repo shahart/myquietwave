@@ -9,7 +9,7 @@ internal interface HebcalRepository {
     suspend fun dailyLearning(isoDate: String): HebCal
     fun parasha(): Call<HebCal>
     suspend fun shabbat(query: LocationQuery): HebCal
-    fun zmanim(query: LocationQuery): Call<HebCalZmanimModel>
+    suspend fun zmanim(query: LocationQuery): HebCalZmanimModel
 }
 
 internal class NetworkHebcalRepository(
@@ -29,7 +29,7 @@ internal class NetworkHebcalRepository(
         return call.executeBody()
     }
 
-    override fun zmanim(query: LocationQuery): Call<HebCalZmanimModel> {
+    override suspend fun zmanim(query: LocationQuery): HebCalZmanimModel {
         val ue = LocationQueryParser.ue(query)
         return when (query) {
             is LocationQuery.City -> api.getZmanimPerCity(query.name, ue)

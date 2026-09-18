@@ -136,17 +136,9 @@ class ShabbathApiUnitTest {
     fun fetchYomZmanim(): String {
         var res = ""
         val city = "IL-Jerusalem"
-        val response =
-            RetrofitInstance.api.getZmanimPerCity(Utils.getCity(city), Utils.getUe(city)).execute()
-        if (/*! */response.isSuccessful) {
-            val hebcal = response.body()
-            if (hebcal != null) {
-                res = hebcal.times.sunrise + ", " + hebcal.times.chatzot + ", " + hebcal.times.sunset
-            }
-        }
-        else {
-            fail(response.toString() + response.body())
-        }
+        val hebcal =
+            runBlocking { RetrofitInstance.api.getZmanimPerCity(Utils.getCity(city), Utils.getUe(city)) }
+        res = hebcal.times.sunrise + ", " + hebcal.times.chatzot + ", " + hebcal.times.sunset
         return res
     }
 
@@ -155,17 +147,9 @@ class ShabbathApiUnitTest {
         requireLiveTests()
         var res = ""
         val city = "IL-Jerusalem"
-        val response =
-            RetrofitInstance.api.getZmanimByLoc("32", "35", "off").execute()
-        if (response.isSuccessful) {
-            val hebcal = response.body()
-            if (hebcal != null) {
-                res = hebcal.times.sunrise + ", " + hebcal.times.chatzot + ", " + hebcal.times.sunset
-            }
-        }
-        else {
-            fail(response.toString() + response.body())
-        }
+        val hebcal =
+            runBlocking { RetrofitInstance.api.getZmanimByLoc("32", "35", "off") }
+        res = hebcal.times.sunrise + ", " + hebcal.times.chatzot + ", " + hebcal.times.sunset
     }
 
     @Test
