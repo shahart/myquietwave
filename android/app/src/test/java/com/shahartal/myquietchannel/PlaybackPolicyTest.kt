@@ -48,6 +48,12 @@ class PlaybackPolicyTest {
     }
 
     @Test
+    fun shabbatVolumeLimitHandlesSmallAndTypicalStreams() {
+        assertEquals(1, PlaybackPolicy.shabbatVolumeLimit(1))
+        assertEquals(7, PlaybackPolicy.shabbatVolumeLimit(15))
+    }
+
+    @Test
     fun playbackConfigNormalizesRawServiceInput() {
         val config = PlaybackConfig.fromRawValues(
             station = "כאן 88",

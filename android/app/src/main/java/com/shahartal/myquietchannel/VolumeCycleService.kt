@@ -129,15 +129,13 @@ class VolumeCycleService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         job?.cancel()
         job = serviceScope.launch {
-
-            val maxPercentage = 50
-
             val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
             val stream = AudioManager.STREAM_MUSIC
 
             origVolume = audioManager.getStreamVolume(stream)
 
             val maxVolume = audioManager.getStreamMaxVolume(stream) // usually 15
+            val shabbatVolumeLimit = PlaybackPolicy.shabbatVolumeLimit(maxVolume)
             Log.i("myquietwave", "VolumeCycleService init volume $origVolume out of $maxVolume")
 
             var stationValue: String? = Station.GLGLZ.displayName
@@ -187,7 +185,7 @@ class VolumeCycleService : Service() {
                 }
 
                 var volume50 = configuredVolume //  (maxVolume * volume / 100).coerceAtLeast(1)
-                if (isNearShabbat && volume50 > (maxVolume * maxPercentage / 100).coerceAtLeast(1) + 1) { // 0..15
+                if (isNearShabbat && volume50 > shabbatVolumeLimit + 1) { // 0..15
                     volume50 = PlaybackPolicy.limitVolume(volume50, maxVolume, isNearShabbat = true) + 1
                     Log.w("myquietwave", "VolumeCycleService Volume crossed threshold")
                 }
@@ -225,16 +223,14 @@ class VolumeCycleService : Service() {
                         delay(500)
 
                         if (!isAudioPlaying()) {
-                            // getSystemService(NotificationManager::class.java).cancel(1)
-                            // break
                             updateNotification(getString(R.string.notif_text_radio_stopped))
 
                             // break
                         }
 
                         var currVolume = audioManager.getStreamVolume(stream)
-                        if (isNearShabbat && currVolume > (maxVolume * maxPercentage / 100).coerceAtLeast(1)) { // 0..15
-                            currVolume = (maxVolume * maxPercentage / 100).coerceAtLeast(1)
+                        if (isNearShabbat && currVolume > shabbatVolumeLimit) { // 0..15
+                            currVolume = shabbatVolumeLimit
                             Log.d("myquietwave", "VolumeCycleService Limit the max volume")
                             audioManager.setStreamVolume(stream, currVolume, 0)
                         }
@@ -249,7 +245,6 @@ class VolumeCycleService : Service() {
                     updateNotification(getString(R.string.notif_text_1))
 
                     if (!isAudioPlaying()) {
-                        // getSystemService(NotificationManager::class.java).cancel(1)
                         updateNotification(getString(R.string.notif_text_radio_stopped))
                     }
 
