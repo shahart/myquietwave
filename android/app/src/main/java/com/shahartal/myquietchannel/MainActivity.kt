@@ -97,9 +97,6 @@ internal fun parseGlglzSongs(xml: String): GlglzSongs? {
 
 class MainActivity : ComponentActivity() {
 
-    val hebrewDays = arrayOf("א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ", "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל")
-    val hebrewMonths = arrayOf("תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול")
-
     companion object {
         const val NEXT_HOURS = NewsSchedule.DEFAULT_TEXT
     }
@@ -515,23 +512,9 @@ class MainActivity : ComponentActivity() {
                                 val hebrewCalendar = HebrewCalendar()
                                 hebrewCalendar.add(Calendar.HOUR_OF_DAY, 12)
                                 val hebY = hebrewCalendar.get(HebrewCalendar.YEAR)
-                                val hebrewYear = Utils.getYY(hebY)
                                 val hebrewMonth = hebrewCalendar.get(HebrewCalendar.MONTH)
                                 val hebrewDay = hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH) // switches at midnight by-design
-                                var hebrewMonthName = hebrewMonths[hebrewMonth]
-
-                                //return (year * 12 + 17) % 19 >= 12;
-                                val x: Int = (hebY * 12 + 17) % 19 // HebrewCalendar.YEARS_IN_CYCLE
-                                val isLeapYear = x >= (if (x < 0) -7 else 12)
-
-                                if (isLeapYear) {
-                                    if (hebrewMonth == 5)
-                                        hebrewMonthName = "אדר א"
-                                    else if (hebrewMonth == 6)
-                                        hebrewMonthName = "אדר ב"
-                                }
-                                val hebrewDayName = hebrewDays[hebrewDay-1]
-                                textViewHebDate.text = " הערב אור ל- $hebrewDayName $hebrewMonthName $hebrewYear"
+                                textViewHebDate.text = " הערב אור ל- ${HebrewDateDisplay.format(hebY, hebrewMonth, hebrewDay)}"
                             }
 
                             textViewClock5locTitle.text = hebcal.location.title
@@ -1082,23 +1065,9 @@ class MainActivity : ComponentActivity() {
 
         val hebrewCalendar = HebrewCalendar()
         val hebY = hebrewCalendar.get(HebrewCalendar.YEAR)
-        val hebrewYear = Utils.getYY(hebY)
         val hebrewMonth = hebrewCalendar.get(HebrewCalendar.MONTH)
         val hebrewDay = hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH) // switches at midnight by-design
-        var hebrewMonthName = hebrewMonths[hebrewMonth]
-
-        //return (year * 12 + 17) % 19 >= 12;
-        val x: Int = (hebY * 12 + 17) % 19 // HebrewCalendar.YEARS_IN_CYCLE
-        val isLeapYear = x >= (if (x < 0) -7 else 12)
-
-        if (isLeapYear) {
-            if (hebrewMonth == 5)
-                hebrewMonthName = "אדר א"
-            else if (hebrewMonth == 6)
-                hebrewMonthName = "אדר ב"
-        }
-        val hebrewDayName = hebrewDays[hebrewDay-1]
-        textViewHebDate.text = "$hebrewDayName $hebrewMonthName $hebrewYear"
+        textViewHebDate.text = HebrewDateDisplay.format(hebY, hebrewMonth, hebrewDay)
 
         lifecycleScope.launch {
             while (true) {
