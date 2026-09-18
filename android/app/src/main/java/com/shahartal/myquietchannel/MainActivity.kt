@@ -28,6 +28,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.CheckBox
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 //import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -38,6 +39,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.firebase.Firebase
@@ -1273,7 +1275,14 @@ class MainActivity : ComponentActivity() {
     }
 
     private lateinit var appUpdateManager: AppUpdateManager
-    private val RC_APP_UPDATE = 100 // Request code for the update flow
+    private val appUpdateLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult(),
+    ) { result ->
+        if (result.resultCode != RESULT_OK) {
+            Log.e("myquietwave", "Update flow failed! Result code: ${result.resultCode}")
+            Firebase.crashlytics.log("ERROR. Update flow failed. Result code: ${result.resultCode}")
+        }
+    }
 
     private fun checkForAppUpdate() {
         appUpdateManager = AppUpdateManagerFactory.create(this)
@@ -1295,9 +1304,8 @@ class MainActivity : ComponentActivity() {
     private fun startUpdateFlow(appUpdateInfo: AppUpdateInfo) {
         appUpdateManager.startUpdateFlowForResult(
             appUpdateInfo,
-            AppUpdateType.IMMEDIATE, // Change to AppUpdateType.FLEXIBLE for flexible updates
-            this,
-            RC_APP_UPDATE
+            appUpdateLauncher,
+            AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
         )
     }
 
@@ -1321,13 +1329,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_APP_UPDATE) { //
-            if (resultCode != RESULT_OK) {
-                Log.e("myquietwave", "Update flow failed! Result code: $resultCode")
-                Firebase.crashlytics.log("ERROR. Update flow failed. Result code: " + resultCode.toString())
-            }
-        }
-    }
 }
