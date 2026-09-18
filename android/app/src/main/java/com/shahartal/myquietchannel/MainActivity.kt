@@ -13,7 +13,6 @@ import android.icu.util.HebrewCalendar
 import android.location.Location
 import android.location.LocationManager
 import android.media.AudioManager
-import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.text.SpannableString
@@ -117,8 +116,6 @@ class MainActivity : ComponentActivity() {
     private lateinit var peekSongsButton: Button
 
     // private lateinit var powerButton: Button
-
-    private var mediaPlayer: MediaPlayer? = null
 
     private lateinit var editTextNumberNewsDuration: TextView
     private lateinit var textViewNextNews: TextView
@@ -342,9 +339,6 @@ class MainActivity : ComponentActivity() {
         updateServiceUi()
 
         getSystemService(NotificationManager::class.java).cancel(VolumeCycleService.NOTIFICATION_ID)
-        if (mediaPlayer?.isPlaying == true)
-            stationsSpinner.setEnabled(false)
-
         try {
             refreshCurrentSongIfNeeded()
         } catch (e: Exception) {
@@ -1135,9 +1129,6 @@ class MainActivity : ComponentActivity() {
 
         toggleButton.setOnClickListener {
             // Log.d("myquietwave", "MainActivity isServiceRunning: " + isServiceRunning)
-
-            if (mediaPlayer?.isPlaying == true)
-                mediaPlayer?.stop()
 
             if (isServiceRunning) {
 
