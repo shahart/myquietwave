@@ -3,8 +3,8 @@ package com.shahartal.myquietchannel
 import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.os.SystemClock
 import android.widget.TextView
+import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.clearText
@@ -25,7 +25,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
 import androidx.test.espresso.matcher.ViewMatchers.Visibility
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.containsString
@@ -45,8 +44,7 @@ class DialogInstrumentedTest {
     val runtimePermissionRule: GrantPermissionRule =
         GrantPermissionRule.grant(Manifest.permission.POST_NOTIFICATIONS)
 
-    @get:Rule
-    val activityRule = ActivityTestRule(MainActivity::class.java, true, false)
+    private lateinit var scenario: ActivityScenario<MainActivity>
 
     private val targetContext: Context
         get() = InstrumentationRegistry.getInstrumentation().targetContext
@@ -65,6 +63,7 @@ class DialogInstrumentedTest {
 
     @After
     fun stopService() {
+        if (::scenario.isInitialized) scenario.close()
         targetContext.stopService(Intent(targetContext, VolumeCycleService::class.java))
         VolumeCycleService.isRunning = false
     }
@@ -125,7 +124,7 @@ class DialogInstrumentedTest {
             .perform(scrollTo(), click())
         onView(withId(R.id.editTextDuration))
             .perform(scrollTo())
-            .check(matches(withText(VolumeCycleService.max_news_duration.toString())))
+            .check(matches(withText(VolumeCycleService.MAX_NEWS_DURATION.toString())))
 
         onView(withId(R.id.editTextDuration))
             .perform(scrollTo(), click(), replaceText("0"), closeSoftKeyboard())
@@ -152,10 +151,10 @@ class DialogInstrumentedTest {
 
         onView(withId(R.id.editTextStationSpinner))
             .perform(scrollTo(), click())
-        onData(allOf(instanceOf(String::class.java), `is`("FM102")))
+        onData(allOf(instanceOf(String::class.java), `is`("כאן 88")))
             .perform(click())
         onView(withId(R.id.editTextStationSpinner))
-            .check(matches(withSpinnerText("FM102")))
+            .check(matches(withSpinnerText("כאן 88")))
 
         onView(withId(R.id.editTextLocationSpinner))
             .perform(scrollTo(), click())
@@ -171,7 +170,7 @@ class DialogInstrumentedTest {
     fun songPeekButtonOnlyAppearsForGlglz() {
         launchActivity()
 
-        selectStation("FM102")
+        selectStation("כאן 88")
         onView(withId(R.id.peekSongsButton))
             .check(matches(withEffectiveVisibility(Visibility.GONE)))
 
@@ -180,12 +179,12 @@ class DialogInstrumentedTest {
             .perform(scrollTo())
             .check(matches(isDisplayed()))
 
-        activityRule.activity.runOnUiThread {
-            activityRule.activity.findViewById<TextView>(R.id.textViewCurrentSong).text = "Current song"
-            activityRule.activity.findViewById<TextView>(R.id.textViewNextSong).text = "Next song"
+        scenario.onActivity { activity ->
+            activity.findViewById<TextView>(R.id.textViewCurrentSong).text = "Current song"
+            activity.findViewById<TextView>(R.id.textViewNextSong).text = "Next song"
         }
 
-        selectStation("FM102")
+        selectStation("כאן 88")
         onView(withId(R.id.peekSongsButton))
             .check(matches(withEffectiveVisibility(Visibility.GONE)))
         onView(withId(R.id.textViewCurrentSong))
@@ -198,7 +197,7 @@ class DialogInstrumentedTest {
     fun startButtonShowsVolumeSetupDialogAndUpdatesServiceControls() {
         launchActivity()
 
-        selectStation("FM102")
+        selectStation("כאן 88")
 
         onView(withId(R.id.toggleButton))
             .perform(click())
@@ -224,9 +223,8 @@ class DialogInstrumentedTest {
     }
 
     private fun launchActivity() {
-        activityRule.launchActivity(Intent())
+        scenario = ActivityScenario.launch(Intent(targetContext, MainActivity::class.java))
         InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        SystemClock.sleep(300)
     }
 
     private fun selectStation(station: String) {

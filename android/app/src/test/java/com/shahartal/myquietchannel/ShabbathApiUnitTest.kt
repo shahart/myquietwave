@@ -5,6 +5,7 @@ import com.shahartal.myquietchannel.parasha.RetrofitInstance
 import org.junit.Test
 
 import org.junit.Assert.*
+import org.junit.Assume.assumeTrue
 //import retrofit2.Call
 //import retrofit2.Callback
 //import retrofit2.Response
@@ -50,6 +51,7 @@ class ShabbathApiUnitTest {
 
     @Test
     fun fetchParasha_works() {
+        requireLiveTests()
         val res = fetchParasha()
         assertTrue("res: '$res'", res.contains("פרשת"))
     }
@@ -108,6 +110,7 @@ class ShabbathApiUnitTest {
 
     @Test
     fun fetchZmanim_works() {
+        requireLiveTests()
         val res = fetchZmanim()
         assertTrue("res: '$res'", res.contains("+"))
     }
@@ -132,6 +135,7 @@ class ShabbathApiUnitTest {
 
     @Test
     fun fetchDafYomi_works() {
+        requireLiveTests()
         val res = fetchDafYomi()
         assertTrue("res: '$res'", res.contains("דף"))
     }
@@ -155,6 +159,7 @@ class ShabbathApiUnitTest {
 
     @Test
     fun fetchYomZmanimLoc() {
+        requireLiveTests()
         var res = ""
         val city = "IL-Jerusalem"
         val response =
@@ -172,6 +177,7 @@ class ShabbathApiUnitTest {
 
     @Test
     fun fetchYomZmanim_works() {
+        requireLiveTests()
         val res = fetchYomZmanim()
         assertTrue("res: '$res'", res.contains(", "))
     }
@@ -216,5 +222,12 @@ class ShabbathApiUnitTest {
         assertEquals("IL-Modiin Ilit", Utils.convertFromLocationIL("IL-מודיעין עילית"))
         assertEquals("IL-Betar Ilit", Utils.convertFromLocationIL("IL-ביתר עילית"))
         assertEquals("IL-Zefat", Utils.convertFromLocationIL("IL-צפת"))
+    }
+
+    private fun requireLiveTests() {
+        assumeTrue(
+            "Set RUN_LIVE_TESTS=true to call Hebcal",
+            System.getenv("RUN_LIVE_TESTS")?.equals("true", ignoreCase = true) == true,
+        )
     }
 }

@@ -64,5 +64,7 @@
     <!--    <string name="notif_text_6">Playing the current news</string>-->
 
     <string name="station">Station par défaut</string>
+    <string name="radioPlayer">Ignorer le champ \'Prochain journal\'\n      Écouter la radio en continu</string>
+    <string name="instructions2">Vous pouvez aussi écouter la radio maintenant</string>
 
 </resources>

@@ -63,5 +63,7 @@
     <string name="ue_usage">Añade ,ue para no usar elevación en los cálculos</string>
 
     <string name="station">Estación predeterminada</string>
+    <string name="radioPlayer">Ignorar el campo \'Próximas noticias\'\n      Reproducir la radio continuamente</string>
+    <string name="instructions2">También puedes reproducir la radio ahora</string>
 
 </resources>

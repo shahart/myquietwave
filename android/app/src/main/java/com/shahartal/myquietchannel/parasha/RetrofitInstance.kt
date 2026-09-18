@@ -8,20 +8,18 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 
 object RetrofitInstance {
 
-    private val retrofit by lazy {
-
+    internal fun createApi(baseUrl: String): JsonHebCalShabbatApi {
         val gson = GsonBuilder()
             .setStrictness(Strictness.LENIENT)
             .create()
 
-        Retrofit.Builder()
-            .baseUrl("https://www.hebcal.com/")
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addConverterFactory(ScalarsConverterFactory.create()) // fallback
             .build()
+            .create(JsonHebCalShabbatApi::class.java)
     }
 
-    val api: JsonHebCalShabbatApi by lazy {
-        retrofit.create(JsonHebCalShabbatApi::class.java)
-    }
+    val api: JsonHebCalShabbatApi by lazy { createApi("https://www.hebcal.com/") }
 }

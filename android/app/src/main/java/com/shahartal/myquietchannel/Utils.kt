@@ -10,44 +10,26 @@ import kotlin.math.roundToInt
 
 object Utils {
     
-    val GLZ = "https://glzwizzlv.bynetcdn.com/glz_mp3"
-    val GLGLZ = "https://glzwizzlv.bynetcdn.com/glglz_mp3"
+    val GLZ = Station.GLZ.streamUrl
+    val GLGLZ = Station.GLGLZ.streamUrl
 
-    val GIMMEL = "https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_GIMMEL.mp3"
-    val BET = "https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_BET.mp3"
+    val GIMMEL = Station.GIMMEL.streamUrl
+    val BET = Station.BET.streamUrl
 
-    val FM102 = "https://cdn88.mediacast.co.il/102fm-tlv/102fm_mp3/icecast.audio"
-    val GALEY_ISRL = "https://cdn.cybercdn.live/Galei_Israel/Live/icecast.audio"
+    val FM102 = Station.FM102.streamUrl
+    val GALEY_ISRL = Station.GALEY_ISRAEL.streamUrl
 
-    val KAN_88 = "https://27863.live.streamtheworld.com/KAN_88.mp3"
-    val KOL_BARAMA = "https://cdn.cybercdn.live/Kol_Barama/Live_Audio/icecast.audio"
-    val KOL_CHAI = "https://live.kcm.fm/live-new"
-    val KOL_CHAI_MUSIC = "https://live.kcm.fm/livemusic"
+    val KAN_88 = Station.KAN_88.streamUrl
+    val KOL_BARAMA = Station.KOL_BARAMA.streamUrl
+    val KOL_CHAI = Station.KOL_CHAI.streamUrl
+    val KOL_CHAI_MUSIC = Station.KOL_CHAI_MUSIC.streamUrl
 
-    val MORESHET = "https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_MORESHET.mp3"
+    val MORESHET = Station.MORESHET.streamUrl
 
     // val N12news = "http://ff_engine.streamgates.net/Ch10News.mp3"
     
-    fun getStationUrl(url: String?): String {
-        if (url == null) return GLGLZ
-        
-        if (url == "גלגלצ") return GLGLZ
-        if (url == "גלי צהל") return GLZ
-
-        if (url == "רשת ב") return BET
-        if (url == "רשת ג") return GIMMEL
-
-        if (url == "FM102") return FM102
-        if (url == "גלי ישראל") return GALEY_ISRL
-        if (url == "כאן 88") return KAN_88
-        if (url == "קול חי") return KOL_CHAI
-        if (url == "קול חי מיוזיק") return KOL_CHAI_MUSIC
-        if (url == "קול ברמה") return KOL_BARAMA
-
-        if (url == "כאן מורשת") return MORESHET
-
-        return GLGLZ
-    }
+    fun getStationUrl(url: String?): String =
+        Station.fromStreamUrl(url)?.streamUrl ?: Station.fromPersistedValue(url).streamUrl
 
     fun switchDate(date: String): String {
         try {
@@ -64,8 +46,7 @@ object Utils {
         }
     }
 
-    fun isBefore(date: String): Boolean {
-        val today = LocalDate.now()
+    fun isBefore(date: String, today: LocalDate = LocalDate.now()): Boolean {
         try {
             if (today <= LocalDate.parse(
                     date,
@@ -113,7 +94,7 @@ object Utils {
         val values = arrayOf(5000,4000,3000,2000,1000,400,300,200,100,90,80,70,60,50,40,30,20,10,9,8,7,6,5,4,3,2,1)
         var output = "";
         while (input > 0) {
-            for (i in 0..letters.size) {
+            for (i in letters.indices) {
                 if (input == 16) {
                     return output + "טז"
                 }
@@ -130,86 +111,8 @@ object Utils {
         return output
     }
 
-    fun convertLocationIL(loc: String): String {
-        if (loc.startsWith("IL-Jerusalem")) return "IL-ירושלים";
-        if (loc.startsWith("IL-Tel Aviv")) return "IL-תל אביב";
-        if (loc.startsWith("IL-Haifa")) return "IL-חיפה";
-        if (loc.startsWith("IL-Eilat")) return "IL-אילת";
-        if (loc.startsWith("IL-Be'er Sheva")) return "IL-באר שבע";
-		
-        if (loc.startsWith("IL-Ashdod")) return "IL-אשדוד";
-        if (loc.startsWith("IL-Ashkelon")) return "IL-אשקלון";
-        if (loc.startsWith("IL-Bat Yam")) return "IL-בת ים";
-        if (loc.startsWith("IL-Beit Shemesh")) return "IL-בית שמש";
-        if (loc.startsWith("IL-Bnei Brak")) return "IL-בני ברק";
-		
-        if (loc.startsWith("IL-Hadera")) return "IL-חדרה";
-        if (loc.startsWith("IL-Herzliya")) return "IL-הרצליה";
-        if (loc.startsWith("IL-Holon")) return "IL-חולון";
-        if (loc.startsWith("IL-Kfar Saba")) return "IL-כפר סבא";
-        if (loc.startsWith("IL-Lod")) return "IL-לוד";
-		
-        if (loc.startsWith("IL-Modiin Ilit")) return "IL-מודיעין עילית";
-        if (loc.startsWith("IL-Modiin")) return "IL-מודיעין";
-        if (loc.startsWith("IL-Nazareth")) return "IL-נצרת";
-        if (loc.startsWith("IL-Netanya")) return "IL-נתניה";
-        if (loc.startsWith("IL-Petach Tikvah")) return "IL-פתח תקוה";
-        if (loc.startsWith("IL-Ra'anana")) return "IL-רעננה";
-		
-        if (loc.startsWith("IL-Ramat Gan")) return "IL-רמת גן";
-        if (loc.startsWith("IL-Ramla")) return "IL-רמלה";
-        if (loc.startsWith("IL-Rishon LeZion")) return "IL-ראשון לציון";
-        if (loc.startsWith("IL-Tiberias")) return "IL-טבריה";
-        
-       	// special treatment
-        if (loc.startsWith("IL-Yavne")) return "IL-יבנה";
-        if (loc.startsWith("IL-Mitzpe Ramon")) return "IL-מצפה רמון";
+    fun convertLocationIL(loc: String): String = IsraeliLocationNames.toHebrew(loc)
 
-        if (loc.startsWith("IL-Betar Ilit")) return "IL-ביתר עילית";
-        if (loc.startsWith("IL-Zefat")) return "IL-צפת";
-
-        return loc;
-    }
-
-    fun convertFromLocationIL(loc: String): String {
-        if (loc == "IL-ירושלים") return "IL-Jerusalem";
-        if (loc == "IL-תל אביב") return "IL-Tel Aviv";
-        if (loc == "IL-חיפה") return "IL-Haifa";
-        if (loc == "IL-אילת") return "IL-Eilat";
-        if (loc == "IL-באר שבע") return "IL-Be'er Sheva";
-		
-        if (loc == "IL-אשדוד") return "IL-Ashdod";
-        if (loc == "IL-אשקלון") return "IL-Ashkelon";
-        if (loc == "IL-בת ים") return "IL-Bat Yam";
-        if (loc == "IL-בית שמש") return "IL-Beit Shemesh";
-        if (loc == "IL-בני ברק") return "IL-Bnei Brak";
-
-        if (loc == "IL-חדרה") return "IL-Hadera";
-        if (loc == "IL-הרצליה") return "IL-Herzliya";
-        if (loc == "IL-חולון") return "IL-Holon";
-        if (loc == "IL-כפר סבא") return "IL-Kfar Saba";
-        if (loc == "IL-לוד") return "IL-Lod";
-
-        if (loc == "IL-מודיעין") return "IL-Modiin";
-        if (loc == "IL-נצרת") return "IL-Nazareth";
-        if (loc == "IL-נתניה") return "IL-Netanya";
-        if (loc == "IL-פתח תקוה") return "IL-Petach Tikvah";
-        if (loc == "IL-רעננה") return "IL-Ra'anana";
-
-        if (loc == "IL-רמת גן") return "IL-Ramat Gan";
-        if (loc == "IL-רמלה") return "IL-Ramla";
-        if (loc == "IL-ראשון לציון") return "IL-Rishon LeZion";
-        if (loc == "IL-טבריה") return "IL-Tiberias";
-
-	// special treatment
-        if (loc == "IL-יבנה") return "IL-Yavne";
-        if (loc == "IL-מצפה רמון") return "IL-Mitzpe Ramon";
-
-        if (loc == "IL-ביתר עילית") return "IL-Betar Ilit";
-        if (loc == "IL-מודיעין עילית") return "IL-Modiin Ilit";
-        if (loc == "IL-צפת") return "IL-Zefat";
-
-        return loc;
-    }
+    fun convertFromLocationIL(loc: String): String = IsraeliLocationNames.toEnglish(loc)
 
 }

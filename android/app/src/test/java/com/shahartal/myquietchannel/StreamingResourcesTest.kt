@@ -1,6 +1,7 @@
 package com.shahartal.myquietchannel
 
 import org.junit.Assert.assertTrue
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -15,6 +16,7 @@ class StreamingResourcesTest(
 
     @Test
     fun streamingResourceIsAvailable() {
+        assumeTrue("Set RUN_LIVE_TESTS=true to check external streams", liveTestsEnabled())
         val connection = URI(resourceUrl).toURL().openConnection() as HttpURLConnection
         connection.connectTimeout = CONNECT_TIMEOUT_MILLIS
         connection.readTimeout = READ_TIMEOUT_MILLIS
@@ -38,6 +40,9 @@ class StreamingResourcesTest(
     companion object {
         private const val CONNECT_TIMEOUT_MILLIS = 10_000
         private const val READ_TIMEOUT_MILLIS = 10_000
+
+        private fun liveTestsEnabled(): Boolean =
+            System.getenv("RUN_LIVE_TESTS")?.equals("true", ignoreCase = true) == true
 
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")

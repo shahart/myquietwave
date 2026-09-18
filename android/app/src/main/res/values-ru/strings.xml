@@ -63,5 +63,7 @@
     <string name="ue_usage">Добавьте ,ue чтобы не использовать высоту в расчётах</string>
 
     <string name="station">Станция по умолчанию</string>
+    <string name="radioPlayer">Игнорировать поле \'Ближайшие новости\'\n      Непрерывно воспроизводить радио</string>
+    <string name="instructions2">Также можно включить радио прямо сейчас</string>
 
 </resources>
