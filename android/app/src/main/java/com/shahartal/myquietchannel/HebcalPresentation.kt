@@ -1,5 +1,6 @@
 package com.shahartal.myquietchannel
 
+import com.shahartal.myquietchannel.parasha.HebCalZmanimTimesModel
 import com.shahartal.myquietchannel.parasha.Item
 
 internal data class LinkedText(val text: String, val link: String)
@@ -90,6 +91,25 @@ internal object HebcalPresentation {
         val value = rawValue.removePrefix("0")
         return " $value "
     }
+
+    fun zmanimDetails(times: HebCalZmanimTimesModel): String = listOf(
+        "chatzot Night חצות הלילה: ${displayTime(times.chatzotNight)}",
+        "alot HaShahar עלות השחר: ${displayTime(times.alotHaShachar)}",
+        "dawn: ${displayTime(times.dawn)}",
+        "sof Zman Shma מגן אברהם: ${displayTime(times.sofZmanShmaMGA)}",
+        "sof Zman Shma: ${displayTime(times.sofZmanShma)}",
+        "sof Zman Tfilla מגן אברהם: ${displayTime(times.sofZmanTfillaMGA)}",
+        "sof Zman Tfilla: ${displayTime(times.sofZmanTfilla)}",
+        "chatzot חצות היום: ${displayTime(times.chatzot)}",
+        "",
+        "mincha Gedola מנחה גדולה: ${displayTime(times.minchaGedola)}",
+        "mincha Ketana מנחה קטנה: ${displayTime(times.minchaKetana)}",
+        "plag HaMincha פלג המנחה: ${displayTime(times.plagHaMincha)}",
+        "bein HaShmashos בין השמשות: ${displayTime(times.beinHaShmashos)}",
+        "Dusk חשיכה: ${displayTime(times.dusk)}",
+        "Tzeit צאת הכוכבים: ${displayTime(times.tzeit7083deg)}",
+        "Tzeit 72' צאת הכוכבים רבינו תם: ${displayTime(times.tzeit72min)}",
+    ).joinToString("\n")
 
     fun translateBookNames(value: String): String =
         bookNames.entries.fold(value) { result, (english, hebrew) -> result.replace(english, hebrew) }

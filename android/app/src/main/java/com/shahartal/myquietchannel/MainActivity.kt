@@ -544,29 +544,7 @@ class MainActivity : ComponentActivity() {
 
                             textViewClock5suns.setOnClickListener {
                                 val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
-                                alertDialogBuilder.setMessage(
-                                    "chatzot Night חצות הלילה: " + HebcalPresentation.displayTime(hebcal.times.chatzotNight) + "\n" +
-                                    "alot HaShahar עלות השחר: " + HebcalPresentation.displayTime(hebcal.times.alotHaShachar) + "\n" +
-                                    "dawn: " + HebcalPresentation.displayTime(hebcal.times.dawn) + "\n" +
-
-                                    "sof Zman Shma מגן אברהם: " + HebcalPresentation.displayTime(hebcal.times.sofZmanShmaMGA) + "\n" +
-                                    "sof Zman Shma: " + HebcalPresentation.displayTime(hebcal.times.sofZmanShma) + "\n" +
-                                    "sof Zman Tfilla מגן אברהם: " + HebcalPresentation.displayTime(hebcal.times.sofZmanTfillaMGA) + "\n" +
-                                    "sof Zman Tfilla: " + HebcalPresentation.displayTime(hebcal.times.sofZmanTfilla) + "\n" +
-
-                                    "chatzot חצות היום: " + HebcalPresentation.displayTime(hebcal.times.chatzot) + "\n" +
-
-                                            "\n" +
-
-                                    "mincha Gedola מנחה גדולה: " + HebcalPresentation.displayTime(hebcal.times.minchaGedola) + "\n" +
-                                    "mincha Ketana מנחה קטנה: " + HebcalPresentation.displayTime(hebcal.times.minchaKetana) + "\n" +
-                                    "plag HaMincha פלג המנחה: " + HebcalPresentation.displayTime(hebcal.times.plagHaMincha) + "\n" +
-
-                                    "bein HaShmashos בין השמשות: " + HebcalPresentation.displayTime(hebcal.times.beinHaShmashos) + "\n" +
-                                    "Dusk חשיכה: " + HebcalPresentation.displayTime(hebcal.times.dusk) + "\n" +
-                                    "Tzeit צאת הכוכבים: " + HebcalPresentation.displayTime(hebcal.times.tzeit7083deg) + "\n" +
-                                    "Tzeit 72' צאת הכוכבים רבינו תם: " + HebcalPresentation.displayTime(hebcal.times.tzeit72min)
-                                )
+                                alertDialogBuilder.setMessage(HebcalPresentation.zmanimDetails(hebcal.times))
                                 alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
                                     dialog!!.cancel()
                                 }
