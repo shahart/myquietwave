@@ -54,6 +54,7 @@ import com.shahartal.myquietchannel.parasha.HebCal
 import com.shahartal.myquietchannel.parasha.HebCalZmanimModel
 import com.shahartal.myquietchannel.parasha.RetrofitInstance
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -1044,7 +1045,7 @@ class MainActivity : ComponentActivity() {
         textViewHebDate.text = HebrewDateDisplay.format(hebY, hebrewMonth, hebrewDay)
 
         lifecycleScope.launch {
-            while (true) {
+            while (isActive) {
                 val now = java.time.LocalDateTime.now()
                 textViewClock.text = DateDisplay.clockTime(now)
                 textViewDate.text = DateDisplay.calendarLabel(now.toLocalDate())
@@ -1180,7 +1181,7 @@ class MainActivity : ComponentActivity() {
         checkForAppUpdate()
 
         lifecycleScope.launch {
-            while (true) {
+            while (isActive) {
                 delay(90_000)
                 try {
                     if (isServiceRunning) {
@@ -1195,7 +1196,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private lateinit var appUpdateManager: AppUpdateManager
+    private val appUpdateManager: AppUpdateManager by lazy {
+        AppUpdateManagerFactory.create(this)
+    }
     private val appUpdateLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult(),
     ) { result ->
@@ -1206,7 +1209,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun checkForAppUpdate() {
-        appUpdateManager = AppUpdateManagerFactory.create(this)
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
