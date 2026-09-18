@@ -36,7 +36,13 @@ class VolumeCycleService : Service() {
         @Deprecated("Use MAX_NEWS_DURATION", ReplaceWith("MAX_NEWS_DURATION"))
         const val max_news_duration = MAX_NEWS_DURATION
         const val CHANNEL_ID = "VolumeCycleChannel"
-        private const val NOTIFICATION_ID = 1
+        const val NOTIFICATION_ID = 1
+        const val EXTRA_NEWS_DURATION = "newsDuration"
+        const val EXTRA_NEXT_HOURS = "nextHours"
+        const val EXTRA_STATION = "station"
+        const val EXTRA_TODO_LIST = "todoList"
+        const val EXTRA_LOCATION = "location"
+        const val EXTRA_RADIO_PLAYER = "radioPlayer"
     }
 
     private var job: Job? = null
@@ -147,10 +153,10 @@ class VolumeCycleService : Service() {
                 Firebase.crashlytics.log("VolumeCycleService intent is null")
             }
             else {
-                newsDurationValue = intent.getIntExtra("newsDuration", AppSettings.DEFAULT_NEWS_DURATION_MINUTES)
-                scheduleValue = intent.getStringExtra("nextHours")
-                stationValue = intent.getStringExtra("station")
-                radioOnlyValue = intent.getBooleanExtra("radioPlayer", false)
+                newsDurationValue = intent.getIntExtra(EXTRA_NEWS_DURATION, AppSettings.DEFAULT_NEWS_DURATION_MINUTES)
+                scheduleValue = intent.getStringExtra(EXTRA_NEXT_HOURS)
+                stationValue = intent.getStringExtra(EXTRA_STATION)
+                radioOnlyValue = intent.getBooleanExtra(EXTRA_RADIO_PLAYER, false)
             }
 
             val now = ZonedDateTime.now(ZoneId.systemDefault())

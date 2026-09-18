@@ -100,6 +100,8 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val NEXT_HOURS = NewsSchedule.DEFAULT_TEXT
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 0
+        private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 112
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -958,7 +960,11 @@ class MainActivity : ComponentActivity() {
         textViewPosition.setOnClickListener {
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 0)
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+                    LOCATION_PERMISSION_REQUEST_CODE,
+                )
             }
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -1063,13 +1069,13 @@ class MainActivity : ComponentActivity() {
 
         // Android 13+ needs to ask for notifications permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (! shouldShowRequestPermissionRationale("112")){ // PERMISSION_REQUEST_CODE
+            if (!shouldShowRequestPermissionRationale(NOTIFICATION_PERMISSION_REQUEST_CODE.toString())) {
                 try {
                     Log.i("myquietwave", "request notifications permission")
                     ActivityCompat.requestPermissions(
                         this,
                         arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                        112
+                        NOTIFICATION_PERMISSION_REQUEST_CODE,
                     )
                     Log.i("myquietwave", "MainActivity Done. request notifications permission")
                 } catch (e: Exception) {
@@ -1103,7 +1109,7 @@ class MainActivity : ComponentActivity() {
                 nextSong.text = ""
                 updateServiceUi()
 
-                getSystemService(NotificationManager::class.java).cancel(1)
+                getSystemService(NotificationManager::class.java).cancel(VolumeCycleService.NOTIFICATION_ID)
 
             } else {
 
@@ -1114,17 +1120,15 @@ class MainActivity : ComponentActivity() {
                     textViewNextNews.text = NEXT_HOURS
                 }
 
-                serviceIntent.putExtra("newsDuration", newsDuration)
-                serviceIntent.putExtra("nextHours", textViewNextNews.text.toString())
-                serviceIntent.putExtra("station", stationsSpinner.getSelectedItem().toString())
-                serviceIntent.putExtra("todoList", editTextTodo.text.toString())
-                serviceIntent.putExtra("location", editTextLocation.text.toString())
-                serviceIntent.putExtra("radioPlayer", radioPlayer.isChecked)
+                serviceIntent.putExtra(VolumeCycleService.EXTRA_NEWS_DURATION, newsDuration)
+                serviceIntent.putExtra(VolumeCycleService.EXTRA_NEXT_HOURS, textViewNextNews.text.toString())
+                serviceIntent.putExtra(VolumeCycleService.EXTRA_STATION, stationsSpinner.getSelectedItem().toString())
+                serviceIntent.putExtra(VolumeCycleService.EXTRA_TODO_LIST, editTextTodo.text.toString())
+                serviceIntent.putExtra(VolumeCycleService.EXTRA_LOCATION, editTextLocation.text.toString())
+                serviceIntent.putExtra(VolumeCycleService.EXTRA_RADIO_PLAYER, radioPlayer.isChecked)
 
                 val selectedStation = Station.fromPersistedValue(stationsSpinner.selectedItem?.toString())
                 selectedStation.takeIf { it.songFeedName != null }?.let(::fetchGlglzSong)
-
-                if (true) {
 
                     startForegroundService(serviceIntent)
                     isServiceRunning = true
@@ -1174,7 +1178,6 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                }
             }
         }
 
