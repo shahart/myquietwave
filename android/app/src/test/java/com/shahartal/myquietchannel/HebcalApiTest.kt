@@ -6,6 +6,7 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
@@ -111,6 +112,19 @@ class HebcalApiTest {
             fail("Expected HTTP failure")
         } catch (error: retrofit2.HttpException) {
             assertEquals(503, error.code())
+        }
+    }
+
+    @Test
+    fun repositoryRejectsMalformedSuccessfulPayloads() {
+        runBlocking {
+            server.enqueue(jsonResponse("{}"))
+            val repository = NetworkHebcalRepository(
+                RetrofitInstance.createApi(server.url("/").toString())
+            )
+
+            val result = repository.zmanim(LocationQuery.City("IL-Jerusalem", useElevation = true))
+            assertNull(result.times)
         }
     }
 
