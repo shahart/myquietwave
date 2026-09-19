@@ -22,6 +22,12 @@ class DateDisplayTest {
     }
 
     @Test
+    fun malformedApiTimestampIsNotConsideredPassed() {
+        assertFalse(DateDisplay.hasTimePassed("2026-09-18", LocalTime.NOON))
+        assertFalse(DateDisplay.hasTimePassed("2026-09-18Tinvalid", LocalTime.NOON))
+    }
+
+    @Test
     fun formatsClockAndCalendarLabels() {
         assertEquals("7:05:09", DateDisplay.clockTime(LocalDateTime.of(2026, 9, 20, 7, 5, 9)))
         assertEquals("ראשון 20/9/2026", DateDisplay.calendarLabel(LocalDate.of(2026, 9, 20)))

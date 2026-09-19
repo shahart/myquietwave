@@ -20,7 +20,8 @@ internal object DateDisplay {
         "${hebrewWeekday(date)} ${date.dayOfMonth}/${date.monthValue}/${date.year}"
 
     fun hasTimePassed(isoDateTime: String, now: LocalTime = LocalTime.now()): Boolean {
-        val eventTime = LocalTime.parse(isoDateTime.substringAfter('T').take(5))
+        val rawTime = isoDateTime.substringAfter('T', missingDelimiterValue = "").take(5)
+        val eventTime = runCatching { LocalTime.parse(rawTime) }.getOrNull() ?: return false
         return !now.isBefore(eventTime)
     }
 
