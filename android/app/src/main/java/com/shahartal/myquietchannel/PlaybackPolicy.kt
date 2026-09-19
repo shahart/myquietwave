@@ -51,7 +51,7 @@ internal object PlaybackPolicy {
         .let { if (isNearShabbat) it.coerceAtMost(FRIDAY_MAX_NEWS_DURATION_MINUTES) else it }
 
     fun limitVolume(value: Int, maximumVolume: Int, isNearShabbat: Boolean): Int {
-        val nonZero = value.coerceAtLeast(1)
+        val nonZero = value.coerceIn(1, maximumVolume.coerceAtLeast(1))
         if (!isNearShabbat) return nonZero
         return nonZero.coerceAtMost(shabbatVolumeLimit(maximumVolume))
     }

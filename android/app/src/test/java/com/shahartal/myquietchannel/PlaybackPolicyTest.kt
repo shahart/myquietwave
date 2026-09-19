@@ -80,6 +80,14 @@ class PlaybackPolicyTest {
     }
 
     @Test
+    fun volumeIsKeptWithinDeviceBoundsAndNeverMuted() {
+        assertEquals(1, PlaybackPolicy.limitVolume(0, maximumVolume = 15, isNearShabbat = false))
+        assertEquals(15, PlaybackPolicy.limitVolume(99, maximumVolume = 15, isNearShabbat = false))
+        assertEquals(1, PlaybackPolicy.limitVolume(99, maximumVolume = 0, isNearShabbat = false))
+        assertEquals(7, PlaybackPolicy.limitVolume(99, maximumVolume = 15, isNearShabbat = true))
+    }
+
+    @Test
     fun playbackConfigNormalizesRawServiceInput() {
         val config = PlaybackConfig.fromRawValues(
             station = "כאן 88",
