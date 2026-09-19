@@ -12,6 +12,11 @@ internal class UrlConnectionTextHttpClient(
     private val connectTimeoutMillis: Int = 15_000,
     private val readTimeoutMillis: Int = 15_000,
 ) : TextHttpClient {
+    init {
+        require(connectTimeoutMillis > 0) { "connectTimeoutMillis must be positive" }
+        require(readTimeoutMillis > 0) { "readTimeoutMillis must be positive" }
+    }
+
     override fun get(url: String): String {
         val connection = URL(url).openConnection() as HttpURLConnection
         try {

@@ -67,6 +67,16 @@ class ContentRepositoriesTest {
         }
     }
 
+    @Test
+    fun textHttpClientRejectsInvalidTimeouts() {
+        assertThrows(IllegalArgumentException::class.java) {
+            UrlConnectionTextHttpClient(connectTimeoutMillis = 0)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            UrlConnectionTextHttpClient(readTimeoutMillis = -1)
+        }
+    }
+
     companion object {
         private val HAFTARAH_HTML = """
             <div class="row_four">
