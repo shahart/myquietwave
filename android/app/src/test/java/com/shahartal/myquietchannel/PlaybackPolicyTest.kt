@@ -109,6 +109,13 @@ class PlaybackPolicyTest {
     }
 
     @Test
+    fun remainingNewsMinutesNeverBecomesNegative() {
+        assertEquals(6, PlaybackPolicy.remainingNewsMinutes(6, 0))
+        assertEquals(2, PlaybackPolicy.remainingNewsMinutes(6, 4))
+        assertEquals(0, PlaybackPolicy.remainingNewsMinutes(6, 7))
+    }
+
+    @Test
     fun playbackConfigNormalizesRawServiceInput() {
         val config = PlaybackConfig.fromRawValues(
             station = "כאן 88",

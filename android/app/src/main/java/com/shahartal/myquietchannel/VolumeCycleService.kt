@@ -272,14 +272,15 @@ class VolumeCycleService : Service() {
                 }
                 // @RequiresApi(8
                 val now = ZonedDateTime.now(ZoneId.systemDefault()).minute
+                val remainingNewsMinutes = PlaybackPolicy.remainingNewsMinutes(newsDuration, now)
                 // continue the current news
-                if (now < newsDuration) {
-                    Log.d("myquietwave", "VolumeCycleService continue positive volume, more delay (as part of news duration) [minutes] " + (newsDuration - now))
+                if (remainingNewsMinutes > 0) {
+                    Log.d("myquietwave", "VolumeCycleService continue positive volume, more delay (as part of news duration) [minutes] $remainingNewsMinutes")
 
-                    for (i in 1..newsDuration - now) {
+                    for (i in 1..remainingNewsMinutes) {
                         updateNotification(
                             newsCountdownText(
-                                remainingMinutes = newsDuration - i + 1,
+                                remainingMinutes = remainingNewsMinutes - i + 1,
                                 volumePercent = 100 * audioManager.getStreamVolume(stream) / maxVolume,
                             ),
                         )
