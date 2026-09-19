@@ -869,7 +869,6 @@ class MainActivity : ComponentActivity() {
             spinner.post { ignoreInitialLocationSelection = false }
         }
 
-        // @RequiresApi(8
         if (ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY) {
             shabesText = binding.textViewShabes
             shabesText.text = getString(R.string.shabbath)

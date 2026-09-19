@@ -58,7 +58,6 @@ class VolumeCycleService : Service() {
         super.onCreate()
         isRunning = true
 
-        // @RequiresApi(8
         startHour = ZonedDateTime.now(ZoneId.systemDefault()).hour
         startSeconds = ZonedDateTime.now(ZoneId.systemDefault()).second
 
@@ -142,7 +141,6 @@ class VolumeCycleService : Service() {
         return true
     }
 
-    // @RequiresApi(Build.VERSION_CODES.O) // Unnecessary; SDK_INT is always >= 26
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         job?.cancel()
         job = serviceScope.launch {
@@ -265,7 +263,6 @@ class VolumeCycleService : Service() {
 
                     runNewsCountdown(audioManager, stream, maxVolume, newsDuration)
                 }
-                // @RequiresApi(8
                 val now = ZonedDateTime.now(ZoneId.systemDefault()).minute
                 val remainingNewsMinutes = PlaybackPolicy.remainingNewsMinutes(newsDuration, now)
                 // continue the current news
@@ -302,7 +299,6 @@ class VolumeCycleService : Service() {
 
                 // delay(30_000)
 
-                // WAS: for (i in 1..(nextDelay-1)*2) {
                 while (true) {
                     if (schedule.isDue(ZonedDateTime.now(ZoneId.systemDefault()), startSeconds)) {
                         break
@@ -328,7 +324,7 @@ class VolumeCycleService : Service() {
             }
             Log.w("myquietwave", "VolumeCycleService not active any more")
         }
-        return START_STICKY // TODO? START_REDELIVER_INTENT
+        return START_STICKY
     }
 
     override fun onDestroy() {
@@ -353,18 +349,14 @@ class VolumeCycleService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    // @RequiresApi(8
-    // @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
-        // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // Unnecessary; SDK_INT is always >= 26
-            val serviceChannel = NotificationChannel(
-                CHANNEL_ID,
-                "Volume Cycle Service",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(serviceChannel)
-        // }
+        val serviceChannel = NotificationChannel(
+            CHANNEL_ID,
+            "Volume Cycle Service",
+            NotificationManager.IMPORTANCE_DEFAULT,
+        )
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(serviceChannel)
     }
 
     private fun newsCountdownText(remainingMinutes: Int, volumePercent: Int): String =

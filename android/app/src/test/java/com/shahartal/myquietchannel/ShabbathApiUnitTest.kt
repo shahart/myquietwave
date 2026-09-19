@@ -7,9 +7,6 @@ import org.junit.Test
 import org.junit.Assert.*
 import org.junit.Assume.assumeTrue
 import kotlinx.coroutines.runBlocking
-//import retrofit2.Call
-//import retrofit2.Callback
-//import retrofit2.Response
 
 /**
  * Example local unit test, which will execute on the development machine (host).
