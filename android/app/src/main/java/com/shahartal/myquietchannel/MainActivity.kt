@@ -667,6 +667,52 @@ class MainActivity : ComponentActivity() {
                 if (haftarahConnectionSourceUrl == sourceUrl) {
                     haftarahConnectionButton.isEnabled = true
                 }
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        settingsRepository = SettingsRepository(
+            getSharedPreferences(SettingsRepository.PREFERENCES_NAME, MODE_PRIVATE)
+        )
+        displayCache = SharedPreferencesDisplayCache(
+            getSharedPreferences(SettingsRepository.PREFERENCES_NAME, MODE_PRIVATE)
+        )
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    mainViewModel.dailyLearning.collect { state ->
+                    state.summary?.let { summary ->
+                        summary.selichotText?.let { textViewClock7special.text = it }
+                        summary.omer?.let { omer ->
+                            textViewOmer.text = omer.text
+                            textViewOmer.setOnClickListener { openUrl(omer.link) }
+                        }
+                        summary.dafYomi?.let { dafYomi ->
+                            textViewClock4dafYomi.text = underlined(dafYomi.text)
+                            displayCache.put("dafYomi", dafYomi.text)
+                            val tooltip = buildString {
+                                append("עוד לימודים יומיים:\n\n")
+                                summary.additionalLearning.forEach { append(it).append('\n') }
+                            }
+                            textViewClock4dafYomiTitle.setOnClickListener { showMessageDialog(tooltip) }
+                            textViewClock4dafYomi.setOnClickListener {
+                                openUrl("https://daf-yomi.com/Dafyomi_Page.aspx")
+                            }
+                        }
+                    }
+                    state.error?.let { error ->
+                        Log.e("myquietwave", "MainActivity fetchDafYomi failed", error)
+                        textViewClock4dafYomi.text = displayCache.get("dafYomi")
+                        Firebase.crashlytics.log("MainActivity fetchDafYomi Exception")
+                        Firebase.crashlytics.recordException(error)
+                    }
+                    }
+                }
+
                 launch {
                     mainViewModel.shabbat.collect { state ->
                         state.summary?.let { summary ->
@@ -702,6 +748,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+
                 launch {
                     mainViewModel.zmanim.collect { state ->
                         state.model?.let { model ->
@@ -734,49 +781,6 @@ class MainActivity : ComponentActivity() {
                             Firebase.crashlytics.log("MainActivity fetchSunsZmanim Exception")
                             Firebase.crashlytics.recordException(error)
                         }
-                    }
-                }
-            }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        settingsRepository = SettingsRepository(
-            getSharedPreferences(SettingsRepository.PREFERENCES_NAME, MODE_PRIVATE)
-        )
-        displayCache = SharedPreferencesDisplayCache(
-            getSharedPreferences(SettingsRepository.PREFERENCES_NAME, MODE_PRIVATE)
-        )
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mainViewModel.dailyLearning.collect { state ->
-                    state.summary?.let { summary ->
-                        summary.selichotText?.let { textViewClock7special.text = it }
-                        summary.omer?.let { omer ->
-                            textViewOmer.text = omer.text
-                            textViewOmer.setOnClickListener { openUrl(omer.link) }
-                        }
-                        summary.dafYomi?.let { dafYomi ->
-                            textViewClock4dafYomi.text = underlined(dafYomi.text)
-                            displayCache.put("dafYomi", dafYomi.text)
-                            val tooltip = buildString {
-                                append("עוד לימודים יומיים:\n\n")
-                                summary.additionalLearning.forEach { append(it).append('\n') }
-                            }
-                            textViewClock4dafYomiTitle.setOnClickListener { showMessageDialog(tooltip) }
-                            textViewClock4dafYomi.setOnClickListener {
-                                openUrl("https://daf-yomi.com/Dafyomi_Page.aspx")
-                            }
-                        }
-                    }
-                    state.error?.let { error ->
-                        Log.e("myquietwave", "MainActivity fetchDafYomi failed", error)
-                        textViewClock4dafYomi.text = displayCache.get("dafYomi")
-                        Firebase.crashlytics.log("MainActivity fetchDafYomi Exception")
-                        Firebase.crashlytics.recordException(error)
                     }
                 }
             }
