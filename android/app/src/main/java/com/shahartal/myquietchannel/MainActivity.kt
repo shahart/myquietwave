@@ -663,38 +663,36 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
 
-                                val hebName = HebcalPresentation.translateBookNames(it.leyning.haftarah.replace("|", "\n"))
-                                val fullTextH =  " הפטרה " + hebName
+                                val haftarah = ParashaPresentation.haftarah(
+                                    it.leyning.haftarah,
+                                    it.leyning.haftarah_sephardic,
+                                )
+                                val fullTextH = haftarah.ashkenazi
                                 val spannableStringH = SpannableString(fullTextH)
                                 spannableStringH.setSpan(UnderlineSpan(), " הפטרה ".length, fullTextH.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                 textViewClockH.text = spannableStringH
 
-                                displayCache.put("haftarah", " הפטרה " + hebName)
+                                displayCache.put("haftarah", fullTextH)
 
-                                val strH: String = it.leyning.haftarah.split(':')[0]
                                 textViewClockH.setOnClickListener {
                                     val browserIntent = Intent(
                                         Intent.ACTION_VIEW,
-                                        ("https://shahart.github.io/heb-bible/index.html?b=" + strH).toUri()
+                                        ("https://shahart.github.io/heb-bible/index.html?b=" + haftarah.ashkenaziReference).toUri()
                                     )
                                     startActivity(browserIntent)
                                 }
 
-                                // it.leyning.haftarah_sephardic = "Ezekiel 8:25-29:21"
-                                it.leyning.haftarah_sephardic?.let { sephardicHaftarah ->
-                                    val hebName = HebcalPresentation.translateBookNames(sephardicHaftarah.replace("|", "\n"))
-                                    val fullTextHS =  " הפטרה ספרדים " + hebName
+                                haftarah.sephardic?.let { fullTextHS ->
                                     val spannableStringHS = SpannableString(fullTextHS)
                                     spannableStringHS.setSpan(UnderlineSpan(), " הפטרה ספרדים ".length, fullTextHS.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                     textViewClockHS.text = spannableStringHS
 
-                                    displayCache.put("haftarah_sephardic", " הפטרה ספרדים " + hebName)
+                                    displayCache.put("haftarah_sephardic", fullTextHS)
 
-                                    val strHS: String = sephardicHaftarah.split(':')[0]
                                     textViewClockHS.setOnClickListener {
                                         val browserIntent = Intent(
                                             Intent.ACTION_VIEW,
-                                            ("https://shahart.github.io/heb-bible/index.html?b=" + strHS).toUri()
+                                            ("https://shahart.github.io/heb-bible/index.html?b=" + haftarah.sephardicReference).toUri()
                                         )
                                         startActivity(browserIntent)
                                     }

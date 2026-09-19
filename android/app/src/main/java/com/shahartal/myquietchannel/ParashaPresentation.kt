@@ -5,6 +5,13 @@ internal data class ParashaNames(
     val secondary: String?,
 )
 
+internal data class HaftarahTexts(
+    val ashkenazi: String,
+    val ashkenaziReference: String,
+    val sephardic: String?,
+    val sephardicReference: String?,
+)
+
 internal object ParashaPresentation {
     private val maqafOnlyNames = setOf("כי־תצא", "כי־תבוא", "שלח־לך", "לך־לך")
 
@@ -28,5 +35,21 @@ internal object ParashaPresentation {
         }
 
         return ParashaNames(primary = primary, secondary = secondary)
+    }
+
+    fun haftarah(ashkenazi: String, sephardic: String?): HaftarahTexts {
+        fun format(value: String, prefix: String): Pair<String, String> {
+            val translated = HebcalPresentation.translateBookNames(value.replace("|", "\n"))
+            return " $prefix $translated" to value.substringBefore(':')
+        }
+
+        val (text, reference) = format(ashkenazi, "הפטרה")
+        val sephardicText = sephardic?.let { format(it, "הפטרה ספרדים") }
+        return HaftarahTexts(
+            ashkenazi = text,
+            ashkenaziReference = reference,
+            sephardic = sephardicText?.first,
+            sephardicReference = sephardicText?.second,
+        )
     }
 }

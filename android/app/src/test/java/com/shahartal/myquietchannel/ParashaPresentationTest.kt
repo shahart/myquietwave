@@ -27,4 +27,17 @@ class ParashaPresentationTest {
             ParashaPresentation.names("כי־תצא"),
         )
     }
+
+    @Test
+    fun formatsHaftarahTextsAndReferences() {
+        assertEquals(
+            HaftarahTexts(
+                " הפטרה ישעיהו 1:1\n2:2",
+                "Isaiah 1",
+                " הפטרה ספרדים יחזקאל 3:1",
+                "Ezekiel 3",
+            ),
+            ParashaPresentation.haftarah("Isaiah 1:1|2:2", "Ezekiel 3:1"),
+        )
+    }
 }
