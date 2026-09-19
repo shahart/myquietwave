@@ -150,27 +150,18 @@ class VolumeCycleService : Service() {
             val shabbatVolumeLimit = PlaybackPolicy.shabbatVolumeLimit(maxVolume)
             Log.i("myquietwave", "VolumeCycleService init volume $origVolume out of $maxVolume")
 
-            var stationValue: String? = Station.GLGLZ.displayName
-            var newsDurationValue = AppSettings.DEFAULT_NEWS_DURATION_MINUTES
-            var radioOnlyValue = false
-            var scheduleValue: String? = NewsSchedule.DEFAULT_TEXT
             if (intent == null) {
                 Log.e("myquietwave", "VolumeCycleService intent is null")
                 Firebase.crashlytics.log("VolumeCycleService intent is null")
             }
-            else {
-                newsDurationValue = intent.getIntExtra(EXTRA_NEWS_DURATION, AppSettings.DEFAULT_NEWS_DURATION_MINUTES)
-                scheduleValue = intent.getStringExtra(EXTRA_NEXT_HOURS)
-                stationValue = intent.getStringExtra(EXTRA_STATION)
-                radioOnlyValue = intent.getBooleanExtra(EXTRA_RADIO_PLAYER, false)
-            }
+            val intentValues = PlaybackIntentValues.fromIntent(intent)
 
             val now = ZonedDateTime.now(ZoneId.systemDefault())
             val config = PlaybackConfig.fromRawValues(
-                station = stationValue,
-                newsDurationMinutes = newsDurationValue,
-                radioOnly = radioOnlyValue,
-                scheduleText = scheduleValue,
+                station = intentValues.station,
+                newsDurationMinutes = intentValues.newsDurationMinutes,
+                radioOnly = intentValues.radioOnly,
+                scheduleText = intentValues.scheduleText,
                 now = now,
             )
             val station = config.station

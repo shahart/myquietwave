@@ -7,6 +7,19 @@ import org.junit.Test
 
 class PlaybackRequestTest {
     @Test
+    fun playbackIntentValuesUseDefaultsForNullIntent() {
+        assertEquals(
+            PlaybackIntentValues(
+                station = Station.GLGLZ.displayName,
+                newsDurationMinutes = AppSettings.DEFAULT_NEWS_DURATION_MINUTES,
+                scheduleText = null,
+                radioOnly = false,
+            ),
+            PlaybackIntentValues.fromIntent(null),
+        )
+    }
+
+    @Test
     fun normalizesUiValuesAndAppliesDefaults() {
         val request = PlaybackStartRequest.fromUiValues(
             station = "כאן 88",
