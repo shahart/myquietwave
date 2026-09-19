@@ -625,24 +625,9 @@ class MainActivity : ComponentActivity() {
                                 haftarahConnectionSourceUrl = HaftarahConnection.sourceUrl(it.hebrew)
                                 haftarahConnectionButton.isEnabled = true
 
-                                var str: String = it.hebrew
-                                var str2: String = ""
-
-                                if (str.contains("-")) {
-                                    str2 = "פרשת " + str.split("-")[1]
-                                    str = str.split("-")[0]
-                                }
-
-                                if (str.contains("כי־תצא") ||
-                                    str.contains("כי־תבוא") ||
-                                    str.contains("שלח־לך") ||
-                                    str.contains("לך־לך")) {
-                                    str = str.replace("־", "_")
-                                }
-                                else if (str.contains("־")) {
-                                    str2 = "פרשת " + str.split("־")[1]
-                                    str = str.split("־")[0]
-                                }
+                                val parashaNames = ParashaPresentation.names(it.hebrew)
+                                val str = parashaNames.primary
+                                val str2 = parashaNames.secondary.orEmpty()
 
                                 val fullText =  " שבת " + str
                                 val spannableString = SpannableString(fullText)
