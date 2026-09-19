@@ -1,6 +1,7 @@
 package com.shahartal.myquietchannel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -84,5 +85,17 @@ internal class MainViewModel(
                 _zmanim.value = ZmanimUiState(error = error)
             }
         }
+    }
+}
+
+internal class MainViewModelFactory(
+    private val hebcalRepository: HebcalRepository,
+) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        require(modelClass.isAssignableFrom(MainViewModel::class.java)) {
+            "Unsupported ViewModel: ${modelClass.name}"
+        }
+        return MainViewModel(hebcalRepository) as T
     }
 }

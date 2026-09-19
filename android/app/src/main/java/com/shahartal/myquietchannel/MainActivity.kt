@@ -141,11 +141,7 @@ class MainActivity : ComponentActivity() {
         NetworkHebcalRepository(RetrofitInstance.api)
     }
     private val mainViewModel: MainViewModel by lazy {
-        ViewModelProvider(this, object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T =
-                MainViewModel(hebcalRepository) as T
-        })[MainViewModel::class.java]
+        ViewModelProvider(this, MainViewModelFactory(hebcalRepository))[MainViewModel::class.java]
     }
     private val haftarahRepository: HaftarahRepository by lazy {
         CachedHaftarahRepository(
