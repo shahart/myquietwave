@@ -13,6 +13,9 @@ internal object HebrewDateDisplay {
     )
 
     fun format(year: Int, month: Int, day: Int): String {
+        require(year > 0) { "year must be positive" }
+        require(month in monthNames.indices) { "month must be between 0 and 12" }
+        require(day in 1..dayNames.size) { "day must be between 1 and ${dayNames.size}" }
         val monthName = when {
             isLeapYear(year) && month == 5 -> "אדר א"
             isLeapYear(year) && month == 6 -> "אדר ב"
