@@ -9,10 +9,9 @@ internal object DateDisplay {
     private val hebrewWeekdays = listOf("ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת")
     private val clockFormatter = DateTimeFormatter.ofPattern("H:mm:ss")
 
-    fun hebrewWeekday(isoDate: String): String {
-        val date = LocalDate.parse(isoDate.substringBefore('T'))
-        return hebrewWeekday(date)
-    }
+    fun hebrewWeekday(isoDate: String): String = runCatching {
+        hebrewWeekday(LocalDate.parse(isoDate.substringBefore('T')))
+    }.getOrDefault("")
 
     fun clockTime(now: LocalDateTime): String = now.format(clockFormatter)
 

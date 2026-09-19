@@ -16,6 +16,12 @@ class DateDisplayTest {
     }
 
     @Test
+    fun malformedDateProducesEmptyWeekday() {
+        assertEquals("", DateDisplay.hebrewWeekday("not-a-date"))
+        assertEquals("", DateDisplay.hebrewWeekday("2026-13-40"))
+    }
+
+    @Test
     fun comparesCurrentTimeWithApiTimestamp() {
         assertFalse(DateDisplay.hasTimePassed("2026-09-18T18:00:00+03:00", LocalTime.of(17, 59)))
         assertTrue(DateDisplay.hasTimePassed("2026-09-18T18:00:00+03:00", LocalTime.of(18, 0)))
