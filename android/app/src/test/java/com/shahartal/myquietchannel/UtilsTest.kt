@@ -33,4 +33,12 @@ class UtilsTest {
         assertThrows(IllegalArgumentException::class.java) { Utils.getYY(0) }
         assertThrows(IllegalArgumentException::class.java) { Utils.getYY(-1) }
     }
+
+    @Test
+    fun normalizesLocationElevationSuffixAndCity() {
+        assertEquals("off", Utils.getUe("IL-Jerusalem,   UE  "))
+        assertEquals("on", Utils.getUe("IL-Jerusalem"))
+        assertEquals("IL-Jerusalem", Utils.getCity("  IL-Jerusalem, UE  "))
+        assertEquals("IL-Jerusalem", Utils.getCity(" IL-Jerusalem "))
+    }
 }

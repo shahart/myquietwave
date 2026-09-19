@@ -2,7 +2,6 @@ package com.shahartal.myquietchannel
 
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
-import java.util.Locale.getDefault
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.pow
@@ -71,21 +70,11 @@ object Utils {
     }
 
     fun getUe(loc: String): String {
-        if (loc.lowercase(getDefault()).contains(", ue") || loc.lowercase(getDefault()).contains(",ue")) {
-            return "off"
-        }
-        else {
-            return "on"
-        }
+        return if (Regex(",\\s*ue\\s*$", RegexOption.IGNORE_CASE).containsMatchIn(loc)) "off" else "on"
     }
 
     fun getCity(loc: String): String {
-        if (loc.contains(",")) {
-            return loc.trim().split(",")[0]
-        }
-        else {
-            return loc
-        }
+        return loc.trim().substringBefore(',').trim()
     }
 
     fun getYY(no: Int): String {
