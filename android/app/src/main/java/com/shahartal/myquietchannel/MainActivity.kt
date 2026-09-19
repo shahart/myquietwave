@@ -609,7 +609,7 @@ class MainActivity : ComponentActivity() {
                                         textViewClock8fast.text.toString() + " צאת הכוכבים " +
                                             ParashaPresentation.fastTime(it.date)
 
-                                if (Utils.isBefore(it.date.split('T')[0])) {
+                                if (Utils.isBefore(it.date.substringBefore('T'))) {
                                     textViewClock8fast.text = ""
                                 }
                             }
