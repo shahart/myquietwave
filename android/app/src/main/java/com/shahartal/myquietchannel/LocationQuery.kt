@@ -82,8 +82,13 @@ internal object IsraeliLocationNames {
     )
     private val hebrewToEnglish = englishToHebrew.entries.associate { (english, hebrew) -> hebrew to english }
 
-    fun toHebrew(value: String): String =
-        englishToHebrew.entries.firstOrNull { value.startsWith(it.key) }?.value ?: value
+    fun toHebrew(value: String): String {
+        val normalized = value.trim()
+        return englishToHebrew.entries.firstOrNull { normalized.startsWith(it.key) }?.value ?: normalized
+    }
 
-    fun toEnglish(value: String): String = hebrewToEnglish[value] ?: value
+    fun toEnglish(value: String): String {
+        val normalized = value.trim()
+        return hebrewToEnglish[normalized] ?: normalized
+    }
 }

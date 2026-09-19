@@ -44,4 +44,11 @@ class LocationQueryTest {
         val english = "IL-Mitzpe Ramon"
         assertEquals(english, IsraeliLocationNames.toEnglish(IsraeliLocationNames.toHebrew(english)))
     }
+
+    @Test
+    fun locationTranslationsIgnoreSurroundingWhitespace() {
+        assertEquals("IL-ירושלים", IsraeliLocationNames.toHebrew("  IL-Jerusalem  "))
+        assertEquals("IL-Jerusalem", IsraeliLocationNames.toEnglish("  IL-ירושלים  "))
+        assertEquals("custom", IsraeliLocationNames.toEnglish("  custom  "))
+    }
 }
