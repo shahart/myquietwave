@@ -2,6 +2,7 @@ package com.shahartal.myquietchannel
 
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.concurrent.ConcurrentHashMap
 
 internal fun interface TextHttpClient {
     fun get(url: String): String
@@ -49,18 +50,26 @@ internal class CachedHaftarahRepository(
     private val client: TextHttpClient,
     private val maxAttempts: Int = 2,
 ) : HaftarahRepository {
-    private val cache = mutableMapOf<String, String>()
+    init {
+        require(maxAttempts > 0) { "maxAttempts must be positive" }
+    }
 
-    override fun connection(sourceUrl: String): String = cache.getOrPut(sourceUrl) {
-        var lastError: Exception? = null
-        repeat(maxAttempts) {
-            try {
-                return@getOrPut HaftarahConnection.extract(client.get(sourceUrl))
-            } catch (error: Exception) {
-                lastError = error
-                if (error is HttpStatusException && error.status < 500) throw error
+    private val cache = ConcurrentHashMap<String, String>()
+
+    override fun connection(sourceUrl: String): String = synchronized(cache) {
+        cache[sourceUrl] ?: run {
+            var lastError: Exception? = null
+            repeat(maxAttempts) {
+                try {
+                    return@run HaftarahConnection.extract(client.get(sourceUrl)).also {
+                        cache[sourceUrl] = it
+                    }
+                } catch (error: Exception) {
+                    lastError = error
+                    if (error is HttpStatusException && error.status < 500) throw error
+                }
             }
+            throw lastError ?: IllegalStateException("Unable to fetch the haftarah connection")
         }
-        throw lastError ?: IllegalStateException("Unable to fetch the haftarah connection")
     }
 }

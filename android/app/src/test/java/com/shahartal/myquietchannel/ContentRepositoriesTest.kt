@@ -60,6 +60,13 @@ class ContentRepositoriesTest {
         assertEquals(1, clientCalls)
     }
 
+    @Test
+    fun haftarahRepositoryRejectsInvalidRetryCount() {
+        assertThrows(IllegalArgumentException::class.java) {
+            CachedHaftarahRepository(client = { HAFTARAH_HTML }, maxAttempts = 0)
+        }
+    }
+
     companion object {
         private val HAFTARAH_HTML = """
             <div class="row_four">
