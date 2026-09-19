@@ -50,4 +50,12 @@ class ParashaPresentationTest {
         assertEquals("05:42", ParashaPresentation.fastTime("2026-09-18T05:42:00+03:00"))
         assertEquals("", ParashaPresentation.fastTime("2026-09-18"))
     }
+
+    @Test
+    fun appendsDistinctNonBlankMemos() {
+        val first = ParashaPresentation.appendMemo("", "ראש השנה", "מנהגי היום")
+        assertEquals("\n\nראש השנה: מנהגי היום", first)
+        assertEquals(first, ParashaPresentation.appendMemo(first, "יום", "מנהגי היום"))
+        assertEquals(first, ParashaPresentation.appendMemo(first, "יום", "  "))
+    }
 }

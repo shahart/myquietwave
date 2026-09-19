@@ -58,4 +58,10 @@ internal object ParashaPresentation {
 
     fun fastTime(isoDateTime: String): String =
         isoDateTime.substringAfter('T', missingDelimiterValue = "").take(5)
+
+    fun appendMemo(existing: String, hebrew: String, memo: String?): String {
+        val text = memo?.trim().orEmpty()
+        if (text.isEmpty() || existing.contains(text)) return existing
+        return "$existing\n\n$hebrew: $text"
+    }
 }

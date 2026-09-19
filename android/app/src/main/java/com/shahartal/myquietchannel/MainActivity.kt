@@ -584,9 +584,7 @@ class MainActivity : ComponentActivity() {
                                     textViewClock6rosh.text = spannableStringH
                                 }
 
-                                if (! memo.contains(it.memo)) {
-                                    memo += "\n\n" + it.hebrew + ": " + it.memo
-                                }
+                                memo = ParashaPresentation.appendMemo(memo, it.hebrew, it.memo)
                             }
                             else if (it.category == "holiday") {
                                 val holidayDate = it.date
@@ -595,9 +593,7 @@ class MainActivity : ComponentActivity() {
                                     textViewClock7special.text = textViewClock7special.text.toString() + "\n" +
                                         ParashaPresentation.calendarEvent(it.hebrew, it.date)
 
-                                    if (! memo.contains(it.memo)) {
-                                        memo += "\n\n" + it.hebrew + ": " + it.memo
-                                    }
+                                    memo = ParashaPresentation.appendMemo(memo, it.hebrew, it.memo)
 
                                 }
                             }
