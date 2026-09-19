@@ -16,11 +16,19 @@ internal data class DailyLearningUiState(
     val isLoading: Boolean = false,
 )
 
+internal data class ShabbatUiState(
+    val summary: ShabbatSummary? = null,
+    val error: Throwable? = null,
+    val isLoading: Boolean = false,
+)
+
 internal class MainViewModel(
     private val hebcalRepository: HebcalRepository,
 ) : ViewModel() {
     private val _dailyLearning = MutableStateFlow(DailyLearningUiState())
     val dailyLearning: StateFlow<DailyLearningUiState> = _dailyLearning.asStateFlow()
+    private val _shabbat = MutableStateFlow(ShabbatUiState())
+    val shabbat: StateFlow<ShabbatUiState> = _shabbat.asStateFlow()
 
     fun fetchDailyLearning(date: LocalDate = LocalDate.now()) {
         val isoDate = date.toString()
@@ -37,6 +45,21 @@ internal class MainViewModel(
                 _dailyLearning.value = DailyLearningUiState(summary = summary)
             }.onFailure { error ->
                 _dailyLearning.value = DailyLearningUiState(error = error)
+            }
+        }
+    }
+
+    fun fetchShabbat(query: LocationQuery) {
+        _shabbat.value = _shabbat.value.copy(isLoading = true, error = null)
+        viewModelScope.launch {
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    HebcalPresentation.shabbat(hebcalRepository.shabbat(query).items)
+                }
+            }.onSuccess { summary ->
+                _shabbat.value = ShabbatUiState(summary = summary)
+            }.onFailure { error ->
+                _shabbat.value = ShabbatUiState(error = error)
             }
         }
     }

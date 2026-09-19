@@ -404,8 +404,6 @@ class MainActivity : ComponentActivity() {
 
         val trimmedLocation = loc.trim()
         var res: String
-        var resH: String = " "
-
         if (trimmedLocation.firstOrNull()?.isLetter() == true) {
             res = trimmedLocation + "\n"
         } else {
@@ -420,44 +418,7 @@ class MainActivity : ComponentActivity() {
             return
         }
 
-        lifecycleScope.launch {
-            try {
-                val hebcal = withContext(Dispatchers.IO) { hebcalRepository.shabbat(query) }
-                val summary = HebcalPresentation.shabbat(hebcal.items)
-                if (summary.candleTimes.isNotEmpty()) {
-                    res = "\n${getString(R.string.candleLighting)} ${summary.candleTimes.joinToString(" ")}"
-                    if (summary.candleTimes.size > 1) res += "\n"
-                    displayCache.put("candles", getString(R.string.candleLighting) + " " + summary.candleTimes.last())
-                }
-                if (summary.havdalahTimes.isNotEmpty()) {
-                    resH = "\n${getString(R.string.havdalah)} ${summary.havdalahTimes.joinToString(" ")}"
-                    if (summary.havdalahTimes.size > 1) resH += "\n"
-                    displayCache.put("havdalah", getString(R.string.havdalah) + " " + summary.havdalahTimes.last())
-                }
-                summary.mevarchim?.let { mevarchim ->
-                    res += "\n${mevarchim.title} \nהמולד: ${mevarchim.molad}\n"
-                    textViewClock3.setOnClickListener { openUrl(mevarchim.wikiUrl) }
-                    val spannable = SpannableString(res + resH)
-                    val start = res.indexOf(mevarchim.title)
-                    if (start != -1) {
-                        spannable.setSpan(
-                            UnderlineSpan(),
-                            start,
-                            start + mevarchim.title.length,
-                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                        )
-                    }
-                    textViewClock3.text = spannable
-                } ?: run {
-                    textViewClock3.text = res + resH
-                }
-            } catch (error: Exception) {
-                Log.w("myquietwave", "MainActivity fetchZmanim failed", error)
-                showShabbatFallback(res)
-                Firebase.crashlytics.log("MainActivity fetchZmanim Exception")
-                Firebase.crashlytics.recordException(error)
-            }
-        }
+        mainViewModel.fetchShabbat(query)
     }
 
     fun fetchSunsZmanim() {
@@ -745,6 +706,41 @@ class MainActivity : ComponentActivity() {
                 if (dialog.isShowing) dialog.setMessage(content)
                 if (haftarahConnectionSourceUrl == sourceUrl) {
                     haftarahConnectionButton.isEnabled = true
+                }
+                launch {
+                    mainViewModel.shabbat.collect { state ->
+                        state.summary?.let { summary ->
+                            var res = ""
+                            var resH = ""
+                            if (summary.candleTimes.isNotEmpty()) {
+                                res = "\n${getString(R.string.candleLighting)} ${summary.candleTimes.joinToString(" ")}"
+                                if (summary.candleTimes.size > 1) res += "\n"
+                                displayCache.put("candles", getString(R.string.candleLighting) + " " + summary.candleTimes.last())
+                            }
+                            if (summary.havdalahTimes.isNotEmpty()) {
+                                resH = "\n${getString(R.string.havdalah)} ${summary.havdalahTimes.joinToString(" ")}"
+                                if (summary.havdalahTimes.size > 1) resH += "\n"
+                                displayCache.put("havdalah", getString(R.string.havdalah) + " " + summary.havdalahTimes.last())
+                            }
+                            summary.mevarchim?.let { mevarchim ->
+                                res += "\n${mevarchim.title} \nהמולד: ${mevarchim.molad}\n"
+                                textViewClock3.setOnClickListener { openUrl(mevarchim.wikiUrl) }
+                                val spannable = SpannableString(res + resH)
+                                val start = res.indexOf(mevarchim.title)
+                                if (start != -1) spannable.setSpan(
+                                    UnderlineSpan(), start, start + mevarchim.title.length,
+                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                                )
+                                textViewClock3.text = spannable
+                            } ?: run { textViewClock3.text = res + resH }
+                        }
+                        state.error?.let { error ->
+                            Log.w("myquietwave", "MainActivity fetchShabbat failed", error)
+                            showShabbatFallback("")
+                            Firebase.crashlytics.log("MainActivity fetchShabbat Exception")
+                            Firebase.crashlytics.recordException(error)
+                        }
+                    }
                 }
             }
         }
