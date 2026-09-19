@@ -3,6 +3,7 @@ package com.shahartal.myquietchannel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import java.time.LocalDate
 
@@ -25,5 +26,11 @@ class UtilsTest {
         assertEquals("טו", Utils.getYY(15))
         assertEquals("טז", Utils.getYY(16))
         assertEquals("ה'תשפו", Utils.getYY(5786))
+    }
+
+    @Test
+    fun rejectsNonPositiveHebrewYears() {
+        assertThrows(IllegalArgumentException::class.java) { Utils.getYY(0) }
+        assertThrows(IllegalArgumentException::class.java) { Utils.getYY(-1) }
     }
 }

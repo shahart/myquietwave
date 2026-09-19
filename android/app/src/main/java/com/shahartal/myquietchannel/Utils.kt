@@ -89,6 +89,7 @@ object Utils {
     }
 
     fun getYY(no: Int): String {
+        require(no > 0) { "Hebrew year must be positive" }
         var input = no
         val letters = arrayOf("ה'","ד'","ג'","ב'","א'","ת","ש","ר","ק","צ","פ","ע","ס","נ","מ","ל","כ","י","ט","ח","ז","ו","ה","ד","ג","ב","א")
         val values = arrayOf(5000,4000,3000,2000,1000,400,300,200,100,90,80,70,60,50,40,30,20,10,9,8,7,6,5,4,3,2,1)
