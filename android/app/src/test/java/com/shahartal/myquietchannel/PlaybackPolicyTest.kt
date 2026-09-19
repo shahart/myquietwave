@@ -88,6 +88,13 @@ class PlaybackPolicyTest {
     }
 
     @Test
+    fun cycleStartVolumeAppliesShabbatAndInitialDefaults() {
+        assertEquals(4, PlaybackPolicy.cycleStartVolume(0, maximumVolume = 15, isNearShabbat = false))
+        assertEquals(8, PlaybackPolicy.cycleStartVolume(15, maximumVolume = 15, isNearShabbat = true))
+        assertEquals(15, PlaybackPolicy.cycleStartVolume(15, maximumVolume = 15, isNearShabbat = false))
+    }
+
+    @Test
     fun playbackConfigNormalizesRawServiceInput() {
         val config = PlaybackConfig.fromRawValues(
             station = "כאן 88",

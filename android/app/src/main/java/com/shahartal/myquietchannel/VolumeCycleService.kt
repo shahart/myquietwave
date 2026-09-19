@@ -183,13 +183,13 @@ class VolumeCycleService : Service() {
                     continue
                 }
 
-                var volume50 = configuredVolume //  (maxVolume * volume / 100).coerceAtLeast(1)
+                val volume50 = PlaybackPolicy.cycleStartVolume(
+                    configuredVolume = configuredVolume,
+                    maximumVolume = maxVolume,
+                    isNearShabbat = isNearShabbat,
+                )
                 if (isNearShabbat && volume50 > shabbatVolumeLimit + 1) { // 0..15
-                    volume50 = PlaybackPolicy.limitVolume(volume50, maxVolume, isNearShabbat = true) + 1
                     Log.w("myquietwave", "VolumeCycleService Volume crossed threshold")
-                }
-                if (volume50 == 0) {
-                    volume50 = 4 // 2 out of 15 = 13% (maxVolume * 20 / 100).coerceAtLeast(1)
                 }
 
                 // Set to 20%

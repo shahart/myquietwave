@@ -58,6 +58,15 @@ internal object PlaybackPolicy {
 
     fun shabbatVolumeLimit(maximumVolume: Int): Int =
         (maximumVolume * 50 / 100).coerceAtLeast(1)
+
+    fun cycleStartVolume(configuredVolume: Int, maximumVolume: Int, isNearShabbat: Boolean): Int {
+        var volume = configuredVolume
+        val shabbatLimit = shabbatVolumeLimit(maximumVolume)
+        if (isNearShabbat && volume > shabbatLimit + 1) {
+            volume = limitVolume(volume, maximumVolume, isNearShabbat = true) + 1
+        }
+        return if (volume == 0) 4 else volume
+    }
 }
 
 internal data class PlaybackConfig(
