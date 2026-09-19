@@ -126,9 +126,14 @@ class VolumeCycleService : Service() {
     }
 
     private fun startStation(url: String) {
-        mediaPlayer?.release()
+        releaseMediaPlayer()
         mediaPlayer = getMediaPlayer(url)
         mediaPlayer?.start()
+    }
+
+    private fun releaseMediaPlayer() {
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 
     private fun startStationIfNeeded(station: Station): Boolean {
@@ -310,8 +315,7 @@ class VolumeCycleService : Service() {
                 Log.d("myquietwave","VolumeCycleService started zero volume") // , delay till the next news [minutes] $nextDelay") //  + currentVolume)
                 audioManager.setStreamVolume(stream, 0, 0)
 
-                mediaPlayer?.release()
-                mediaPlayer = null
+                releaseMediaPlayer()
 
                 var oldText = ""
 
@@ -358,8 +362,7 @@ class VolumeCycleService : Service() {
 
         job?.cancel()
         serviceScope.coroutineContext[Job]?.cancel()
-        mediaPlayer?.release()
-        mediaPlayer = null
+        releaseMediaPlayer()
         super.onDestroy()
         isRunning = false
         startHour = -1
