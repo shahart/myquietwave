@@ -59,6 +59,12 @@ internal object ParashaPresentation {
     fun fastTime(isoDateTime: String): String =
         isoDateTime.substringAfter('T', missingDelimiterValue = "").take(5)
 
+    fun fastBeginning(isoDateTime: String): String =
+        " זמני התענית: עלות השחר ${fastTime(isoDateTime)}"
+
+    fun fastEnd(isoDateTime: String): String =
+        " צאת הכוכבים ${fastTime(isoDateTime)}"
+
     fun appendMemo(existing: String, hebrew: String, memo: String?): String {
         val text = memo?.trim().orEmpty()
         if (text.isEmpty() || existing.contains(text)) return existing

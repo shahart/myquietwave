@@ -49,6 +49,14 @@ class ParashaPresentationTest {
         )
         assertEquals("05:42", ParashaPresentation.fastTime("2026-09-18T05:42:00+03:00"))
         assertEquals("", ParashaPresentation.fastTime("2026-09-18"))
+        assertEquals(
+            " זמני התענית: עלות השחר 05:42",
+            ParashaPresentation.fastBeginning("2026-09-18T05:42:00+03:00"),
+        )
+        assertEquals(
+            " צאת הכוכבים 19:20",
+            ParashaPresentation.fastEnd("2026-09-18T19:20:00+03:00"),
+        )
     }
 
     @Test

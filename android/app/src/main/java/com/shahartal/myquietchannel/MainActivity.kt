@@ -599,15 +599,14 @@ class MainActivity : ComponentActivity() {
                             }
                             else if (it.title == "Fast begins") {
 
-                                textViewClock8fast.text = textViewClock8fast.text.toString() + "  זמני התענית: עלות השחר " +
-                                        ParashaPresentation.fastTime(it.date)
+                                textViewClock8fast.text = textViewClock8fast.text.toString() +
+                                        ParashaPresentation.fastBeginning(it.date)
 
                             }
                             else if (it.title == "Fast ends") {
 
                                 textViewClock8fast.text =
-                                        textViewClock8fast.text.toString() + " צאת הכוכבים " +
-                                            ParashaPresentation.fastTime(it.date)
+                                    textViewClock8fast.text.toString() + ParashaPresentation.fastEnd(it.date)
 
                                 if (Utils.isBefore(it.date.substringBefore('T'))) {
                                     textViewClock8fast.text = ""
