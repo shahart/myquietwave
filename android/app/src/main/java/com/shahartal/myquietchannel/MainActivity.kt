@@ -440,48 +440,12 @@ class MainActivity : ComponentActivity() {
         textViewClock5suns = binding.textViewClock5suns
         textViewClock5locTitle = binding.textViewClock5locTitle
 
-        lifecycleScope.launch {
-            var res = " "
-            try {
-                val query = requireNotNull(LocationQueryParser.parse(loc))
-                val hebcal = withContext(Dispatchers.IO) { hebcalRepository.zmanim(query) }
-                            res =
-                                "\n" + getString(R.string.sunrise) + " " + HebcalPresentation.displayTime(hebcal.times.sunrise)
-                            displayCache.put("sunrise", getString(R.string.sunrise) + " " + HebcalPresentation.displayTime(hebcal.times.sunrise))
-                            res += "\n" + getString(R.string.sunset) + " " + HebcalPresentation.displayTime(hebcal.times.sunset) + " "
-
-                            if (DateDisplay.hasTimePassed(hebcal.times.sunset)) {
-                                val hebrewCalendar = HebrewCalendar()
-                                hebrewCalendar.add(Calendar.HOUR_OF_DAY, 12)
-                                val hebY = hebrewCalendar.get(HebrewCalendar.YEAR)
-                                val hebrewMonth = hebrewCalendar.get(HebrewCalendar.MONTH)
-                                val hebrewDay = hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH) // switches at midnight by-design
-                                textViewHebDate.text = " הערב אור ל- ${HebrewDateDisplay.format(hebY, hebrewMonth, hebrewDay)}"
-                            }
-
-                            textViewClock5locTitle.text = hebcal.location.title
-
-                            textViewClock5suns.text = res
-                            displayCache.put("sunset", getString(R.string.sunset) + " " + HebcalPresentation.displayTime(hebcal.times.sunset))
-
-                            textViewClock5suns.setOnClickListener {
-                                val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
-                                alertDialogBuilder.setMessage(HebcalPresentation.zmanimDetails(hebcal.times))
-                                alertDialogBuilder.setNegativeButton(getString(R.string.close_alert)) { dialog: DialogInterface?, _: Int ->
-                                    dialog!!.cancel()
-                                }
-                                val alertDialog = alertDialogBuilder.create()
-                                alertDialog.show()
-                            }
-
-                            // textViewClock3.text = res
-            } catch (e: Exception) {
-                Log.w("myquietwave", "MainActivity fetchSunsZmanim unable to fetch hebCal $e", e)
-                showSunFallback(res)
-                Firebase.crashlytics.log("MainActivity fetchSunsZmanim Exception")
-                Firebase.crashlytics.recordException(e)
-            }
+        val query = LocationQueryParser.parse(loc)
+        if (query == null) {
+            showSunFallback(" ")
+            return
         }
+        mainViewModel.fetchZmanim(query)
     }
     fun fetchParasha() { // }: String {
 
@@ -738,6 +702,40 @@ class MainActivity : ComponentActivity() {
                             Log.w("myquietwave", "MainActivity fetchShabbat failed", error)
                             showShabbatFallback("")
                             Firebase.crashlytics.log("MainActivity fetchShabbat Exception")
+                            Firebase.crashlytics.recordException(error)
+                        }
+                    }
+                }
+                launch {
+                    mainViewModel.zmanim.collect { state ->
+                        state.model?.let { model ->
+                            val sunrise = HebcalPresentation.displayTime(model.times.sunrise)
+                            val sunset = HebcalPresentation.displayTime(model.times.sunset)
+                            val text = "\n${getString(R.string.sunrise)} $sunrise\n${getString(R.string.sunset)} $sunset "
+                            displayCache.put("sunrise", getString(R.string.sunrise) + " " + sunrise)
+                            displayCache.put("sunset", getString(R.string.sunset) + " " + sunset)
+                            if (DateDisplay.hasTimePassed(model.times.sunset)) {
+                                val hebrewCalendar = HebrewCalendar()
+                                hebrewCalendar.add(Calendar.HOUR_OF_DAY, 12)
+                                textViewHebDate.text = " הערב אור ל- ${HebrewDateDisplay.format(
+                                    hebrewCalendar.get(HebrewCalendar.YEAR),
+                                    hebrewCalendar.get(HebrewCalendar.MONTH),
+                                    hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH),
+                                )}"
+                            }
+                            textViewClock5locTitle.text = model.location.title
+                            textViewClock5suns.text = text
+                            textViewClock5suns.setOnClickListener {
+                                AlertDialog.Builder(this@MainActivity)
+                                    .setMessage(HebcalPresentation.zmanimDetails(model.times))
+                                    .setNegativeButton(getString(R.string.close_alert)) { dialog, _ -> dialog.cancel() }
+                                    .show()
+                            }
+                        }
+                        state.error?.let { error ->
+                            Log.w("myquietwave", "MainActivity fetchSunsZmanim failed", error)
+                            showSunFallback(" ")
+                            Firebase.crashlytics.log("MainActivity fetchSunsZmanim Exception")
                             Firebase.crashlytics.recordException(error)
                         }
                     }

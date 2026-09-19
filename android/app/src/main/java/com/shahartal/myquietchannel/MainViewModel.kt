@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
+import com.shahartal.myquietchannel.parasha.HebCalZmanimModel
 
 internal data class DailyLearningUiState(
     val summary: DailyLearningSummary? = null,
@@ -22,6 +23,12 @@ internal data class ShabbatUiState(
     val isLoading: Boolean = false,
 )
 
+internal data class ZmanimUiState(
+    val model: HebCalZmanimModel? = null,
+    val error: Throwable? = null,
+    val isLoading: Boolean = false,
+)
+
 internal class MainViewModel(
     private val hebcalRepository: HebcalRepository,
 ) : ViewModel() {
@@ -29,6 +36,8 @@ internal class MainViewModel(
     val dailyLearning: StateFlow<DailyLearningUiState> = _dailyLearning.asStateFlow()
     private val _shabbat = MutableStateFlow(ShabbatUiState())
     val shabbat: StateFlow<ShabbatUiState> = _shabbat.asStateFlow()
+    private val _zmanim = MutableStateFlow(ZmanimUiState())
+    val zmanim: StateFlow<ZmanimUiState> = _zmanim.asStateFlow()
 
     fun fetchDailyLearning(date: LocalDate = LocalDate.now()) {
         val isoDate = date.toString()
@@ -60,6 +69,19 @@ internal class MainViewModel(
                 _shabbat.value = ShabbatUiState(summary = summary)
             }.onFailure { error ->
                 _shabbat.value = ShabbatUiState(error = error)
+            }
+        }
+    }
+
+    fun fetchZmanim(query: LocationQuery) {
+        _zmanim.value = _zmanim.value.copy(isLoading = true, error = null)
+        viewModelScope.launch {
+            runCatching {
+                withContext(Dispatchers.IO) { hebcalRepository.zmanim(query) }
+            }.onSuccess { model ->
+                _zmanim.value = ZmanimUiState(model = model)
+            }.onFailure { error ->
+                _zmanim.value = ZmanimUiState(error = error)
             }
         }
     }
