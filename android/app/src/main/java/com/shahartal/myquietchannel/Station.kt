@@ -19,8 +19,10 @@ internal enum class Station(
     ;
 
     companion object {
-        fun fromPersistedValue(value: String?): Station =
-            entries.firstOrNull { it.displayName == value || it.name == value } ?: GLGLZ
+        fun fromPersistedValue(value: String?): Station {
+            val normalized = value?.trim()
+            return entries.firstOrNull { it.displayName == normalized || it.name == normalized } ?: GLGLZ
+        }
 
         fun fromStreamUrl(value: String?): Station? = entries.firstOrNull { it.streamUrl == value }
     }

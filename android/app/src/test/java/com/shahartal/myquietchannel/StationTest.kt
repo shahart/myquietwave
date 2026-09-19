@@ -22,6 +22,12 @@ class StationTest {
     }
 
     @Test
+    fun persistedStationNamesIgnoreSurroundingWhitespace() {
+        assertEquals(Station.KAN_88, Station.fromPersistedValue("  ${Station.KAN_88.displayName}  "))
+        assertEquals(Station.GLGLZ, Station.fromPersistedValue("   "))
+    }
+
+    @Test
     fun onlyGlglzOffersSongMetadata() {
         assertEquals("glglz", Station.GLGLZ.songFeedName)
         assertEquals(listOf(Station.GLGLZ), Station.entries.filter { it.songFeedName != null })
