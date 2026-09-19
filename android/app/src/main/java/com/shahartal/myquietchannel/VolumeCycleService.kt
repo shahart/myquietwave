@@ -263,17 +263,7 @@ class VolumeCycleService : Service() {
                         }
                     }
 
-                    for (i in 1..newsDuration) {
-
-                        updateNotification(
-                            newsCountdownText(
-                                remainingMinutes = newsDuration - i + 1,
-                                volumePercent = 100 * audioManager.getStreamVolume(stream) / maxVolume,
-                            ),
-                        )
-
-                        delay(60 * 1000L) // 6 minutes
-                    }
+                    runNewsCountdown(audioManager, stream, maxVolume, newsDuration)
                 }
                 // @RequiresApi(8
                 val now = ZonedDateTime.now(ZoneId.systemDefault()).minute
@@ -282,16 +272,7 @@ class VolumeCycleService : Service() {
                 if (remainingNewsMinutes > 0) {
                     Log.d("myquietwave", "VolumeCycleService continue positive volume, more delay (as part of news duration) [minutes] $remainingNewsMinutes")
 
-                    for (i in 1..remainingNewsMinutes) {
-                        updateNotification(
-                            newsCountdownText(
-                                remainingMinutes = remainingNewsMinutes - i + 1,
-                                volumePercent = 100 * audioManager.getStreamVolume(stream) / maxVolume,
-                            ),
-                        )
-
-                        delay(60 * 1000L)
-                    }
+                    runNewsCountdown(audioManager, stream, maxVolume, remainingNewsMinutes)
                 }
 
                 // this happens only in the Init
@@ -392,6 +373,23 @@ class VolumeCycleService : Service() {
         } else {
             getString(R.string.notif_text_4_1, volumePercent)
         }
+
+    private suspend fun runNewsCountdown(
+        audioManager: AudioManager,
+        stream: Int,
+        maxVolume: Int,
+        minutes: Int,
+    ) {
+        repeat(minutes) { index ->
+            updateNotification(
+                newsCountdownText(
+                    remainingMinutes = minutes - index,
+                    volumePercent = 100 * audioManager.getStreamVolume(stream) / maxVolume,
+                ),
+            )
+            delay(60 * 1000L)
+        }
+    }
 
     private fun isAudioPlaying(): Boolean =
         (getSystemService(AUDIO_SERVICE) as AudioManager).isMusicActive
