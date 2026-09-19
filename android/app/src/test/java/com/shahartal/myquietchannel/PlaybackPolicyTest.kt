@@ -27,6 +27,15 @@ class PlaybackPolicyTest {
     }
 
     @Test
+    fun blankScheduleUsesDefaultTimes() {
+        val expected = NewsSchedule.parse(NewsSchedule.DEFAULT_TEXT).times
+
+        assertEquals(expected, NewsSchedule.parse(null).times)
+        assertEquals(expected, NewsSchedule.parse("").times)
+        assertEquals(expected, NewsSchedule.parse("   ").times)
+    }
+
+    @Test
     fun scheduleWaitsUntilServiceStartSecondBoundary() {
         val schedule = NewsSchedule.parse("12:30")
         assertFalse(schedule.isDue(at(12, 30, 8), serviceStartSecond = 10))
