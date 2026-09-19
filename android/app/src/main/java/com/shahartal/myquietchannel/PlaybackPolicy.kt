@@ -15,11 +15,12 @@ internal data class NewsSchedule(
         const val DEFAULT_TEXT = "17, 21, 7, 12, 15, 18"
 
         fun parse(value: String?): NewsSchedule {
-            val times = (value?.takeIf { it.isNotBlank() } ?: DEFAULT_TEXT)
+            val source = value?.takeIf { it.isNotBlank() } ?: DEFAULT_TEXT
+            val times = source
                 .split(',')
                 .mapNotNull(::parseTime)
                 .toSet()
-            return NewsSchedule(times)
+            return NewsSchedule(times.ifEmpty { parse(DEFAULT_TEXT).times })
         }
 
         private fun parseTime(token: String): ScheduleTime? {
