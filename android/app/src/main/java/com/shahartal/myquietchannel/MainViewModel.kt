@@ -1,0 +1,43 @@
+package com.shahartal.myquietchannel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.time.LocalDate
+
+internal data class DailyLearningUiState(
+    val summary: DailyLearningSummary? = null,
+    val error: Throwable? = null,
+    val isLoading: Boolean = false,
+)
+
+internal class MainViewModel(
+    private val hebcalRepository: HebcalRepository,
+) : ViewModel() {
+    private val _dailyLearning = MutableStateFlow(DailyLearningUiState())
+    val dailyLearning: StateFlow<DailyLearningUiState> = _dailyLearning.asStateFlow()
+
+    fun fetchDailyLearning(date: LocalDate = LocalDate.now()) {
+        val isoDate = date.toString()
+        _dailyLearning.value = _dailyLearning.value.copy(isLoading = true, error = null)
+        viewModelScope.launch {
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    HebcalPresentation.dailyLearning(
+                        hebcalRepository.dailyLearning(isoDate).items,
+                        isoDate,
+                    )
+                }
+            }.onSuccess { summary ->
+                _dailyLearning.value = DailyLearningUiState(summary = summary)
+            }.onFailure { error ->
+                _dailyLearning.value = DailyLearningUiState(error = error)
+            }
+        }
+    }
+}
