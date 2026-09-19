@@ -30,6 +30,12 @@ internal data class ZmanimUiState(
     val isLoading: Boolean = false,
 )
 
+internal data class ParashaUiState(
+    val hebcal: com.shahartal.myquietchannel.parasha.HebCal? = null,
+    val error: Throwable? = null,
+    val isLoading: Boolean = false,
+)
+
 internal class MainViewModel(
     private val hebcalRepository: HebcalRepository,
 ) : ViewModel() {
@@ -39,6 +45,8 @@ internal class MainViewModel(
     val shabbat: StateFlow<ShabbatUiState> = _shabbat.asStateFlow()
     private val _zmanim = MutableStateFlow(ZmanimUiState())
     val zmanim: StateFlow<ZmanimUiState> = _zmanim.asStateFlow()
+    private val _parasha = MutableStateFlow(ParashaUiState())
+    val parasha: StateFlow<ParashaUiState> = _parasha.asStateFlow()
 
     fun fetchDailyLearning(date: LocalDate = LocalDate.now()) {
         val isoDate = date.toString()
@@ -83,6 +91,19 @@ internal class MainViewModel(
                 _zmanim.value = ZmanimUiState(model = model)
             }.onFailure { error ->
                 _zmanim.value = ZmanimUiState(error = error)
+            }
+        }
+    }
+
+    fun fetchParasha() {
+        _parasha.value = _parasha.value.copy(isLoading = true, error = null)
+        viewModelScope.launch {
+            runCatching {
+                withContext(Dispatchers.IO) { hebcalRepository.parasha() }
+            }.onSuccess { hebcal ->
+                _parasha.value = ParashaUiState(hebcal = hebcal)
+            }.onFailure { error ->
+                _parasha.value = ParashaUiState(error = error)
             }
         }
     }
