@@ -349,7 +349,11 @@ class VolumeCycleService : Service() {
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         val stream = AudioManager.STREAM_MUSIC
         Log.d("myquietwave", "VolumeCycleService on destroy, volume back to " + origVolume + " from " + audioManager.getStreamVolume(stream) + " out of " +  audioManager.getStreamMaxVolume(stream))
-        audioManager.setStreamVolume(stream, origVolume, 0)
+        audioManager.setStreamVolume(
+            stream,
+            PlaybackPolicy.restoredVolume(origVolume, audioManager.getStreamMaxVolume(stream)),
+            0,
+        )
 
         job?.cancel()
         serviceScope.coroutineContext[Job]?.cancel()

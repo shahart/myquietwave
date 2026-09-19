@@ -102,6 +102,13 @@ class PlaybackPolicyTest {
     }
 
     @Test
+    fun restoredVolumeStaysWithinDeviceBounds() {
+        assertEquals(0, PlaybackPolicy.restoredVolume(-1, 15))
+        assertEquals(15, PlaybackPolicy.restoredVolume(99, 15))
+        assertEquals(0, PlaybackPolicy.restoredVolume(4, 0))
+    }
+
+    @Test
     fun playbackConfigNormalizesRawServiceInput() {
         val config = PlaybackConfig.fromRawValues(
             station = "כאן 88",

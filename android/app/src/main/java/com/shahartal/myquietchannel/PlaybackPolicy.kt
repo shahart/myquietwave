@@ -70,6 +70,9 @@ internal object PlaybackPolicy {
 
     fun configuredVolumeAfterStartup(observedVolume: Int): Int =
         observedVolume.coerceAtLeast(3)
+
+    fun restoredVolume(originalVolume: Int, maximumVolume: Int): Int =
+        originalVolume.coerceIn(0, maximumVolume.coerceAtLeast(0))
 }
 
 internal data class PlaybackConfig(
