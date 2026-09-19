@@ -57,6 +57,13 @@ class HebcalPresentationTest {
     }
 
     @Test
+    fun displayTimeReturnsEmptyForMalformedTimestamp() {
+        assertEquals("", HebcalPresentation.displayTime("2026-09-18"))
+        assertEquals("", HebcalPresentation.displayTime("not-a-date"))
+        assertEquals("", HebcalPresentation.displayTime("2026-09-18T"))
+    }
+
+    @Test
     fun formatsZmanimDetailsInDisplayOrder() {
         val times = HebCalZmanimTimesModel(
             sunrise = "2026-09-18T06:00:00+03:00",

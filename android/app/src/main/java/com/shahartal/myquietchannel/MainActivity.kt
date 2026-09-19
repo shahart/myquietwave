@@ -436,7 +436,7 @@ class MainActivity : ComponentActivity() {
             requireNotNull(LocationQueryParser.parse(loc))
         } catch (error: Exception) {
             Log.e("myquietwave", "MainActivity fetchZmanim invalid location", error)
-            textViewClock3.text = res + " " + displayCache.get("candles") + " " + displayCache.get("havdalah")
+            showShabbatFallback(res)
             return
         }
 
@@ -473,7 +473,7 @@ class MainActivity : ComponentActivity() {
                 }
             } catch (error: Exception) {
                 Log.w("myquietwave", "MainActivity fetchZmanim failed", error)
-                textViewClock3.text = res + " " + displayCache.get("candles") + " " + displayCache.get("havdalah")
+                showShabbatFallback(res)
                 Firebase.crashlytics.log("MainActivity fetchZmanim Exception")
                 Firebase.crashlytics.recordException(error)
             }
@@ -536,8 +536,7 @@ class MainActivity : ComponentActivity() {
                             // textViewClock3.text = res
             } catch (e: Exception) {
                 Log.w("myquietwave", "MainActivity fetchSunsZmanim unable to fetch hebCal $e", e)
-                res += " " + displayCache.get("sunrise") + " " + displayCache.get("sunset")
-                textViewClock5suns.text = res
+                showSunFallback(res)
                 Firebase.crashlytics.log("MainActivity fetchSunsZmanim Exception")
                 Firebase.crashlytics.recordException(e)
             }
@@ -735,13 +734,25 @@ class MainActivity : ComponentActivity() {
                         }
             } catch (e: Exception) {
             Log.e("myquietwave", "MainActivity fetchParasha Exception $e", e)
-            textViewClock2.text = getParasha()
-            textViewClockH.text = displayCache.get("haftarah")
-            textViewClockHS.text = displayCache.get("haftarah_sephardic")
+            showParashaFallback()
             Firebase.crashlytics.log("MainActivity fetchParasha Exception")
             Firebase.crashlytics.recordException(e)
             }
         }
+    }
+
+    private fun showShabbatFallback(prefix: String) {
+        textViewClock3.text = prefix + " " + displayCache.get("candles") + " " + displayCache.get("havdalah")
+    }
+
+    private fun showSunFallback(prefix: String) {
+        textViewClock5suns.text = prefix + " " + displayCache.get("sunrise") + " " + displayCache.get("sunset")
+    }
+
+    private fun showParashaFallback() {
+        textViewClock2.text = getParasha()
+        textViewClockH.text = displayCache.get("haftarah")
+        textViewClockHS.text = displayCache.get("haftarah_sephardic")
     }
 
     fun getParasha(): String {

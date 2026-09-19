@@ -87,7 +87,8 @@ internal object HebcalPresentation {
     }
 
     fun displayTime(isoDateTime: String): String {
-        val rawValue = isoDateTime.substringAfter('T').take(5)
+        val rawValue = isoDateTime.substringAfter('T', missingDelimiterValue = "").take(5)
+        if (rawValue.length < 5) return ""
         val value = rawValue.removePrefix("0")
         return " $value "
     }
