@@ -560,8 +560,7 @@ class MainActivity : ComponentActivity() {
                             if (it.category == "roshchodesh") {
 
                                 textViewClock6rosh.text = textViewClock6rosh.text.toString() +
-                                    it.hebrew + " - " + DateDisplay.hebrewWeekday(it.date) + " " +
-                                    Utils.switchDate(it.date) + "\n"
+                                    ParashaPresentation.calendarEvent(it.hebrew, it.date) + "\n"
                                 val roshchodeshDate = it.date;
                                 if (Utils.isBefore(roshchodeshDate)) {
                                     textViewClock6rosh.text = "";
@@ -594,8 +593,7 @@ class MainActivity : ComponentActivity() {
                                 if (! Utils.isBefore(holidayDate)) {
 
                                     textViewClock7special.text = textViewClock7special.text.toString() + "\n" +
-                                        it.hebrew + " - " + DateDisplay.hebrewWeekday(it.date) + " " +
-                                        Utils.switchDate(it.date)
+                                        ParashaPresentation.calendarEvent(it.hebrew, it.date)
 
                                     if (! memo.contains(it.memo)) {
                                         memo += "\n\n" + it.hebrew + ": " + it.memo
@@ -606,14 +604,14 @@ class MainActivity : ComponentActivity() {
                             else if (it.title == "Fast begins") {
 
                                 textViewClock8fast.text = textViewClock8fast.text.toString() + "  זמני התענית: עלות השחר " +
-                                        (it.date.split('T')[1].substring(0,5))
+                                        ParashaPresentation.fastTime(it.date)
 
                             }
                             else if (it.title == "Fast ends") {
 
                                 textViewClock8fast.text =
-                                    textViewClock8fast.text.toString() + " צאת הכוכבים " +
-                                            (it.date.split('T')[1].substring(0,5))
+                                        textViewClock8fast.text.toString() + " צאת הכוכבים " +
+                                            ParashaPresentation.fastTime(it.date)
 
                                 if (Utils.isBefore(it.date.split('T')[0])) {
                                     textViewClock8fast.text = ""

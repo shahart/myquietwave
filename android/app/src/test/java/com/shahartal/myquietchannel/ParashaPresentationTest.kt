@@ -40,4 +40,14 @@ class ParashaPresentationTest {
             ParashaPresentation.haftarah("Isaiah 1:1|2:2", "Ezekiel 3:1"),
         )
     }
+
+    @Test
+    fun formatsCalendarEventsAndFastTimes() {
+        assertEquals(
+            "ראש השנה - שישי 18-9-2026",
+            ParashaPresentation.calendarEvent("ראש השנה", "2026-09-18"),
+        )
+        assertEquals("05:42", ParashaPresentation.fastTime("2026-09-18T05:42:00+03:00"))
+        assertEquals("", ParashaPresentation.fastTime("2026-09-18"))
+    }
 }

@@ -52,4 +52,10 @@ internal object ParashaPresentation {
             sephardicReference = sephardicText?.second,
         )
     }
+
+    fun calendarEvent(hebrew: String, isoDate: String): String =
+        "$hebrew - ${DateDisplay.hebrewWeekday(isoDate)} ${Utils.switchDate(isoDate)}"
+
+    fun fastTime(isoDateTime: String): String =
+        isoDateTime.substringAfter('T', missingDelimiterValue = "").take(5)
 }
