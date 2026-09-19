@@ -290,11 +290,10 @@ class VolumeCycleService : Service() {
 
                 // this happens only in the Init
                 if (configuredVolume == 0) {
-                    configuredVolume = audioManager.getStreamVolume(stream)
+                    configuredVolume = PlaybackPolicy.configuredVolumeAfterStartup(
+                        audioManager.getStreamVolume(stream),
+                    )
                     Log.i("myquietwave", "VolumeCycleService configured volume $configuredVolume out of $maxVolume")
-                    if (configuredVolume == 0) {
-                        configuredVolume = 3 // (maxVolume * 15 / 100).coerceAtLeast(1) // let's start with 1 or 2
-                    }
                 }
 
                 updateNotification(getString(R.string.notif_text_5))

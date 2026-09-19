@@ -67,6 +67,9 @@ internal object PlaybackPolicy {
         }
         return if (volume == 0) 4 else volume
     }
+
+    fun configuredVolumeAfterStartup(observedVolume: Int): Int =
+        observedVolume.coerceAtLeast(3)
 }
 
 internal data class PlaybackConfig(

@@ -95,6 +95,13 @@ class PlaybackPolicyTest {
     }
 
     @Test
+    fun configuredVolumeUsesSafeStartupMinimum() {
+        assertEquals(3, PlaybackPolicy.configuredVolumeAfterStartup(0))
+        assertEquals(3, PlaybackPolicy.configuredVolumeAfterStartup(2))
+        assertEquals(8, PlaybackPolicy.configuredVolumeAfterStartup(8))
+    }
+
+    @Test
     fun playbackConfigNormalizesRawServiceInput() {
         val config = PlaybackConfig.fromRawValues(
             station = "כאן 88",
