@@ -52,6 +52,15 @@ class PlaybackPolicyTest {
     }
 
     @Test
+    fun scheduleClampsInvalidServiceStartSeconds() {
+        val schedule = NewsSchedule.parse("12:30")
+
+        assertTrue(schedule.isDue(at(12, 30, 0), serviceStartSecond = -10))
+        assertFalse(schedule.isDue(at(12, 30, 57), serviceStartSecond = 70))
+        assertTrue(schedule.isDue(at(12, 30, 59), serviceStartSecond = 70))
+    }
+
+    @Test
     fun durationIsClampedAndFridayAfternoonIsLimitedToSixMinutes() {
         assertEquals(1, PlaybackPolicy.normalizeDuration(0, isNearShabbat = false))
         assertEquals(59, PlaybackPolicy.normalizeDuration(99, isNearShabbat = false))

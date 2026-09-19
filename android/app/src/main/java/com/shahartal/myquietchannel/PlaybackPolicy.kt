@@ -8,8 +8,10 @@ internal data class ScheduleTime(val hour: Int, val minute: Int)
 internal data class NewsSchedule(
     val times: Set<ScheduleTime>,
 ) {
-    fun isDue(now: ZonedDateTime, serviceStartSecond: Int): Boolean =
-        ScheduleTime(now.hour, now.minute) in times && now.second >= serviceStartSecond - 1
+    fun isDue(now: ZonedDateTime, serviceStartSecond: Int): Boolean {
+        val boundary = serviceStartSecond.coerceIn(0, 59)
+        return ScheduleTime(now.hour, now.minute) in times && now.second >= boundary - 1
+    }
 
     companion object {
         const val DEFAULT_TEXT = "17, 21, 7, 12, 15, 18"
