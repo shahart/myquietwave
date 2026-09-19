@@ -99,6 +99,21 @@ class HebcalApiTest {
         assertEquals("/zmanim?cfg=json&geonameid=293222&ue=off", server.takeRequest().path)
     }
 
+    @Test
+    fun repositoryPropagatesHttpFailures() = runBlocking {
+        server.enqueue(MockResponse().setResponseCode(503).setBody("unavailable"))
+        val repository = NetworkHebcalRepository(
+            RetrofitInstance.createApi(server.url("/").toString())
+        )
+
+        try {
+            repository.shabbat(LocationQuery.City("IL-Jerusalem", useElevation = false))
+            fail("Expected HTTP failure")
+        } catch (error: retrofit2.HttpException) {
+            assertEquals(503, error.code())
+        }
+    }
+
     private fun jsonResponse(body: String): MockResponse = MockResponse()
         .setResponseCode(200)
         .setHeader("Content-Type", "application/json")
