@@ -17,7 +17,7 @@ cd android
 ./gradlew build              # Full build
 ./gradlew assembleDebug      # Build APK
 ./gradlew test               # Unit tests
-./gradlew connectedAndroidTest  # Instrumented tests (requires device/emulator)
+./gradlew connectedDebugAndroidTest  # Instrumented tests (requires device/emulator)
 ./gradlew clean              # Clean build artifacts
 ```
 
@@ -48,7 +48,8 @@ User settings (location, volume, hours)
 The core cycle is: **4-hour mute → 3-minute play** on repeat, paused during Shabbat.
 
 ### Android (`android/app/src/main/java/`)
-- **`MainActivity.kt`**: All UI (Jetpack Compose + legacy Spinner), settings persistence, location picker, Hebrew calendar display, Firebase integration, in-app update management
+- **`MainActivity.kt`**: UI (Jetpack Compose + legacy Spinner), settings persistence, location picker, Hebrew calendar display, Firebase integration, and in-app update management. Collects lifecycle-aware presentation state from `MainViewModel` for daily learning, Shabbat/candle-lighting, and zmanim (sunrise/sunset).
+- **`MainViewModel.kt`**: Owns coroutine-backed HebCal loading and exposes `StateFlow` UI state for daily learning, Shabbat, zmanim, and parasha data. Keep network loading out of Activity lifecycle callbacks; collect state with `repeatOnLifecycle`.
 - **`VolumeCycleService.kt`**: Foreground service (`FOREGROUND_SERVICE_MEDIA_PLAYBACK`), coroutine-based volume cycle scheduler, Shabbat guard
 - **`parasha/`**: Retrofit + HebCal API integration
   - `JsonHebCalShabbatApi.kt`: Retrofit interface (Shabbat, Zmanim, Daf Yomi endpoints)

@@ -1,7 +1,8 @@
 # Changelog
 
-## 1.70
+## 2.00
 
+Refactor, plus:
 Fix two 'lighting' times
 Pop-up the Parasha-Haftarah connection
 Kickoff for Leil Slihot
