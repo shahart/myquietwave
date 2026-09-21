@@ -1,3 +1,21 @@
+function getNextSaturdayDate(date = new Date()) {
+    const nextSaturday = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    nextSaturday.setDate(nextSaturday.getDate() + (6 - nextSaturday.getDay() + 7) % 7);
+    return [
+        nextSaturday.getFullYear(),
+        String(nextSaturday.getMonth() + 1).padStart(2, '0'),
+        String(nextSaturday.getDate()).padStart(2, '0'),
+    ].join('-');
+}
+
+function getLocalDateString(date = new Date()) {
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0'),
+    ].join('-');
+}
+
 async function calc() {
     document.getElementById('havdala').innerHTML = '';
     document.getElementById('lighting').innerHTML = '';
@@ -126,8 +144,18 @@ async function calc() {
             let shabbatExists = false;
             let yomTovExists = false;
             let yomTovName = '';
+            let majorHolidayOnNextSaturday = null;
+            const nextSaturdayDate = getNextSaturdayDate();
+            const todayDate = getLocalDateString();
             let days = "ראשון,שני,שלישי,רביעי,חמישי,שישי,שבת";
             for (let i = 0; i < data.items.length; i++) {
+                const item = data.items[i];
+                const isDailyCalendarItem = item.category === 'holiday' ||
+                    item.category === 'roshchodesh' ||
+                    item.title === 'Fast begins' || item.title === 'Fast ends';
+                if (isDailyCalendarItem && item.date.substring(0, 10) < todayDate) {
+                    continue;
+                }
                 if (data.items[i].category === 'parashat') {
                     document.getElementById('parasha').innerHTML = data.items[i].hebrew;
                     setHaftarahConnectionParasha(data.items[i].hebrew);
@@ -170,6 +198,9 @@ async function calc() {
                     shabbatExists = true;
                 }
                 else if (data.items[i].category === 'havdalah') {
+                    if (new Date(data.items[i].date) <= new Date()) {
+                        continue;
+                    }
                     if (document.getElementById('havdala').innerHTML === '') {
                         document.getElementById('havdala').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
                     }
@@ -231,6 +262,10 @@ async function calc() {
                     }
                 }
                 else if (data.items[i].category == 'holiday') {
+                    if (data.items[i].subcat === 'major' &&
+                        data.items[i].date.substring(0, 10) === nextSaturdayDate) {
+                        majorHolidayOnNextSaturday = data.items[i];
+                    }
                     fastDate = data.items[i].date;
                     let today = new Date().toISOString().split('T')[0];
                     if (today <= fastDate) {
@@ -253,7 +288,15 @@ async function calc() {
             }
             if (! shabbatExists) {
                 document.getElementById('shabbathExists').innerText = '';
-                const reason = yomTovName
+                if (majorHolidayOnNextSaturday) {
+                    document.getElementById('parasha').innerHTML = majorHolidayOnNextSaturday.title;
+                    document.getElementById('parasha2').innerHTML = '';
+                    document.getElementById('parashaUrl').removeAttribute('href');
+                    document.getElementById('parasha2Url').removeAttribute('href');
+                }
+                const reason = majorHolidayOnNextSaturday
+                    ? 'השבת חל ' + majorHolidayOnNextSaturday.title + ', ולכן אין פרשת שבוע רגילה.'
+                    : yomTovName
                     ? 'השבת חל ' + yomTovName + ', ולכן אין פרשת שבוע רגילה.'
                     : 'אין פרשת שבוע רגילה בשבת הקרובה.';
                 setHaftarahConnectionButtonState(false, reason);
@@ -336,4 +379,3 @@ function getLoc() {
         alert("GeoLocation is not supported by this browser.");
     }
 }
-
