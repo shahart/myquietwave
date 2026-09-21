@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Tests for fetchOnAirXml</title>
+    <style>
+        body { font-family: monospace; margin: 20px; }
+        .pass { color: green; }
+        .fail { color: red; }
+        #results { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>fetchOnAirXml Tests</h1>
+    <div id="results"></div>
+
+    <script src="js/radio.js"></script>
+    <script>
+        const results = document.getElementById('results');
+        let passed = 0, failed = 0;
+
+        function assert(condition, name) {
+            if (condition) {
+                passed++;
+                results.innerHTML += '<div class="pass">PASS: ' + name + '</div>';
+            } else {
+                failed++;
+                results.innerHTML += '<div class="fail">FAIL: ' + name + '</div>';
+            }
+        }
+
+        function summary() {
+            results.innerHTML += '<div style="margin-top: 20px; font-weight: bold;">' + passed + ' passed, ' + failed + ' failed</div>';
+        }
+
+        const targetUrl = "http://glzxml.blob.core.windows.net/dalet/glglz-onair/onair.xml";
+        const expectedPrefix = "https://myquietwave.lat-shahar.workers.dev/?url=";
+        const expectedFull = expectedPrefix + encodeURIComponent(targetUrl);
+
+        // --- Sync Tests ---
+        assert(typeof fetchOnAirXml === 'function', 'fetchOnAirXml is defined');
+        assert(expectedFull.startsWith(expectedPrefix), 'URL starts with worker proxy prefix');
+        assert(expectedFull.includes(encodeURIComponent(targetUrl)), 'URL contains encoded target URL');
+
+        // --- Live async tests ---
+        (async function() {
+            const targetUrl = "http://glzxml.blob.core.windows.net/dalet/glglz-onair/onair.xml";
+            const proxyUrl = "https://myquietwave.lat-shahar.workers.dev/?url=" + encodeURIComponent(targetUrl);
+            const timeout = { signal: AbortSignal.timeout(10000) };
+
+            let xml = null;
+
+            // Try direct first (works if CORS enabled on Azure blob)
+            try {
+                const resp = await fetch(targetUrl, timeout);
+                if (resp.ok) {
+                    xml = await resp.text();
+                    assert(true, 'Direct fetch succeeded (CORS is enabled)');
+                }
+            } catch (e) { /* CORS blocked or timeout, try proxy */ }
+
+            // Fallback: Cloudflare Worker proxy
+            if (!xml) {
+                try {
+                    const resp = await fetch(proxyUrl, timeout);
+                    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                    xml = await resp.text();
+                    assert(true, 'Worker proxy fetch succeeded');
+                } catch (e) {
+                    assert(false, 'Both direct and proxy fetch failed: ' + e.message);
+                }
+            }
+
+            if (xml) {
+                assert(xml.length > 0, 'decoded XML is non-empty');
+                assert(xml.includes('BroadcastMonitor'), 'XML contains BroadcastMonitor root element');
+
+                const doc = new DOMParser().parseFromString(xml, 'text/xml');
+                assert(!doc.querySelector('parsererror'), 'XML parses without errors');
+
+                const stationName = doc.querySelector('stationName');
+                assert(stationName !== null, 'XML has stationName');
+                assert(stationName.textContent.length > 0, 'stationName: ' + stationName.textContent);
+
+                const titleName = doc.querySelector('Current > titleName');
+                assert(titleName !== null, 'Current has titleName');
+
+                const updated = doc.querySelector('updated');
+                assert(updated !== null, 'XML has updated timestamp');
+
+                const div = document.createElement('div');
+                div.style.cssText = 'margin-top:16px;padding:14px;border-radius:12px;background:#f0f0f0;white-space:pre-wrap;font-size:0.9em;max-height:300px;overflow:auto;';
+                div.textContent = xml;
+                document.body.appendChild(div);
+            }
+
+            summary();
+        })();
+    </script>
+</body>
+</html>

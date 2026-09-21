@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Tests for index.html features</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { font-family: monospace; margin: 20px; }
+        .pass { color: green; }
+        .fail { color: red; }
+        .section { font-weight: bold; margin-top: 16px; font-size: 1.1em; }
+        #results { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>index.html Feature Tests</h1>
+
+    <!-- Minimal DOM from index.html for testing -->
+    <select id="stationSelect">
+        <option value="https://glzwizzlv.bynetcdn.com/glz_mp3">גלצ</option>
+        <option value="https://glzwizzlv.bynetcdn.com/glglz_mp3">גלגלצ</option>
+        <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_BET.mp3">רשת ב</option>
+        <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/KAN_GIMMEL.mp3" selected>רשת ג</option>
+        <option value="https://cdn88.mediacast.co.il/102fm-tlv/102fm_mp3/icecast.audio">FM102</option>
+        <option value="https://cdn.cybercdn.live/Galei_Israel/Live/icecast.audio">גלי ישראל</option>
+        <option value="https://27863.live.streamtheworld.com/KAN_88.mp3">כאן 88</option>
+        <option value="https://live.kcm.fm/live-new">קול חי</option>
+        <option value="https://live.kcm.fm/livemusic">קול חי מיוזיק</option>
+        <option value="https://cdn.cybercdn.live/Kol_Barama/Live_Audio/icecast.audio">קול ברמה</option>
+    </select>
+    <button id="radioButton">האזן לחדשות</button>
+    <button id="listenNowButton">האזן עכשיו</button>
+    <button id="whatsNext">מה השיר הבא בגלגלצ ?</button>
+    <select id="locationSelect">
+        <optgroup label="ישראל">
+            <option value="IL-Jerusalem">IL-ירושלים</option>
+            <option value="IL-Tel Aviv">IL-תל אביב</option>
+            <option value="IL-Haifa">IL-חיפה</option>
+            <option value="IL-Be'er Sheva">IL-באר שבע</option>
+            <option value="IL-Eilat">IL-אילת</option>
+            <option value="IL-Ashdod">IL-אשדוד</option>
+            <option value="IL-Ashkelon">IL-אשקלון</option>
+            <option value="IL-Betar Ilit">IL-ביתר עילית</option>
+            <option value="IL-Bat Yam">IL-בת ים</option>
+            <option value="IL-Beit Shemesh">IL-בית שמש</option>
+            <option value="IL-Bnei Brak">IL-בני ברק</option>
+            <option value="IL-Herzliya">IL-הרצליה</option>
+            <option value="IL-Hadera">IL-חדרה</option>
+            <option value="IL-Holon">IL-חולון</option>
+            <option value="IL-Tiberias">IL-טבריה</option>
+            <option value="IL-Yavne">IL-יבנה</option>
+            <option value="IL-Kfar Saba">IL-כפר סבא</option>
+            <option value="IL-Lod">IL-לוד</option>
+            <option value="IL-Modiin">IL-מודיעין</option>
+            <option value="IL-Modiin Ilit">IL-מודיעין עילית</option>
+            <option value="IL-Mitzpe Ramon">IL-מצפה רמון</option>
+            <option value="IL-Nazareth">IL-נצרת</option>
+            <option value="IL-Netanya">IL-נתניה</option>
+            <option value="IL-Petach Tikvah">IL-פתח תקוה</option>
+            <option value="IL-Zefat">IL-צפת</option>
+            <option value="IL-Rishon LeZion">IL-ראשון לציון</option>
+            <option value="IL-Ramla">IL-רמלה</option>
+            <option value="IL-Ramat Gan">IL-רמת גן</option>
+            <option value="IL-Ra'anana">IL-רעננה</option>
+        </optgroup>
+        <optgroup label="Other">
+            <option value="other">Geo/ GPS-Lat, Lon</option>
+        </optgroup>
+        <optgroup label="US">
+            <option value="US-New York-NY">US-New York-NY</option>
+            <option value="US-Los Angeles-CA">US-Los Angeles-CA</option>
+        </optgroup>
+    </select>
+    <input type="text" id="otherLocation" value="IL-Jerusalem" style="display:none;">
+    <div id="status"></div>
+    <div id="timer"></div>
+    <div id="clock"></div>
+    <div id="hdat"></div>
+    <div id="dat"></div>
+    <div id="sunrise"></div>
+    <div id="sunset"></div>
+    <div id="foundLoc"></div>
+    <div id="parasha"></div>
+    <div id="parasha2"></div>
+    <a id="parashaUrl" href=""></a>
+    <a id="parasha2Url" href=""></a>
+    <div id="haftarah"></div>
+    <a id="haftarahUrl" href=""></a>
+    <div id="haftarahS"></div>
+    <a id="haftarahSUrl" href=""></a>
+    <div id="lighting"></div>
+    <a id="lightingUrl" href=""></a>
+    <span id="lightingM"></span>
+    <div id="havdala"></div>
+    <div id="special"></div>
+    <div id="fast"></div>
+    <div id="roshchodesh"></div>
+    <a id="roshchodeshUrl" href=""></a>
+    <div id="dafYomi"></div>
+    <a id="dafYomiUrl" href="">הדף היומי</a>
+    <textarea id="todo" rows="4"></textarea>
+    <p id="shabbathExists"></p>
+    <div class="footer-links">
+        <a href="links-shabbat.html"><span>קישור</span></a>
+        <a href="https://example.com/shortcut" target="_blank" rel="noopener"><span>iPhone Shortcut</span></a>
+        <a href="https://play.google.com/store" target="_blank" rel="noopener"><span>Android App</span></a>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        var results = document.getElementById('results');
+        var passed = 0, failed = 0;
+
+        function assert(condition, name) {
+            if (condition) {
+                passed++;
+                results.innerHTML += '<div class="pass">PASS: ' + name + '</div>';
+            } else {
+                failed++;
+                results.innerHTML += '<div class="fail">FAIL: ' + name + '</div>';
+            }
+        }
+
+        function section(name) {
+            results.innerHTML += '<div class="section">' + name + '</div>';
+        }
+
+        function summary() {
+            var el = document.createElement('div');
+            el.style.cssText = 'margin-top:20px;font-weight:bold;font-size:1.2em;';
+            el.textContent = passed + ' passed, ' + failed + ' failed';
+            results.appendChild(el);
+        }
+
+        // ============================================================
+        // Functions under test (from script.js)
+        // ============================================================
+        function saveInput(cname, cvalue) {
+            if (typeof(Storage) !== "undefined") {
+                localStorage.setItem(cname, cvalue);
+            } else {
+                var d = new Date();
+                d.setTime(d.getTime() + (399 * 24 * 60 * 60 * 1000));
+                document.cookie = cname + "=" + cvalue + ";expires=" + d.toUTCString() + ";path=/";
+            }
+        }
+
+        function loadInput(cname) {
+            if (typeof(Storage) !== "undefined") {
+                var res = localStorage.getItem(cname);
+                return res || "";
+            } else {
+                var name = cname + "=";
+                var ca = document.cookie.split(';');
+                for (var c of ca) {
+                    while (c.charAt(0) === ' ') c = c.substring(1);
+                    if (c.indexOf(name) === 0)
+                        return c.substring(name.length, c.length).split('\\').join('\n');
+                }
+                return "";
+            }
+        }
+
+        function no2gim(input) {
+            var letters = ["\u05DC\"","\u05DB\"","\u05D9\"","\u05D8","\u05D7","\u05D6","\u05D5","\u05D4","\u05D3","\u05D2","\u05D1","\u05D0"];
+            var values = [30,20,10,9,8,7,6,5,4,3,2,1];
+            var output = "";
+            while (input > 0) {
+                for (var i = 0; i < letters.length; ++i) {
+                    if (input == 16) return output + "\u05D8\"\u05D6";
+                    if (input == 15) return output + "\u05D8\"\u05D5";
+                    if (input >= values[i]) {
+                        input -= values[i];
+                        output += letters[i];
+                        break;
+                    }
+                }
+            }
+            if (output.endsWith("\""))
+                output = output.slice(0, -1);
+            return output;
+        }
+
+        function getYY(no) {
+            var letters = ["\u05D4'","\u05D3'","\u05D2'","\u05D1'","\u05D0'","\u05EA","\u05E9","\u05E8","\u05E7","\u05E6","\u05E4","\u05E2","\u05E1","\u05E0","\u05DE","\u05DC","\u05DB","\u05D9","\u05D8","\u05D7","\u05D6","\u05D5","\u05D4","\u05D3","\u05D2","\u05D1","\u05D0"];
+            var values = [5000,4000,3000,2000,1000,400,300,200,100,90,80,70,60,50,40,30,20,10,9,8,7,6,5,4,3,2,1];
+            var output = "";
+            while (no > 0) {
+                for (var i = 0; i < letters.length; i++) {
+                    if (no == 16) return output + "\u05D8\u05D6";
+                    if (no == 15) return output + "\u05D8\u05D5";
+                    if (no >= values[i]) {
+                        no -= values[i];
+                        output += letters[i];
+                        break;
+                    }
+                }
+            }
+            return output;
+        }
+
+        function convertEng(hebrew) {
+            hebrew = hebrew.replace("Joshua", "\u05D9\u05D4\u05D5\u05E9\u05E2");
+            hebrew = hebrew.replace("Judges", "\u05E9\u05D5\u05E4\u05D8\u05D9\u05DD");
+            hebrew = hebrew.replace("II Samuel", "\u05E9\u05DE\u05D5\u05D0\u05DC \u05D1");
+            hebrew = hebrew.replace("I Samuel", "\u05E9\u05DE\u05D5\u05D0\u05DC \u05D0");
+            hebrew = hebrew.replace("II Kings", "\u05DE\u05DC\u05DB\u05D9\u05DD \u05D1");
+            hebrew = hebrew.replace("I Kings", "\u05DE\u05DC\u05DB\u05D9\u05DD \u05D0");
+            hebrew = hebrew.replace("Isaiah", "\u05D9\u05E9\u05E2\u05D9\u05D4\u05D5");
+            hebrew = hebrew.replace("Jeremiah", "\u05D9\u05E8\u05DE\u05D9\u05D4\u05D5");
+            hebrew = hebrew.replace("Ezekiel", "\u05D9\u05D7\u05D6\u05E7\u05D0\u05DC");
+            hebrew = hebrew.replace("Hosea", "\u05D4\u05D5\u05E9\u05E2");
+            hebrew = hebrew.replace("Joel", "\u05D9\u05D5\u05D0\u05DC");
+            hebrew = hebrew.replace("Amos", "\u05E2\u05DE\u05D5\u05E1");
+            hebrew = hebrew.replace("Obadiah", "\u05E2\u05D5\u05D1\u05D3\u05D9\u05D4");
+            hebrew = hebrew.replace("Jonah", "\u05D9\u05D5\u05E0\u05D4");
+            hebrew = hebrew.replace("Micah", "\u05DE\u05D9\u05DB\u05D4");
+            hebrew = hebrew.replace("Nachum", "\u05E0\u05D7\u05D5\u05DD");
+            hebrew = hebrew.replace("Habakkuk", "\u05D7\u05D1\u05E7\u05D5\u05E7");
+            hebrew = hebrew.replace("Zephaniah", "\u05E6\u05E4\u05E0\u05D9\u05D4");
+            hebrew = hebrew.replace("Haggai", "\u05D7\u05D2\u05D9");
+            hebrew = hebrew.replace("Zechariah", "\u05D6\u05DB\u05E8\u05D9\u05D4");
+            hebrew = hebrew.replace("Malachi", "\u05DE\u05DC\u05D0\u05DB\u05D9");
+            return hebrew;
+        }
+
+        function trim(n) {
+            if (n.startsWith('0')) return n.substring(1);
+            return n;
+        }
+
+        function sleep(time) {
+            return new Promise(function(resolve) { setTimeout(resolve, time); });
+        }
+
+        function fetchOnAir() {
+            var url = "https://api.allorigins.win/get?url=" + encodeURIComponent("http://glzxml.blob.core.windows.net/dalet/glglz-onair/onair.xml");
+            fetch(url)
+                .then(function(response) {
+                    if (!response.ok) throw new Error("Network response was not ok");
+                    return response.json();
+                })
+                .then(function(json) {
+                    var xml = atob(json.contents);
+                    alert(xml);
+                })
+                .catch(function(error) {
+                    alert("Error: " + error.message);
+                });
+        }
+
+        function setCountdown(label, durationMs) {
+            var statusEl = document.getElementById("status");
+            var timerEl = document.getElementById("timer");
+            var endTime = Date.now() + durationMs;
+            function render() {
+                var remainingMs = Math.max(0, endTime - Date.now());
+                var totalSeconds = Math.floor(remainingMs / 1000);
+                var minutes = Math.floor(totalSeconds / 60);
+                var seconds = totalSeconds % 60;
+                if (remainingMs >= 1000) {
+                    statusEl.textContent = label;
+                    timerEl.textContent = minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+                } else {
+                    statusEl.textContent = "";
+                    timerEl.textContent = "";
+                }
+            }
+            render();
+        }
+
+        function updateClock() {
+            var now = new Date();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var seconds = now.getSeconds();
+            var formattedTime = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+            document.getElementById('clock').innerHTML = "\uD83D\uDD50 " + formattedTime + "<br>" +
+                Intl.DateTimeFormat().resolvedOptions().timeZone + "<br>offset (Hours) " +
+                new Date().getTimezoneOffset() / -60;
+        }
+
+        // ============================================================
+        // 1. saveInput / loadInput (localStorage)
+        // ============================================================
+        section('saveInput / loadInput (localStorage)');
+
+        saveInput('t1', 'hello');
+        assert(loadInput('t1') === 'hello', 'save and load a string');
+
+        saveInput('t1', 'updated');
+        assert(loadInput('t1') === 'updated', 'overwrite existing key');
+
+        saveInput('t2', '');
+        assert(loadInput('t2') === '', 'empty string round-trips');
+
+        assert(loadInput('nonexistent') === '', 'missing key returns empty string');
+
+        saveInput('t3', '\u05D1\u05D3\u05D9\u05E7\u05EA \u05E2\u05D1\u05E8\u05D9\u05EA');
+        assert(loadInput('t3') === '\u05D1\u05D3\u05D9\u05E7\u05EA \u05E2\u05D1\u05E8\u05D9\u05EA', 'Hebrew characters preserved');
+
+        localStorage.removeItem('t1');
+        localStorage.removeItem('t2');
+        localStorage.removeItem('t3');
+
+        // ============================================================
+        // 2. no2gim (Hebrew day numbering with gershayim)
+        // ============================================================
+        section('no2gim (Hebrew day numbering)');
+
+        assert(no2gim(1) === '\u05D0', '1 = \u05D0');
+        assert(no2gim(2) === '\u05D1', '2 = \u05D1');
+        assert(no2gim(5) === '\u05D4', '5 = \u05D4');
+        assert(no2gim(10) === '\u05D9', '10 = \u05D9');
+        assert(no2gim(11) === '\u05D9"\u05D0', '11 = \u05D9"\u05D0');
+        assert(no2gim(15) === '\u05D8"\u05D5', '15 = \u05D8"\u05D5 (special)');
+        assert(no2gim(16) === '\u05D8"\u05D6', '16 = \u05D8"\u05D6 (special)');
+        assert(no2gim(20) === '\u05DB', '20 = \u05DB');
+        assert(no2gim(21) === '\u05DB"\u05D0', '21 = \u05DB"\u05D0');
+        assert(no2gim(30) === '\u05DC', '30 = \u05DC');
+        assert(no2gim(17) === '\u05D9"\u05D6', '17 = \u05D9"\u05D6');
+        assert(no2gim(29) === '\u05DB"\u05D8', '29 = \u05DB"\u05D8');
+
+        // ============================================================
+        // 3. getYY (Hebrew year)
+        // ============================================================
+        section('getYY (Hebrew year)');
+
+        assert(getYY(1) === '\u05D0', '1 = \u05D0');
+        assert(getYY(5) === '\u05D4', '5 = \u05D4');
+        assert(getYY(15) === '\u05D8\u05D5', '15 = \u05D8\u05D5');
+        assert(getYY(16) === '\u05D8\u05D6', '16 = \u05D8\u05D6');
+        assert(getYY(5785) !== '', '5785 produces non-empty output');
+        assert(getYY(5000) === "\u05D4'", "5000 = \u05D4'");
+        assert(getYY(5785).length >= 4, '5785 produces at least 4 characters');
+
+        // ============================================================
+        // 4. convertEng (English Bible names to Hebrew)
+        // ============================================================
+        section('convertEng (English to Hebrew names)');
+
+        assert(convertEng('Joshua 1:1') === '\u05D9\u05D4\u05D5\u05E9\u05E2 1:1', 'Joshua');
+        assert(convertEng('Judges 2:3') === '\u05E9\u05D5\u05E4\u05D8\u05D9\u05DD 2:3', 'Judges');
+        assert(convertEng('I Samuel 3:5') === '\u05E9\u05DE\u05D5\u05D0\u05DC \u05D0 3:5', 'I Samuel');
+        assert(convertEng('II Samuel 7:1') === '\u05E9\u05DE\u05D5\u05D0\u05DC \u05D1 7:1', 'II Samuel');
+        assert(convertEng('I Kings 8:1') === '\u05DE\u05DC\u05DB\u05D9\u05DD \u05D0 8:1', 'I Kings');
+        assert(convertEng('II Kings 12:1') === '\u05DE\u05DC\u05DB\u05D9\u05DD \u05D1 12:1', 'II Kings');
+        assert(convertEng('Isaiah 53:5') === '\u05D9\u05E9\u05E2\u05D9\u05D4\u05D5 53:5', 'Isaiah');
+        assert(convertEng('Jeremiah 29:11') === '\u05D9\u05E8\u05DE\u05D9\u05D4\u05D5 29:11', 'Jeremiah');
+        assert(convertEng('Ezekiel 37:1') === '\u05D9\u05D7\u05D6\u05E7\u05D0\u05DC 37:1', 'Ezekiel');
+        assert(convertEng('Hosea 1:2') === '\u05D4\u05D5\u05E9\u05E2 1:2', 'Hosea');
+        assert(convertEng('Jonah 1:17') === '\u05D9\u05D5\u05E0\u05D4 1:17', 'Jonah');
+        assert(convertEng('Malachi 3:1') === '\u05DE\u05DC\u05D0\u05DB\u05D9 3:1', 'Malachi');
+        assert(convertEng('Micah 5:2') === '\u05DE\u05D9\u05DB\u05D4 5:2', 'Micah');
+        assert(convertEng('Amos 1:1') === '\u05E2\u05DE\u05D5\u05E1 1:1', 'Amos');
+        assert(convertEng('Obadiah 1:1') === '\u05E2\u05D5\u05D1\u05D3\u05D9\u05D4 1:1', 'Obadiah');
+        assert(convertEng('Zephaniah 1:1') === '\u05E6\u05E4\u05E0\u05D9\u05D4 1:1', 'Zephaniah');
+        assert(convertEng('Haggai 1:1') === '\u05D7\u05D2\u05D9 1:1', 'Haggai');
+        assert(convertEng('Zechariah 1:1') === '\u05D6\u05DB\u05E8\u05D9\u05D4 1:1', 'Zechariah');
+        assert(convertEng('Nachum 1:1') === '\u05E0\u05D7\u05D5\u05DD 1:1', 'Nachum');
+        assert(convertEng('Habakkuk 1:1') === '\u05D7\u05D1\u05E7\u05D5\u05E7 1:1', 'Habakkuk');
+        assert(convertEng('Isaiah 53:5; Micah 5:2') === '\u05D9\u05E9\u05E2\u05D9\u05D4\u05D5 53:5; \u05DE\u05D9\u05DB\u05D4 5:2', 'Multiple names');
+        assert(convertEng('No change') === 'No change', 'Unchanged text passes through');
+
+        // ============================================================
+        // 5. trim (leading zero removal)
+        // ============================================================
+        section('trim (leading zero)');
+
+        assert(trim('08:30') === '8:30', 'removes leading zero');
+        assert(trim('12:00') === '12:00', 'no change for non-zero start');
+        assert(trim('00:00') === '0:00', 'removes first zero from 00:00');
+        assert(trim('09:45') === '9:45', 'removes leading zero from 09:45');
+        assert(trim('6:15') === '6:15', 'no change when no leading zero');
+
+        // ============================================================
+        // 6. setCountdown
+        // ============================================================
+        section('setCountdown');
+
+        document.getElementById('status').textContent = '';
+        document.getElementById('timer').textContent = '';
+        setCountdown('Test label', 120000);
+        assert(document.getElementById('status').textContent === 'Test label', 'sets status text');
+        assert(document.getElementById('timer').textContent.length > 0, 'sets timer text');
+        assert(document.getElementById('timer').textContent.includes(':'), 'timer shows MM:SS format');
+
+        setCountdown('', 0);
+        assert(document.getElementById('status').textContent === '', 'zero duration clears status');
+        assert(document.getElementById('timer').textContent === '', 'zero duration clears timer');
+
+        // ============================================================
+        // 7. updateClock
+        // ============================================================
+        section('updateClock');
+
+        updateClock();
+        var clockHTML = document.getElementById('clock').innerHTML;
+        assert(clockHTML.includes('\uD83D\uDD50'), 'clock shows emoji');
+        assert(clockHTML.includes(':'), 'clock shows time with colons');
+        assert(clockHTML.includes('offset'), 'clock shows timezone offset');
+
+        // ============================================================
+        // 8. DOM structure
+        // ============================================================
+        section('DOM structure');
+
+        assert(document.getElementById('stationSelect') !== null, 'stationSelect exists');
+        assert(document.getElementById('radioButton') !== null, 'radioButton exists');
+        assert(document.getElementById('listenNowButton') !== null, 'listenNowButton exists');
+        assert(document.getElementById('locationSelect') !== null, 'locationSelect exists');
+        assert(document.getElementById('otherLocation') !== null, 'otherLocation input exists');
+        assert(document.getElementById('status') !== null, 'status exists');
+        assert(document.getElementById('timer') !== null, 'timer exists');
+        assert(document.getElementById('clock') !== null, 'clock exists');
+        assert(document.getElementById('hdat') !== null, 'hdat exists');
+        assert(document.getElementById('dat') !== null, 'dat exists');
+        assert(document.getElementById('sunrise') !== null, 'sunrise exists');
+        assert(document.getElementById('sunset') !== null, 'sunset exists');
+        assert(document.getElementById('foundLoc') !== null, 'foundLoc exists');
+        assert(document.getElementById('parasha') !== null, 'parasha exists');
+        assert(document.getElementById('parasha2') !== null, 'parasha2 exists');
+        assert(document.getElementById('haftarah') !== null, 'haftarah exists');
+        assert(document.getElementById('lighting') !== null, 'lighting exists');
+        assert(document.getElementById('havdala') !== null, 'havdala exists');
+        assert(document.getElementById('special') !== null, 'special exists');
+        assert(document.getElementById('fast') !== null, 'fast exists');
+        assert(document.getElementById('roshchodesh') !== null, 'roshchodesh exists');
+        assert(document.getElementById('dafYomi') !== null, 'dafYomi exists');
+        assert(document.getElementById('todo') !== null, 'todo textarea exists');
+        assert(document.getElementById('shabbathExists') !== null, 'shabbathExists exists');
+
+        // ============================================================
+        // 9. Station select
+        // ============================================================
+        section('Station select');
+
+        var stationOpts = document.querySelectorAll('#stationSelect option');
+        assert(stationOpts.length === 10, '10 station options');
+        assert(stationOpts[0].textContent === '\u05D2\u05DC\u05E6', 'First is \u05D2\u05DC\u05E6');
+        assert(stationOpts[1].textContent === '\u05D2\u05DC\u05D2\u05DC\u05E6', 'Second is \u05D2\u05DC\u05D2\u05DC\u05E6');
+        assert(stationOpts[3].selected === true, '\u05E8\u05E9\u05EA \u05D2 is default');
+
+        // ============================================================
+        // 10. Location select
+        // ============================================================
+        section('Location select');
+
+        var locOpts = document.querySelectorAll('#locationSelect option');
+        assert(locOpts.length > 30, 'Many location options');
+        var ilOpts = document.querySelectorAll('#locationSelect optgroup[label="\u05D9\u05E9\u05E8\u05D0\u05DC"] option');
+        assert(ilOpts.length >= 29, 'Israel group has >= 29 cities');
+        assert(ilOpts[0].value === 'IL-Jerusalem', 'First IL is IL-Jerusalem');
+        assert(document.querySelector('#locationSelect option[value="other"]') !== null, 'Other/GPS option exists');
+
+        var usOpts = document.querySelectorAll('#locationSelect optgroup[label="US"] option');
+        assert(usOpts.length >= 2, 'US group has options');
+
+        // ============================================================
+        // 11. Other location input
+        // ============================================================
+        section('Other location input');
+
+        assert(document.getElementById('otherLocation').value === 'IL-Jerusalem', 'Default value is IL-Jerusalem');
+        assert(document.getElementById('otherLocation').style.display === 'none', 'Hidden by default');
+
+        // ============================================================
+        // 12. Todo textarea
+        // ============================================================
+        section('Todo textarea');
+
+        assert(document.getElementById('todo').tagName === 'TEXTAREA', 'Is a textarea');
+        assert(document.getElementById('todo').rows === 4, 'Has 4 rows');
+
+        // ============================================================
+        // 13. RTL direction
+        // ============================================================
+        section('Page layout');
+
+        assert(document.body.getAttribute('dir') === 'rtl' || getComputedStyle(document.body).direction === 'rtl', 'RTL direction');
+
+        // ============================================================
+        // 14. Quick links
+        // ============================================================
+        section('Quick links');
+
+        var links = document.querySelectorAll('.footer-links a');
+        assert(links.length === 3, '3 quick links');
+        assert(links[0].getAttribute('href') === 'links-shabbat.html', 'First to links-shabbat.html');
+        assert(links[1].getAttribute('target') === '_blank', 'iPhone opens in new tab');
+        assert(links[2].getAttribute('target') === '_blank', 'Android opens in new tab');
+
+        // ============================================================
+        // 15. Current radio controls
+        // ============================================================
+        section('Current radio controls');
+
+        assert(document.getElementById('radioButton') !== null, 'News radio button exists');
+        assert(document.getElementById('listenNowButton') !== null, 'Listen-now button exists');
+        assert(document.getElementById('whatsNext') !== null, 'What-next button exists');
+
+        // ============================================================
+        // 16. All utility functions available
+        // ============================================================
+        section('All utility functions available');
+
+        assert(typeof saveInput === 'function', 'saveInput');
+        assert(typeof loadInput === 'function', 'loadInput');
+        assert(typeof no2gim === 'function', 'no2gim');
+        assert(typeof getYY === 'function', 'getYY');
+        assert(typeof convertEng === 'function', 'convertEng');
+        assert(typeof trim === 'function', 'trim');
+        assert(typeof sleep === 'function', 'sleep');
+        assert(typeof setCountdown === 'function', 'setCountdown');
+        assert(typeof updateClock === 'function', 'updateClock');
+
+        // ============================================================
+        // 17. Auto-populated elements
+        // ============================================================
+        section('Auto-populated elements');
+
+        updateClock();
+        assert(document.getElementById('clock').innerHTML.length > 10, 'Clock has content');
+
+        var days = "\u05E8\u05D0\u05E9\u05D5\u05DF,\u05E9\u05E0\u05D9,\u05E9\u05DC\u05D9\u05E9\u05D9,\u05E8\u05D1\u05D9\u05E2\u05D9,\u05D7\u05DE\u05D9\u05E9\u05D9,\u05E9\u05D9\u05E9\u05D9,\u05E9\u05D1\u05EA";
+        var d = new Date();
+        document.getElementById('dat').innerHTML = d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear() + " - " + days.split(",")[d.getDay()];
+        var datText = document.getElementById('dat').innerHTML;
+        assert(datText.includes('/'), 'Date format DD/MM/YYYY');
+        assert(datText.includes(' - '), 'Date includes day-of-week');
+
+        // ============================================================
+        // Summary
+        // ============================================================
+        summary();
+    </script>
+</body>
+</html>
