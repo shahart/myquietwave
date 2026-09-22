@@ -175,6 +175,44 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    private fun initializeViewReferences() {
+        statusText = binding.statusText
+        shabesText = binding.textViewShabes
+        toggleButton = binding.toggleButton
+        shareButton = binding.shareButton
+        peekSongsButton = binding.peekSongsButton
+        editTextNumberNewsDuration = binding.editTextDuration
+        textViewNextNews = binding.textViewNextNewsStr
+        textViewNewsLinks = binding.textView14
+        textViewPosition = binding.textViewLocationLabel
+        textViewClock = binding.textViewClock
+        textViewHebDate = binding.textViewHebDate
+        textViewClock_2nd = binding.textViewClock2nd
+        textViewClock_3rd = binding.textViewClock3rd
+        textViewClock2 = binding.textViewClock2
+        textViewClock2_2 = binding.textViewClock22
+        textViewDate = binding.textViewDate
+        textViewClockH = binding.textViewClockH
+        textViewClockHS = binding.textViewClockHS
+        haftarahConnectionButton = binding.haftarahConnectionButton
+        textViewClock3 = binding.textViewClock3
+        textViewClock4dafYomi = binding.textViewClock4dafYomi
+        textViewClock4dafYomiTitle = binding.textViewClock4dafYomiTitle
+        textViewOmer = binding.textViewOmer
+        textViewClock5locTitle = binding.textViewClock5locTitle
+        textViewClock5suns = binding.textViewClock5suns
+        textViewClock6rosh = binding.textViewClock6rosh
+        textViewClock7special = binding.textViewClock7special
+        textViewClock8fast = binding.textViewClock8fast
+        editTextTodo = binding.editTextTodo
+        currentSong = binding.textViewCurrentSong
+        nextSong = binding.textViewNextSong
+        spinner = binding.editTextLocationSpinner
+        stationsSpinner = binding.editTextStationSpinner
+        editTextLocation = binding.editTextLocation
+        radioPlayer = binding.radioCheckbox
+    }
+
     private fun updateServiceUi() {
         val canEditSchedule = !isServiceRunning && !radioPlayer.isChecked
 
@@ -372,17 +410,12 @@ class MainActivity : ComponentActivity() {
     }
 
     fun fetchDafYomi() {
-        textViewClock4dafYomi = binding.textViewClock4dafYomi
-        textViewClock4dafYomiTitle = binding.textViewClock4dafYomiTitle
-        textViewOmer = binding.textViewOmer
         textViewOmer.text = ""
         textViewClock4dafYomi.text = ""
-        textViewClock7special = binding.textViewClock7special
         mainViewModel.fetchDailyLearning()
     }
 
     fun fetchShabatZmanim() {
-        textViewClock3 = binding.textViewClock3
         textViewClock3.text = ""
 
         if ( // (dow == DayOfWeek.THURSDAY || dow == DayOfWeek.FRIDAY || dow == DayOfWeek.SATURDAY) &&
@@ -395,9 +428,6 @@ class MainActivity : ComponentActivity() {
     }
 
     fun fetchShabatZmanim(loc: String) { // }: String {
-
-        textViewClock3 = binding.textViewClock3
-
         val trimmedLocation = loc.trim()
         var res: String
         if (trimmedLocation.firstOrNull()?.isLetter() == true) {
@@ -418,8 +448,6 @@ class MainActivity : ComponentActivity() {
     }
 
     fun fetchSunsZmanim() {
-        textViewClock5suns = binding.textViewClock5suns
-        textViewClock5locTitle = binding.textViewClock5locTitle
         textViewClock5suns.text = ""
 
         if ( // (dow == DayOfWeek.THURSDAY || dow == DayOfWeek.FRIDAY || dow == DayOfWeek.SATURDAY) &&
@@ -432,10 +460,6 @@ class MainActivity : ComponentActivity() {
     }
 
     fun fetchSunsZmanim(loc: String) { // }: String {
-
-        textViewClock5suns = binding.textViewClock5suns
-        textViewClock5locTitle = binding.textViewClock5locTitle
-
         val query = LocationQueryParser.parse(loc)
         if (query == null) {
             showSunFallback(" ")
@@ -444,20 +468,19 @@ class MainActivity : ComponentActivity() {
         mainViewModel.fetchZmanim(query)
     }
     fun fetchParasha() { // }: String {
-
-        textViewClockH = binding.textViewClockH
-        textViewClockHS = binding.textViewClockHS
-        textViewClock6rosh = binding.textViewClock6rosh
-        textViewClock7special = binding.textViewClock7special
-        textViewClock8fast = binding.textViewClock8fast
-
         lifecycleScope.launch {
             try {
                 val hebcal = withContext(Dispatchers.IO) { hebcalRepository.parasha() }
+                        val currentItems = hebcal.items.filterNot(HebcalPresentation::isPastDailyCalendarItem)
+                        val majorHolidayOnNextSaturday =
+                            HebcalPresentation.majorHolidayOnNextSaturday(currentItems)
+                        textViewClock6rosh.text = ""
+                        textViewClock7special.text = ""
+                        textViewClock8fast.text = ""
                         // val str = response.body()
                         // Log.i("myquietwave", "MainActivity fetchParasha " + str)
                         var memo = ""
-                        hebcal.items.forEach {
+                        currentItems.forEach {
                             if (it.category == "roshchodesh") {
 
                                 textViewClock6rosh.text = textViewClock6rosh.text.toString() +
@@ -556,6 +579,10 @@ class MainActivity : ComponentActivity() {
                                         startActivity(browserIntent)
                                     }
                                 }
+                                else {
+                                    textViewClock2_2.text = ""
+                                    textViewClock2_2.setOnClickListener(null)
+                                }
 
                                 val haftarah = ParashaPresentation.haftarah(
                                     it.leyning.haftarah,
@@ -591,9 +618,14 @@ class MainActivity : ComponentActivity() {
                                         startActivity(browserIntent)
                                     }
                                 }
+                                if (haftarah.sephardic == null) {
+                                    textViewClockHS.text = ""
+                                    textViewClockHS.setOnClickListener(null)
+                                }
 
                             }
                         }
+                        majorHolidayOnNextSaturday?.let(::showMajorHolidayInsteadOfParasha)
                         if (memo.length > 0) {
                             textViewClock7special.setOnClickListener {
                                 val alertDialogBuilder = AlertDialog.Builder(this@MainActivity)
@@ -630,6 +662,23 @@ class MainActivity : ComponentActivity() {
         textViewClock2.text = getParasha()
         textViewClockH.text = displayCache.get("haftarah")
         textViewClockHS.text = displayCache.get("haftarah_sephardic")
+    }
+
+    private fun showMajorHolidayInsteadOfParasha(holiday: com.shahartal.myquietchannel.parasha.Item) {
+        val holidayDisplay = if (holiday.yomtov) "יום טוב ${holiday.hebrew}" else holiday.hebrew
+        textViewClock2.text = holidayDisplay
+        textViewClock2.setOnClickListener(null)
+        textViewClock2_2.text = ""
+        textViewClock2_2.setOnClickListener(null)
+        textViewClockH.text = ""
+        textViewClockH.setOnClickListener(null)
+        textViewClockHS.text = ""
+        textViewClockHS.setOnClickListener(null)
+        haftarahConnectionSourceUrl = null
+        haftarahConnectionButton.isEnabled = false
+        displayCache.put("parashat", holidayDisplay)
+        displayCache.put("haftarah", "")
+        displayCache.put("haftarah_sephardic", "")
     }
 
     fun getParasha(): String {
@@ -675,6 +724,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        initializeViewReferences()
         settingsRepository = SettingsRepository(
             getSharedPreferences(SettingsRepository.PREFERENCES_NAME, MODE_PRIVATE)
         )
@@ -786,15 +836,11 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        haftarahConnectionButton = binding.haftarahConnectionButton
         haftarahConnectionButton.setOnClickListener { showHaftarahConnection() }
 
         firebaseAnalytics = Firebase.analytics
 
         Log.i("myquietwave", "MainActivity Version " + BuildConfig.VERSION_NAME)
-
-
-        editTextLocation = binding.editTextLocation
 
         val settings = settingsRepository.load()
         val savedLocation = settings.location
@@ -803,12 +849,6 @@ class MainActivity : ComponentActivity() {
 
         editTextLocation.text = savedLocation
         val locations = resources.getStringArray(R.array.locations)
-
-        spinner = binding.editTextLocationSpinner
-        stationsSpinner = binding.editTextStationSpinner
-        peekSongsButton = binding.peekSongsButton
-        currentSong = binding.textViewCurrentSong
-        nextSong = binding.textViewNextSong
 
         run {
             val stations = resources.getStringArray(R.array.stations)
@@ -875,7 +915,6 @@ class MainActivity : ComponentActivity() {
         }
 
         if (ZonedDateTime.now(ZoneId.systemDefault()).dayOfWeek == DayOfWeek.FRIDAY) {
-            shabesText = binding.textViewShabes
             shabesText.text = getString(R.string.shabbath)
         }
 
@@ -889,18 +928,12 @@ class MainActivity : ComponentActivity() {
 
         fetchDafYomi()
 
-        editTextTodo = binding.editTextTodo
-
-        radioPlayer = binding.radioCheckbox
-
         /* val infoIcon: ImageView = findViewById(R.id.info_icon)
         infoIcon.setOnClickListener {
             Toast.makeText(this, "Here you can place your city, with a comma, for Candle lighting and Havdalah times", Toast.LENGTH_LONG).show();
         }*/
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-        shareButton = binding.shareButton
 
         shareButton.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND)
@@ -910,17 +943,10 @@ class MainActivity : ComponentActivity() {
             startActivity(Intent.createChooser(shareIntent, "Share this app"))
         }
 
-        statusText = binding.statusText
-        toggleButton = binding.toggleButton
-
         peekSongsButton.setOnClickListener {
             fetchGlglzSong(Station.GLGLZ)
         }
 
-        editTextNumberNewsDuration = binding.editTextDuration
-        textViewNextNews = binding.textViewNextNewsStr
-
-        textViewNewsLinks = binding.textView14
         textViewNewsLinks.setOnClickListener {
             val browserIntent = Intent(
                 Intent.ACTION_VIEW,
@@ -929,7 +955,6 @@ class MainActivity : ComponentActivity() {
             startActivity(browserIntent)
         }
 
-        textViewPosition = binding.textViewLocationLabel
         textViewPosition.setOnClickListener {
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -1003,15 +1028,6 @@ class MainActivity : ComponentActivity() {
         textViewNextNews.setOnClickListener { normalizedNewsDuration() }
 
         // seconds
-
-        textViewClock = binding.textViewClock
-        textViewHebDate = binding.textViewHebDate
-        textViewClock_2nd = binding.textViewClock2nd
-        textViewClock_3rd = binding.textViewClock3rd
-
-        textViewClock2 = binding.textViewClock2
-        textViewClock2_2 = binding.textViewClock22
-        textViewDate = binding.textViewDate
 
         textViewClock_2nd.text = TimeZone.currentSystemDefault().id
         // todo? ZoneId.short_ids code, like idt, pst

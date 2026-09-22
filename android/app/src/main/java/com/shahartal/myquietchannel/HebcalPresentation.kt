@@ -2,6 +2,8 @@ package com.shahartal.myquietchannel
 
 import com.shahartal.myquietchannel.parasha.HebCalZmanimTimesModel
 import com.shahartal.myquietchannel.parasha.Item
+import java.time.DayOfWeek
+import java.time.LocalDate
 
 internal data class LinkedText(val text: String, val link: String)
 
@@ -84,6 +86,34 @@ internal object HebcalPresentation {
             havdalahTimes = items.filter { it.category == "havdalah" }.map { displayTime(it.date) },
             mevarchim = mevarchim,
         )
+    }
+
+    /**
+     * Hebcal's Shabbat feed contains a few days on either side of today.  Daily
+     * calendar entries from an earlier date must not be presented as upcoming.
+     */
+    fun isPastDailyCalendarItem(item: Item, today: LocalDate = LocalDate.now()): Boolean {
+        val isDailyCalendarItem = item.category == "holiday" ||
+            item.category == "roshchodesh" ||
+            item.title == "Fast begins" ||
+            item.title == "Fast ends"
+        if (!isDailyCalendarItem) return false
+
+        val itemDate = runCatching { LocalDate.parse(item.date.substringBefore('T')) }.getOrNull()
+        return itemDate == null || itemDate.isBefore(today)
+    }
+
+    fun majorHolidayOnNextSaturday(
+        items: List<Item>,
+        today: LocalDate = LocalDate.now(),
+    ): Item? {
+        val daysUntilSaturday = (DayOfWeek.SATURDAY.value - today.dayOfWeek.value + 7) % 7
+        val nextSaturday = today.plusDays(daysUntilSaturday.toLong())
+        return items.firstOrNull { item ->
+            item.category == "holiday" &&
+                item.subcat == "major" &&
+                item.date.substringBefore('T') == nextSaturday.toString()
+        }
     }
 
     fun displayTime(isoDateTime: String): String {

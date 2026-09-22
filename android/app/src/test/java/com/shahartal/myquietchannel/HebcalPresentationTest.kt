@@ -6,6 +6,7 @@ import com.shahartal.myquietchannel.parasha.HebCalZmanimTimesModel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import java.time.LocalDate
 
 class HebcalPresentationTest {
     @Test
@@ -61,6 +62,45 @@ class HebcalPresentationTest {
         assertEquals("", HebcalPresentation.displayTime("2026-09-18"))
         assertEquals("", HebcalPresentation.displayTime("not-a-date"))
         assertEquals("", HebcalPresentation.displayTime("2026-09-18T"))
+    }
+
+    @Test
+    fun skipsPastDailyCalendarItemsButKeepsFutureItems() {
+        val today = LocalDate.of(2026, 9, 22)
+
+        assertEquals(
+            true,
+            HebcalPresentation.isPastDailyCalendarItem(item(category = "holiday", date = "2026-09-21"), today),
+        )
+        assertEquals(
+            true,
+            HebcalPresentation.isPastDailyCalendarItem(
+                item(category = "", title = "Fast begins", date = "2026-09-21T05:00:00+03:00"),
+                today,
+            ),
+        )
+        assertEquals(
+            false,
+            HebcalPresentation.isPastDailyCalendarItem(item(category = "roshchodesh", date = "2026-09-22"), today),
+        )
+    }
+
+    @Test
+    fun findsMajorHolidayOnTheUpcomingSaturday() {
+        val holiday = item(
+            category = "holiday",
+            title = "Sukkot I",
+            subcat = "major",
+            date = "2026-09-26",
+        )
+
+        assertEquals(
+            holiday,
+            HebcalPresentation.majorHolidayOnNextSaturday(
+                listOf(holiday, item(category = "holiday", subcat = "major", date = "2026-09-27")),
+                LocalDate.of(2026, 9, 22),
+            ),
+        )
     }
 
     @Test

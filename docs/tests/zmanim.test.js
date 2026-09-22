@@ -121,11 +121,11 @@ test('renders a major holiday title that falls on the next Saturday', async () =
     loadScript(context, 'js/zmanim.js');
     await context.calc();
 
-    assert.equal(document.getElementById('parasha').innerHTML, 'Sukkot I');
+    assert.equal(document.getElementById('parasha').innerHTML, 'יום טוב סוכות יום א׳');
     assert.equal(document.getElementById('parasha2').innerHTML, '');
     assert.match(document.getElementById('special').innerHTML, /סוכות יום א׳/);
     assert.doesNotMatch(document.getElementById('special').innerHTML, /יום כיפור/);
     assert.equal(document.getElementById('roshchodesh').innerHTML, '');
     assert.equal(document.getElementById('fast').innerHTML, '');
-    assert.match(document.getElementById('haftarahConnectionDisabledReason').textContent, /Sukkot I/);
+    assert.match(document.getElementById('haftarahConnectionDisabledReason').textContent, /סוכות יום א׳/);
 });

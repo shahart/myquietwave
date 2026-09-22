@@ -289,13 +289,16 @@ async function calc() {
             if (! shabbatExists) {
                 document.getElementById('shabbathExists').innerText = '';
                 if (majorHolidayOnNextSaturday) {
-                    document.getElementById('parasha').innerHTML = majorHolidayOnNextSaturday.title;
+                    const holidayDisplay = majorHolidayOnNextSaturday.yomtov
+                        ? 'יום טוב ' + majorHolidayOnNextSaturday.hebrew
+                        : majorHolidayOnNextSaturday.hebrew;
+                    document.getElementById('parasha').innerHTML = holidayDisplay;
                     document.getElementById('parasha2').innerHTML = '';
                     document.getElementById('parashaUrl').removeAttribute('href');
                     document.getElementById('parasha2Url').removeAttribute('href');
                 }
                 const reason = majorHolidayOnNextSaturday
-                    ? 'השבת חל ' + majorHolidayOnNextSaturday.title + ', ולכן אין פרשת שבוע רגילה.'
+                    ? 'השבת חל ' + majorHolidayOnNextSaturday.hebrew + ', ולכן אין פרשת שבוע רגילה.'
                     : yomTovName
                     ? 'השבת חל ' + yomTovName + ', ולכן אין פרשת שבוע רגילה.'
                     : 'אין פרשת שבוע רגילה בשבת הקרובה.';
