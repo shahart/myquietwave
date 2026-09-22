@@ -32,6 +32,9 @@ import androidx.core.app.ActivityCompat
 //import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Lifecycle
@@ -722,8 +725,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.enableEdgeToEdge(window)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        applySystemBarInsets()
         initializeViewReferences()
         settingsRepository = SettingsRepository(
             getSharedPreferences(SettingsRepository.PREFERENCES_NAME, MODE_PRIVATE)
@@ -1136,6 +1141,32 @@ class MainActivity : ComponentActivity() {
         checkForAppUpdate()
 
         startPeriodicSongRefresh()
+    }
+
+    /**
+     * Keeps the scrollable content accessible below display cutouts and system bars while the
+     * window itself draws edge-to-edge.
+     */
+    private fun applySystemBarInsets() {
+        val root = binding.root
+        val initialLeft = root.paddingLeft
+        val initialTop = root.paddingTop
+        val initialRight = root.paddingRight
+        val initialBottom = root.paddingBottom
+
+        ViewCompat.setOnApplyWindowInsetsListener(root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            view.setPadding(
+                initialLeft + insets.left,
+                initialTop + insets.top,
+                initialRight + insets.right,
+                initialBottom + insets.bottom
+            )
+            windowInsets
+        }
+        ViewCompat.requestApplyInsets(root)
     }
 
     private val appUpdateManager: AppUpdateManager by lazy {
