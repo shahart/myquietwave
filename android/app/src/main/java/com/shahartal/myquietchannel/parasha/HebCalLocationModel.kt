@@ -1,5 +1,9 @@
-package com.shahartal.myquietchannel.parasha;
+package com.shahartal.myquietchannel.parasha
 
+import androidx.annotation.Keep
+import com.google.gson.annotations.SerializedName
+
+@Keep
 data class HebCalLocationModel(
-    val title: String
+    @SerializedName("title") val title: String = ""
 )

@@ -60,12 +60,12 @@ internal object HebcalPresentation {
 
     fun dailyLearning(items: List<Item>, isoDate: String): DailyLearningSummary {
         val daf = items.firstOrNull { it.category == "dafyomi" }
-            ?.let { LinkedText(it.hebrew, it.link) }
+            ?.let { LinkedText(it.hebrew, it.link.orEmpty()) }
         val additional = items.mapNotNull { item ->
             dailyLearningLabels[item.category]?.let { label -> "$label: ${item.hebrew}" }
         }
         val omer = items.firstOrNull { it.category == "omer" }?.let {
-            LinkedText("ספירת העומר (בבוקר): \n${it.hebrew.replace("עומר", "")}", it.link)
+            LinkedText("ספירת העומר (בבוקר): \n${it.hebrew.replace("עומר", "")}", it.link.orEmpty())
         }
         val selichot = items.firstOrNull {
             it.category == "holiday" && it.subcat == "minor" && it.title == "Leil Selichot"
@@ -75,9 +75,10 @@ internal object HebcalPresentation {
 
     fun shabbat(items: List<Item>): ShabbatSummary {
         val mevarchim = items.firstOrNull { it.category == "mevarchim" }?.let { item ->
+            val memo = item.memo.orEmpty()
             MevarchimSummary(
                 title = item.hebrew,
-                molad = translateMolad(item.memo.substringAfter(": ", item.memo)),
+                molad = translateMolad(memo.substringAfter(": ", memo)),
                 wikiUrl = "https://he.wikipedia.org/wiki/${monthWikiTitle(item.hebrew)}",
             )
         }

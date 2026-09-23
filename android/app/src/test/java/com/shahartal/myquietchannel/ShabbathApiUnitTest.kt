@@ -103,7 +103,7 @@ class ShabbathApiUnitTest {
         val city = "IL-Jerusalem"
         val hebcal =
             runBlocking { RetrofitInstance.api.getZmanimPerCity(Utils.getCity(city), Utils.getUe(city)) }
-        res = hebcal.times.sunrise + ", " + hebcal.times.chatzot + ", " + hebcal.times.sunset
+        res = hebcal.times?.sunrise.orEmpty() + ", " + hebcal.times?.chatzot.orEmpty() + ", " + hebcal.times?.sunset.orEmpty()
         return res
     }
 
@@ -114,7 +114,7 @@ class ShabbathApiUnitTest {
         val city = "IL-Jerusalem"
         val hebcal =
             runBlocking { RetrofitInstance.api.getZmanimByLoc("32", "35", "off") }
-        res = hebcal.times.sunrise + ", " + hebcal.times.chatzot + ", " + hebcal.times.sunset
+        res = hebcal.times?.sunrise.orEmpty() + ", " + hebcal.times?.chatzot.orEmpty() + ", " + hebcal.times?.sunset.orEmpty()
     }
 
     @Test

@@ -554,7 +554,11 @@ class MainActivity : ComponentActivity() {
                                 spannableString.setSpan(UnderlineSpan(), " שבת ".length, fullText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                 textViewClock2.text = spannableString
 
-                                displayCache.put("parashat", " שבת " + str)
+                                ParashaCache.save(
+                                    cache = displayCache,
+                                    displayValue = " שבת " + str,
+                                    shabbatDate = it.date,
+                                )
 
                                 textViewClock2.setOnClickListener {
                                     val browserIntent = Intent(
@@ -588,8 +592,8 @@ class MainActivity : ComponentActivity() {
                                 }
 
                                 val haftarah = ParashaPresentation.haftarah(
-                                    it.leyning.haftarah,
-                                    it.leyning.haftarah_sephardic,
+                                    it.leyning?.haftarah.orEmpty(),
+                                    it.leyning?.haftarah_sephardic,
                                 )
                                 val fullTextH = haftarah.ashkenazi
                                 val spannableStringH = SpannableString(fullTextH)
@@ -646,7 +650,7 @@ class MainActivity : ComponentActivity() {
                         }
             } catch (e: Exception) {
             Log.e("myquietwave", "MainActivity fetchParasha Exception $e", e)
-            showParashaFallback()
+            showParashaFallbackOrError()
             Firebase.crashlytics.log("MainActivity fetchParasha Exception")
             Firebase.crashlytics.recordException(e)
             }
@@ -661,8 +665,16 @@ class MainActivity : ComponentActivity() {
         textViewClock5suns.text = prefix + " " + displayCache.get("sunrise") + " " + displayCache.get("sunset")
     }
 
-    private fun showParashaFallback() {
-        textViewClock2.text = getParasha()
+    private fun showParashaFallbackOrError() {
+        val cachedParasha = ParashaCache.currentValue(displayCache)
+        if (cachedParasha == null) {
+            AlertDialog.Builder(this)
+                .setMessage("error loading data")
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+            return
+        }
+        textViewClock2.text = cachedParasha
         textViewClockH.text = displayCache.get("haftarah")
         textViewClockHS.text = displayCache.get("haftarah_sephardic")
     }
@@ -679,13 +691,17 @@ class MainActivity : ComponentActivity() {
         textViewClockHS.setOnClickListener(null)
         haftarahConnectionSourceUrl = null
         haftarahConnectionButton.isEnabled = false
-        displayCache.put("parashat", holidayDisplay)
+        ParashaCache.save(
+            cache = displayCache,
+            displayValue = holidayDisplay,
+            shabbatDate = holiday.date,
+        )
         displayCache.put("haftarah", "")
         displayCache.put("haftarah_sephardic", "")
     }
 
     fun getParasha(): String {
-        var res = displayCache.get("parashat")
+        var res = ParashaCache.currentValue(displayCache).orEmpty()
         if (res.isBlank()) {
             res = " שבת פרשת " + Parshios.getParshaString(HebrewDate.today())
         }
@@ -807,27 +823,31 @@ class MainActivity : ComponentActivity() {
                 launch {
                     mainViewModel.zmanim.collect { state ->
                         state.model?.let { model ->
-                            val sunrise = HebcalPresentation.displayTime(model.times.sunrise)
-                            val sunset = HebcalPresentation.displayTime(model.times.sunset)
-                            val text = "\n${getString(R.string.sunrise)} $sunrise\n${getString(R.string.sunset)} $sunset "
-                            displayCache.put("sunrise", getString(R.string.sunrise) + " " + sunrise)
-                            displayCache.put("sunset", getString(R.string.sunset) + " " + sunset)
-                            if (DateDisplay.hasTimePassed(model.times.sunset)) {
-                                val hebrewCalendar = HebrewCalendar()
-                                hebrewCalendar.add(Calendar.HOUR_OF_DAY, 12)
-                                textViewHebDate.text = " הערב אור ל- ${HebrewDateDisplay.format(
-                                    hebrewCalendar.get(HebrewCalendar.YEAR),
-                                    hebrewCalendar.get(HebrewCalendar.MONTH),
-                                    hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH),
-                                )}"
-                            }
-                            textViewClock5locTitle.text = model.location.title
-                            textViewClock5suns.text = text
-                            textViewClock5suns.setOnClickListener {
-                                AlertDialog.Builder(this@MainActivity)
-                                    .setMessage(HebcalPresentation.zmanimDetails(model.times))
-                                    .setNegativeButton(getString(R.string.close_alert)) { dialog, _ -> dialog.cancel() }
-                                    .show()
+                            val times = model.times
+                            val location = model.location
+                            if (times != null && location != null) {
+                                val sunrise = HebcalPresentation.displayTime(times.sunrise)
+                                val sunset = HebcalPresentation.displayTime(times.sunset)
+                                val text = "\n${getString(R.string.sunrise)} $sunrise\n${getString(R.string.sunset)} $sunset "
+                                displayCache.put("sunrise", getString(R.string.sunrise) + " " + sunrise)
+                                displayCache.put("sunset", getString(R.string.sunset) + " " + sunset)
+                                if (DateDisplay.hasTimePassed(times.sunset)) {
+                                    val hebrewCalendar = HebrewCalendar()
+                                    hebrewCalendar.add(Calendar.HOUR_OF_DAY, 12)
+                                    textViewHebDate.text = " הערב אור ל- ${HebrewDateDisplay.format(
+                                        hebrewCalendar.get(HebrewCalendar.YEAR),
+                                        hebrewCalendar.get(HebrewCalendar.MONTH),
+                                        hebrewCalendar.get(HebrewCalendar.DAY_OF_MONTH),
+                                    )}"
+                                }
+                                textViewClock5locTitle.text = location.title
+                                textViewClock5suns.text = text
+                                textViewClock5suns.setOnClickListener {
+                                    AlertDialog.Builder(this@MainActivity)
+                                        .setMessage(HebcalPresentation.zmanimDetails(times))
+                                        .setNegativeButton(getString(R.string.close_alert)) { dialog, _ -> dialog.cancel() }
+                                        .show()
+                                }
                             }
                         }
                         state.error?.let { error ->

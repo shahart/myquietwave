@@ -1,16 +1,17 @@
 package com.shahartal.myquietchannel.parasha
 
-data class Item(
-    val category: String,
-    val hebrew: String,
-    val leyning: Leyning,
-    val memo: String,
-    val date: String,
-    val title: String,
-    val subcat: String,
-    // val title_orig: String,
-    val link: String, // https://www.sefaria.org/Zevachim.36a?lang=bi&utm_source=hebcal.com&utm_medium=api
-    val yomtov: Boolean = false
+import androidx.annotation.Keep
+import com.google.gson.annotations.SerializedName
 
-    // omer { count: {he, en }, sefira: {he, en, translit} }
+@Keep
+data class Item(
+    @SerializedName("category") val category: String = "",
+    @SerializedName("hebrew") val hebrew: String = "",
+    @SerializedName("leyning") val leyning: Leyning? = null,
+    @SerializedName("memo") val memo: String? = null,
+    @SerializedName("date") val date: String = "",
+    @SerializedName("title") val title: String = "",
+    @SerializedName("subcat") val subcat: String? = null,
+    @SerializedName("link") val link: String? = null,
+    @SerializedName("yomtov") val yomtov: Boolean = false
 )

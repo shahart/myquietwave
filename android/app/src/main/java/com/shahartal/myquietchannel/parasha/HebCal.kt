@@ -1,5 +1,9 @@
 package com.shahartal.myquietchannel.parasha
 
+import androidx.annotation.Keep
+import com.google.gson.annotations.SerializedName
+
+@Keep
 data class HebCal(
-    val items: List<Item>
+    @SerializedName("items") val items: List<Item> = emptyList()
 )

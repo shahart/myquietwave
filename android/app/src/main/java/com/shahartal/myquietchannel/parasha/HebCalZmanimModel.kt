@@ -1,6 +1,10 @@
 package com.shahartal.myquietchannel.parasha
 
+import androidx.annotation.Keep
+import com.google.gson.annotations.SerializedName
+
+@Keep
 data class HebCalZmanimModel(
-    val location: HebCalLocationModel,
-    val times: HebCalZmanimTimesModel
+    @SerializedName("location") val location: HebCalLocationModel? = null,
+    @SerializedName("times") val times: HebCalZmanimTimesModel? = null
 )
