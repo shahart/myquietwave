@@ -76,7 +76,7 @@ test('fetches and renders the current calendar data', async () => {
     assert.equal(document.getElementById('haftarahConnectionButton').disabled, false);
 });
 
-test('renders a major holiday title that falls on the next Saturday', async () => {
+test('renders major holiday readings that fall on the next Saturday', async () => {
     const document = createDocument({ locationSelect: 'IL-Jerusalem' });
     const RealDate = Date;
     class TestDate extends RealDate {
@@ -101,7 +101,18 @@ test('renders a major holiday title that falls on the next Saturday', async () =
             { category: 'roshchodesh', date: '2026-09-21', hebrew: 'ראש חודש תשרי', memo: 'Past Rosh Chodesh' },
             { title: 'Fast begins', date: '2026-09-21T05:00:00+03:00', hebrew: 'תחילת צום' },
             { title: 'Fast ends', date: '2026-09-21T19:00:00+03:00', hebrew: 'סיום צום' },
-            { category: 'holiday', subcat: 'major', title: 'Sukkot I', date: '2026-09-26', hebrew: 'סוכות יום א׳', yomtov: true },
+            {
+                category: 'holiday',
+                subcat: 'major',
+                title: 'Sukkot I',
+                date: '2026-09-26',
+                hebrew: 'סוכות יום א׳',
+                yomtov: true,
+                leyning: {
+                    1: 'Leviticus 22:26-23:44',
+                    haftarah: 'Zechariah 14:1-21',
+                },
+            },
             { category: 'holiday', subcat: 'major', title: 'Sukkot II', date: '2026-09-27', hebrew: 'סוכות יום ב׳', yomtov: true },
         ],
     };
@@ -121,8 +132,16 @@ test('renders a major holiday title that falls on the next Saturday', async () =
     loadScript(context, 'js/zmanim.js');
     await context.calc();
 
-    assert.equal(document.getElementById('parasha').innerHTML, 'יום טוב סוכות יום א׳');
+    assert.equal(
+        document.getElementById('parasha').innerHTML,
+        'יום טוב סוכות יום א׳<br>ויקרא 22:26-23:44',
+    );
     assert.equal(document.getElementById('parasha2').innerHTML, '');
+    assert.equal(document.getElementById('haftarah').innerHTML, 'זכריה 14:1-21');
+    assert.equal(
+        document.getElementById('haftarahUrl').href,
+        'https://shahart.github.io/heb-bible/index.html?b=Zechariah 14',
+    );
     assert.match(document.getElementById('special').innerHTML, /סוכות יום א׳/);
     assert.doesNotMatch(document.getElementById('special').innerHTML, /יום כיפור/);
     assert.equal(document.getElementById('roshchodesh').innerHTML, '');

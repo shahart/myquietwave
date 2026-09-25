@@ -85,6 +85,13 @@ function getYY(no) {
 }
 
 function convertEng(hebrew) {
+    // Torah
+    hebrew = hebrew.replace("Genesis", "בראשית");
+    hebrew = hebrew.replace("Exodus", "שמות");
+    hebrew = hebrew.replace("Leviticus", "ויקרא");
+    hebrew = hebrew.replace("Numbers", "במדבר");
+    hebrew = hebrew.replace("Deuteronomy", "דברים");
+    // Nevi'im
     hebrew = hebrew.replace("Joshua", "יהושע");
     hebrew = hebrew.replace("Judges", "שופטים");
     hebrew = hebrew.replace("II Samuel", "שמואל ב");
@@ -106,6 +113,7 @@ function convertEng(hebrew) {
     hebrew = hebrew.replace("Haggai", "חגי");
     hebrew = hebrew.replace("Zechariah", "זכריה");
     hebrew = hebrew.replace("Malachi", "מלאכי");
+
     return hebrew;
 }
 

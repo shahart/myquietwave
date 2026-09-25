@@ -292,10 +292,21 @@ async function calc() {
                     const holidayDisplay = majorHolidayOnNextSaturday.yomtov
                         ? 'יום טוב ' + majorHolidayOnNextSaturday.hebrew
                         : majorHolidayOnNextSaturday.hebrew;
-                    document.getElementById('parasha').innerHTML = holidayDisplay;
+                    const leyning = majorHolidayOnNextSaturday.leyning || {};
+                    const firstReading = leyning['1'];
+                    const haftarah = leyning.haftarah;
+                    document.getElementById('parasha').innerHTML = firstReading
+                        ? holidayDisplay + '<br>' + convertEng(firstReading.replaceAll('|', ' <br>'))
+                        : holidayDisplay;
                     document.getElementById('parasha2').innerHTML = '';
                     document.getElementById('parashaUrl').removeAttribute('href');
                     document.getElementById('parasha2Url').removeAttribute('href');
+                    if (haftarah) {
+                        document.getElementById('haftarahUrl').innerHTML = 'הפטרה: ';
+                        document.getElementById('haftarah').innerHTML = convertEng(haftarah.replaceAll('|', ' <br>'));
+                        document.getElementById('haftarahUrl').href =
+                            "https://shahart.github.io/heb-bible/index.html?b=" + haftarah.split(':')[0];
+                    }
                 }
                 const reason = majorHolidayOnNextSaturday
                     ? 'השבת חל ' + majorHolidayOnNextSaturday.hebrew + ', ולכן אין פרשת שבוע רגילה.'

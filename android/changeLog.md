@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.02
+
+On YomTov on Saturday, render also its leyning 
+
+## 2.01
+
+Fix regression because of classNotFound. Now Json was reflecting into R8-obfuscated response models
+
 ## 2.00
 
 Refactor, plus:
