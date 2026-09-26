@@ -34,6 +34,7 @@ test('fetches and renders the current calendar data', async () => {
                 },
             },
             { category: 'candles', date: '2026-09-18T18:20:00+03:00', hebrew: 'הדלקת נרות' },
+            { category: 'candles', date: '2099-09-17T19:47:00+03:00', hebrew: 'הדלקת נרות' },
             { category: 'havdalah', date: '2000-09-16T18:00:00+03:00', hebrew: 'הבדלה' },
             { category: 'havdalah', date: '2099-09-19T19:25:00+03:00', hebrew: 'הבדלה' },
         ],
@@ -69,9 +70,10 @@ test('fetches and renders the current calendar data', async () => {
     assert.equal(document.getElementById('foundLoc').innerHTML, 'Jerusalem, Israel');
     assert.equal(document.getElementById('parasha').innerHTML, 'פרשת בראשית');
     assert.match(document.getElementById('haftarah').innerHTML, /ישעיהו/);
-    assert.match(document.getElementById('lighting').innerHTML, /18:20/);
-    assert.match(document.getElementById('havdala').innerHTML, /19:25/);
-    assert.doesNotMatch(document.getElementById('havdala').innerHTML, /18:00/);
+    assert.match(document.getElementById('lighting').innerHTML, /זמן עבר הדלקת נרות 18:20/);
+    assert.match(document.getElementById('lighting').innerHTML, /\/ 19:47/);
+    assert.match(document.getElementById('havdala').innerHTML, /זמן עבר הבדלה 18:00/);
+    assert.match(document.getElementById('havdala').innerHTML, /\/ 19:25/);
     assert.equal(document.getElementById('dafYomi').innerHTML, 'זבחים ל״א');
     assert.equal(document.getElementById('haftarahConnectionButton').disabled, false);
 });

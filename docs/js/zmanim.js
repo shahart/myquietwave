@@ -16,6 +16,12 @@ function getLocalDateString(date = new Date()) {
     ].join('-');
 }
 
+function formatShabbatTime(item, includeLabel) {
+    const time = item.date.split('T')[1].substring(0, 5);
+    const pastPrefix = new Date(item.date) <= new Date() ? "זמן עבר " : "";
+    return pastPrefix + (includeLabel ? item.hebrew + " " : "") + time;
+}
+
 async function calc() {
     document.getElementById('havdala').innerHTML = '';
     document.getElementById('lighting').innerHTML = '';
@@ -198,22 +204,19 @@ async function calc() {
                     shabbatExists = true;
                 }
                 else if (data.items[i].category === 'havdalah') {
-                    if (new Date(data.items[i].date) <= new Date()) {
-                        continue;
-                    }
                     if (document.getElementById('havdala').innerHTML === '') {
-                        document.getElementById('havdala').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
+                        document.getElementById('havdala').innerHTML = formatShabbatTime(data.items[i], true);
                     }
                     else {
-                        document.getElementById('havdala').innerHTML += "/ " + data.items[i].date.split('T')[1].substring(0,5);
+                        document.getElementById('havdala').innerHTML += "/ " + formatShabbatTime(data.items[i], false);
                     }
                 }
                 else if (data.items[i].category === 'candles') {
                     if (document.getElementById('lighting').innerHTML === '') {
-                        document.getElementById('lighting').innerHTML = data.items[i].hebrew + " " + data.items[i].date.split('T')[1].substring(0,5);
+                        document.getElementById('lighting').innerHTML = formatShabbatTime(data.items[i], true);
                     }
                     else {
-                        document.getElementById('lighting').innerHTML += "/ " + data.items[i].date.split('T')[1].substring(0,5);
+                        document.getElementById('lighting').innerHTML += "/ " + formatShabbatTime(data.items[i], false);
                     }
                 }
                 else if (data.items[i].category === 'roshchodesh') {
