@@ -49,6 +49,19 @@ internal class NetworkSongRepository(
 
 internal interface HaftarahRepository {
     fun connection(sourceUrl: String): String
+
+    /** Kol-Kore is not consistent about holiday page slugs, so the first page that has the text wins. */
+    fun connection(sourceUrls: List<String>): String {
+        var lastError: Exception? = null
+        sourceUrls.forEach { sourceUrl ->
+            try {
+                return connection(sourceUrl)
+            } catch (error: Exception) {
+                lastError = error
+            }
+        }
+        throw lastError ?: IllegalArgumentException("sourceUrls must not be empty")
+    }
 }
 
 internal class CachedHaftarahRepository(

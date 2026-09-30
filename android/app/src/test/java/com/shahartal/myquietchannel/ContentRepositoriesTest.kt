@@ -61,6 +61,34 @@ class ContentRepositoriesTest {
     }
 
     @Test
+    fun haftarahRepositoryUsesTheFirstCandidatePageThatHasTheText() {
+        val requested = mutableListOf<String>()
+        val repository = CachedHaftarahRepository(client = { url ->
+            requested += url
+            if (url == "second") HAFTARAH_HTML else throw HttpStatusException(404)
+        })
+
+        assertEquals(
+            "נושאים בפרשה:\n\nנושא",
+            repository.connection(listOf("first", "second")),
+        )
+        assertEquals(listOf("first", "second"), requested)
+    }
+
+    @Test
+    fun haftarahRepositoryFailsWhenNoCandidatePageHasTheText() {
+        var calls = 0
+        val repository = CachedHaftarahRepository(client = {
+            calls++
+            throw HttpStatusException(404)
+        })
+
+        assertThrows(HttpStatusException::class.java) { repository.connection(listOf("first", "second")) }
+        assertEquals(2, calls)
+        assertThrows(IllegalArgumentException::class.java) { repository.connection(emptyList()) }
+    }
+
+    @Test
     fun haftarahRepositoryRejectsInvalidRetryCount() {
         assertThrows(IllegalArgumentException::class.java) {
             CachedHaftarahRepository(client = { HAFTARAH_HTML }, maxAttempts = 0)

@@ -42,6 +42,19 @@ class ParashaPresentationTest {
     }
 
     @Test
+    fun formatsLeyningReadings() {
+        assertEquals(
+            "ויקרא 22:26-23:44",
+            ParashaPresentation.leyningReading("Leviticus 22:26-23:44"),
+        )
+        assertEquals(
+            "בראשית 1:1\n1:2",
+            ParashaPresentation.leyningReading("Genesis 1:1|1:2"),
+        )
+        assertEquals("", ParashaPresentation.leyningReading(""))
+    }
+
+    @Test
     fun formatsCalendarEventsAndFastTimes() {
         assertEquals(
             "ראש השנה - שישי 18-9-2026",

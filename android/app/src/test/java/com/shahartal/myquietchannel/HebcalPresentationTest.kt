@@ -7,6 +7,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import java.time.LocalDate
+import java.time.OffsetDateTime
 
 class HebcalPresentationTest {
     @Test
@@ -42,18 +43,55 @@ class HebcalPresentationTest {
                 item(category = "candles", date = "2026-09-18T18:07:00+03:00"),
                 item(category = "havdalah", date = "2026-09-19T19:20:00+03:00"),
                 item(category = "mevarchim", hebrew = " מברכים חודש שבט", memo = "Molad: Monday and 4 chalakim"),
-            )
+            ),
+            now = OffsetDateTime.parse("2026-09-17T12:00:00+03:00"),
         )
 
-        assertEquals(listOf(" 18:07 "), summary.candleTimes)
-        assertEquals(listOf(" 19:20 "), summary.havdalahTimes)
+        assertEquals(listOf(ShabbatTime(" 18:07 ", isPast = false)), summary.candleTimes)
+        assertEquals(listOf(ShabbatTime(" 19:20 ", isPast = false)), summary.havdalahTimes)
         assertEquals("שני ו- 4 חלקים", summary.mevarchim?.molad)
         assertEquals("https://he.wikipedia.org/wiki/שבט_(חודש)", summary.mevarchim?.wikiUrl)
     }
 
     @Test
+    fun marksPastCandleAndHavdalahTimes() {
+        val now = OffsetDateTime.parse("2026-09-20T12:00:00+03:00")
+        val summary = HebcalPresentation.shabbat(
+            listOf(
+                item(category = "candles", date = "2026-09-18T18:20:00+03:00"),
+                item(category = "candles", date = "2026-09-25T18:07:00+03:00"),
+                item(category = "havdalah", date = "2026-09-19T19:20:00+03:00"),
+                item(category = "havdalah", date = "2026-09-26T19:25:00+03:00"),
+            ),
+            now = now,
+        )
+
+        assertEquals(
+            listOf(ShabbatTime(" 18:20 ", isPast = true), ShabbatTime(" 18:07 ", isPast = false)),
+            summary.candleTimes,
+        )
+        assertEquals(
+            listOf(ShabbatTime(" 19:20 ", isPast = true), ShabbatTime(" 19:25 ", isPast = false)),
+            summary.havdalahTimes,
+        )
+    }
+
+    @Test
+    fun treatsUnparsableShabbatTimesAsUpcoming() {
+        val now = OffsetDateTime.parse("2026-09-20T12:00:00+03:00")
+
+        assertEquals(false, HebcalPresentation.hasTimePassed("not-a-date", now))
+        assertEquals(false, HebcalPresentation.hasTimePassed("2026-09-18", now))
+        assertEquals(true, HebcalPresentation.hasTimePassed("2026-09-20T12:00:00+03:00", now))
+        assertEquals(false, HebcalPresentation.hasTimePassed("2026-09-20T12:01:00+03:00", now))
+    }
+
+    @Test
     fun translatesHaftarahBookNamesAndFormatsMidnight() {
         assertEquals("ישעיהו 1:1", HebcalPresentation.translateBookNames("Isaiah 1:1"))
+        assertEquals("ויקרא 22:26-23:44", HebcalPresentation.translateBookNames("Leviticus 22:26-23:44"))
+        assertEquals("בראשית 1:1", HebcalPresentation.translateBookNames("Genesis 1:1"))
+        assertEquals("דברים 11:16-21", HebcalPresentation.translateBookNames("Deuteronomy 11:16-21"))
         assertEquals(" 0:05 ", HebcalPresentation.displayTime("2026-09-18T00:05:00+03:00"))
     }
 
@@ -104,6 +142,35 @@ class HebcalPresentationTest {
     }
 
     @Test
+    fun exposesTheReadingsOfAYomTovOnSaturday() {
+        val holiday = item(
+            category = "holiday",
+            hebrew = "סוכות יום א׳",
+            title = "Sukkot I",
+            subcat = "major",
+            date = "2026-09-26",
+            leyning = Leyning(
+                haftarah = "Zechariah 14:1-21",
+                firstReading = "Leviticus 22:26-23:44",
+            ),
+        )
+
+        val found = HebcalPresentation.majorHolidayOnNextSaturday(
+            listOf(holiday),
+            LocalDate.of(2026, 9, 22),
+        )?.leyning
+
+        assertEquals(
+            "ויקרא 22:26-23:44",
+            ParashaPresentation.leyningReading(found?.firstReading.orEmpty()),
+        )
+        assertEquals(
+            " הפטרה זכריה 14:1-21",
+            ParashaPresentation.haftarah(found?.haftarah.orEmpty(), null).ashkenazi,
+        )
+    }
+
+    @Test
     fun formatsZmanimDetailsInDisplayOrder() {
         val times = HebCalZmanimTimesModel(
             sunrise = "2026-09-18T06:00:00+03:00",
@@ -129,6 +196,12 @@ class HebcalPresentationTest {
         assertEquals("chatzot Night חצות הלילה:  0:00 ", details.lineSequence().first())
         assertEquals("Tzeit 72' צאת הכוכבים רבינו תם:  19:12 ", details.lineSequence().last())
         assertEquals(16, details.lines().size)
+
+        val (sunriseDetails, sunsetDetails) = HebcalPresentation.zmanimDetailsSections(times)
+        assertEquals(8, sunriseDetails.lines().size)
+        assertEquals(7, sunsetDetails.lines().size)
+        assertEquals("chatzot Night חצות הלילה:  0:00 ", sunriseDetails.lineSequence().first())
+        assertEquals("Tzeit 72' צאת הכוכבים רבינו תם:  19:12 ", sunsetDetails.lineSequence().last())
     }
 
     private fun item(
@@ -139,5 +212,6 @@ class HebcalPresentationTest {
         title: String = "",
         subcat: String = "",
         link: String = "",
-    ) = Item(category, hebrew, Leyning("", null), memo, date, title, subcat, link)
+        leyning: Leyning = Leyning("", null),
+    ) = Item(category, hebrew, leyning, memo, date, title, subcat, link)
 }

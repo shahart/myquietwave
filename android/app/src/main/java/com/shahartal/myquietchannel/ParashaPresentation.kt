@@ -53,6 +53,9 @@ internal object ParashaPresentation {
         )
     }
 
+    fun leyningReading(reading: String): String =
+        HebcalPresentation.translateBookNames(reading.replace("|", "\n")).trim()
+
     fun calendarEvent(hebrew: String, isoDate: String): String =
         "$hebrew - ${DateDisplay.hebrewWeekday(isoDate)} ${Utils.switchDate(isoDate)}"
 

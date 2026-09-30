@@ -34,6 +34,12 @@
     <string name="next_song">Next playing: </string>
     <string name="peek_songs">Peek at current song</string>
 
+    <string name="haftarah_connection_waiting_for_shabbat">Loading Shabbat information...</string>
+    <string name="haftarah_connection_no_regular_parasha">%1$s falls on Shabbat, so there is no regular weekly parasha.</string>
+    <string name="haftarah_connection_shabbat_load_failed">Unable to load Shabbat information.</string>
+    <string name="haftarah_connection_content_load_failed">Unable to load the connection content.</string>
+    <string name="pastTime">Past time</string>
+
     <string name="share">Partager</string>
     <string name="rate">Taux</string>
     <string name="share_text">Découvrez cette belle application:</string>

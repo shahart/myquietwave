@@ -6,5 +6,6 @@ import com.google.gson.annotations.SerializedName
 @Keep
 data class Leyning(
     @SerializedName("haftarah") val haftarah: String = "",
-    @SerializedName("haftarah_sephardic") val haftarah_sephardic: String? = null
+    @SerializedName("haftarah_sephardic") val haftarah_sephardic: String? = null,
+    @SerializedName("1") val firstReading: String = ""
 )

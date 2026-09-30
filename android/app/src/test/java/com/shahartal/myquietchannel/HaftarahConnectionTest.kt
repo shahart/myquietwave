@@ -14,6 +14,19 @@ class HaftarahConnectionTest {
     }
 
     @Test
+    fun holidaySourceUrlsCoverKolKoreSpecialReadingPages() {
+        assertEquals(
+            listOf(
+                "https://kol-kore.org/%D7%A4%D7%A8%D7%A9%D7%95%D7%AA-%D7%9E%D7%99%D7%95%D7%97%D7%93%D7%95%D7%AA/" +
+                    "%D7%94%D7%A4%D7%98%D7%A8%D7%94-%D7%A9%D7%9E%D7%99%D7%A0%D7%99-%D7%A2%D7%A6%D7%A8%D7%AA/",
+                "https://kol-kore.org/%D7%A4%D7%A8%D7%A9%D7%95%D7%AA-%D7%9E%D7%99%D7%95%D7%97%D7%93%D7%95%D7%AA/" +
+                    "%D7%94%D7%A4%D7%98%D7%A8%D7%94-%D7%A9%D7%9E%D7%99%D7%A0%D7%99-%D7%A2%D7%A6%D7%A8%D7%AA-%D7%92%D7%95%D7%9C%D7%93/",
+            ),
+            HaftarahConnection.holidaySourceUrls("שמיני עצרת"),
+        )
+    }
+
+    @Test
     fun extract_returnsOnlyConnectionContentFromMatchingSection() {
         val html = """
             <div class="row_four">

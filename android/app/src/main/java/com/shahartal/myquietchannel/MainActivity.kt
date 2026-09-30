@@ -19,6 +19,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.UnderlineSpan
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -136,7 +137,9 @@ class MainActivity : ComponentActivity() {
     private lateinit var textViewClockHS : TextView
     private lateinit var haftarahConnectionButton: Button
 
-    private var haftarahConnectionSourceUrl: String? = null
+    private var haftarahConnectionSourceUrls: List<String> = emptyList()
+    private var haftarahConnectionUnavailableMessage: String? = null
+    private var haftarahConnectionDialog: AlertDialog? = null
     private val songRepository: SongRepository by lazy {
         NetworkSongRepository(UrlConnectionTextHttpClient())
     }
@@ -157,7 +160,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var textViewClock4dafYomiTitle : TextView
     private lateinit var textViewOmer : TextView
     private lateinit var textViewClock5locTitle : TextView
-    private lateinit var textViewClock5suns : TextView
+    private lateinit var textViewClock5sunrise : TextView
+    private lateinit var textViewClock5sunset : TextView
     private lateinit var textViewClock6rosh : TextView
     private lateinit var textViewClock7special : TextView
     private lateinit var textViewClock8fast : TextView
@@ -198,12 +202,16 @@ class MainActivity : ComponentActivity() {
         textViewClockH = binding.textViewClockH
         textViewClockHS = binding.textViewClockHS
         haftarahConnectionButton = binding.haftarahConnectionButton
+        updateHaftarahConnection(
+            unavailableMessage = getString(R.string.haftarah_connection_waiting_for_shabbat),
+        )
         textViewClock3 = binding.textViewClock3
         textViewClock4dafYomi = binding.textViewClock4dafYomi
         textViewClock4dafYomiTitle = binding.textViewClock4dafYomiTitle
         textViewOmer = binding.textViewOmer
         textViewClock5locTitle = binding.textViewClock5locTitle
-        textViewClock5suns = binding.textViewClock5suns
+        textViewClock5sunrise = binding.textViewClock5sunrise
+        textViewClock5sunset = binding.textViewClock5sunset
         textViewClock6rosh = binding.textViewClock6rosh
         textViewClock7special = binding.textViewClock7special
         textViewClock8fast = binding.textViewClock8fast
@@ -451,7 +459,8 @@ class MainActivity : ComponentActivity() {
     }
 
     fun fetchSunsZmanim() {
-        textViewClock5suns.text = ""
+        textViewClock5sunrise.text = ""
+        textViewClock5sunset.text = ""
 
         if ( // (dow == DayOfWeek.THURSDAY || dow == DayOfWeek.FRIDAY || dow == DayOfWeek.SATURDAY) &&
             editTextLocation.text.toString().trim().isNotEmpty()) {
@@ -539,11 +548,12 @@ class MainActivity : ComponentActivity() {
                                     textViewClock8fast.text = ""
                                 }
                             }
-                           else if (it.category == "parashat") {
+                            else if (it.category == "parashat") {
                                 // return it.hebrew;
 
-                                haftarahConnectionSourceUrl = HaftarahConnection.sourceUrl(it.hebrew)
-                                haftarahConnectionButton.isEnabled = true
+                                updateHaftarahConnection(
+                                    sourceUrls = listOf(HaftarahConnection.sourceUrl(it.hebrew)),
+                                )
 
                                 val parashaNames = ParashaPresentation.names(it.hebrew)
                                 val str = parashaNames.primary
@@ -595,40 +605,7 @@ class MainActivity : ComponentActivity() {
                                     it.leyning?.haftarah.orEmpty(),
                                     it.leyning?.haftarah_sephardic,
                                 )
-                                val fullTextH = haftarah.ashkenazi
-                                val spannableStringH = SpannableString(fullTextH)
-                                spannableStringH.setSpan(UnderlineSpan(), " הפטרה ".length, fullTextH.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                textViewClockH.text = spannableStringH
-
-                                displayCache.put("haftarah", fullTextH)
-
-                                textViewClockH.setOnClickListener {
-                                    val browserIntent = Intent(
-                                        Intent.ACTION_VIEW,
-                                        ("https://shahart.github.io/heb-bible/index.html?b=" + haftarah.ashkenaziReference).toUri()
-                                    )
-                                    startActivity(browserIntent)
-                                }
-
-                                haftarah.sephardic?.let { fullTextHS ->
-                                    val spannableStringHS = SpannableString(fullTextHS)
-                                    spannableStringHS.setSpan(UnderlineSpan(), " הפטרה ספרדים ".length, fullTextHS.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                                    textViewClockHS.text = spannableStringHS
-
-                                    displayCache.put("haftarah_sephardic", fullTextHS)
-
-                                    textViewClockHS.setOnClickListener {
-                                        val browserIntent = Intent(
-                                            Intent.ACTION_VIEW,
-                                            ("https://shahart.github.io/heb-bible/index.html?b=" + haftarah.sephardicReference).toUri()
-                                        )
-                                        startActivity(browserIntent)
-                                    }
-                                }
-                                if (haftarah.sephardic == null) {
-                                    textViewClockHS.text = ""
-                                    textViewClockHS.setOnClickListener(null)
-                                }
+                                showHaftarah(haftarah)
 
                             }
                         }
@@ -657,15 +634,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun shabbatTimeText(time: ShabbatTime): String =
+        if (time.isPast) getString(R.string.pastTime) + " " + time.time else time.time
+
     private fun showShabbatFallback(prefix: String) {
         textViewClock3.text = prefix + " " + displayCache.get("candles") + " " + displayCache.get("havdalah")
     }
 
     private fun showSunFallback(prefix: String) {
-        textViewClock5suns.text = prefix + " " + displayCache.get("sunrise") + " " + displayCache.get("sunset")
+        textViewClock5sunrise.text = prefix + " " + displayCache.get("sunrise")
+        textViewClock5sunset.text = displayCache.get("sunset")
+        textViewClock5sunrise.setOnClickListener(null)
+        textViewClock5sunset.setOnClickListener(null)
     }
 
     private fun showParashaFallbackOrError() {
+        updateHaftarahConnection(
+            unavailableMessage = getString(R.string.haftarah_connection_shabbat_load_failed),
+        )
         val cachedParasha = ParashaCache.currentValue(displayCache)
         if (cachedParasha == null) {
             AlertDialog.Builder(this)
@@ -681,21 +667,78 @@ class MainActivity : ComponentActivity() {
 
     private fun showMajorHolidayInsteadOfParasha(holiday: com.shahartal.myquietchannel.parasha.Item) {
         val holidayDisplay = if (holiday.yomtov) "יום טוב ${holiday.hebrew}" else holiday.hebrew
-        textViewClock2.text = holidayDisplay
+        val reading = ParashaPresentation.leyningReading(holiday.leyning?.firstReading.orEmpty())
+        val display = if (reading.isBlank()) holidayDisplay else "$holidayDisplay\n$reading"
+        textViewClock2.text = display
         textViewClock2.setOnClickListener(null)
         textViewClock2_2.text = ""
         textViewClock2_2.setOnClickListener(null)
+        updateHaftarahConnection(
+            sourceUrls = HaftarahConnection.holidaySourceUrls(holiday.hebrew),
+            unavailableMessage = getString(
+                R.string.haftarah_connection_no_regular_parasha,
+                holidayDisplay,
+            ),
+        )
+        if (holiday.leyning?.haftarah.isNullOrBlank()) {
+            clearHaftarah()
+        } else {
+            showHaftarah(
+                ParashaPresentation.haftarah(
+                    holiday.leyning?.haftarah.orEmpty(),
+                    holiday.leyning?.haftarah_sephardic,
+                )
+            )
+        }
+        ParashaCache.save(
+            cache = displayCache,
+            displayValue = display,
+            shabbatDate = holiday.date,
+        )
+    }
+
+    private fun showHaftarah(haftarah: HaftarahTexts) {
+        val fullTextH = haftarah.ashkenazi
+        val spannableStringH = SpannableString(fullTextH)
+        spannableStringH.setSpan(UnderlineSpan(), " הפטרה ".length, fullTextH.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        textViewClockH.text = spannableStringH
+
+        displayCache.put("haftarah", fullTextH)
+
+        textViewClockH.setOnClickListener {
+            val browserIntent = Intent(
+                Intent.ACTION_VIEW,
+                ("https://shahart.github.io/heb-bible/index.html?b=" + haftarah.ashkenaziReference).toUri()
+            )
+            startActivity(browserIntent)
+        }
+
+        haftarah.sephardic?.let { fullTextHS ->
+            val spannableStringHS = SpannableString(fullTextHS)
+            spannableStringHS.setSpan(UnderlineSpan(), " הפטרה ספרדים ".length, fullTextHS.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            textViewClockHS.text = spannableStringHS
+
+            displayCache.put("haftarah_sephardic", fullTextHS)
+
+            textViewClockHS.setOnClickListener {
+                val browserIntent = Intent(
+                    Intent.ACTION_VIEW,
+                    ("https://shahart.github.io/heb-bible/index.html?b=" + haftarah.sephardicReference).toUri()
+                )
+                startActivity(browserIntent)
+            }
+        }
+        if (haftarah.sephardic == null) {
+            textViewClockHS.text = ""
+            textViewClockHS.setOnClickListener(null)
+        }
+    }
+
+    private fun clearHaftarah() {
         textViewClockH.text = ""
         textViewClockH.setOnClickListener(null)
         textViewClockHS.text = ""
         textViewClockHS.setOnClickListener(null)
-        haftarahConnectionSourceUrl = null
-        haftarahConnectionButton.isEnabled = false
-        ParashaCache.save(
-            cache = displayCache,
-            displayValue = holidayDisplay,
-            shabbatDate = holiday.date,
-        )
         displayCache.put("haftarah", "")
         displayCache.put("haftarah_sephardic", "")
     }
@@ -709,8 +752,15 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showHaftarahConnection() {
-        val sourceUrl = haftarahConnectionSourceUrl ?: return
-        haftarahConnectionButton.isEnabled = false
+        if (haftarahConnectionDialog?.isShowing == true) return
+        val sourceUrls = haftarahConnectionSourceUrls
+        if (sourceUrls.isEmpty()) {
+            showMessageDialog(
+                haftarahConnectionUnavailableMessage
+                    ?: getString(R.string.haftarah_connection_content_load_failed)
+            )
+            return
+        }
 
         val dialog = AlertDialog.Builder(this)
             .setTitle(R.string.haftarah_connection)
@@ -720,23 +770,33 @@ class MainActivity : ComponentActivity() {
 //                startActivity(Intent(Intent.ACTION_VIEW, sourceUrl.toUri()))
 //            }
             .create()
+        haftarahConnectionDialog = dialog
         dialog.show()
 
         lifecycleScope.launch {
             val content = try {
-                withContext(Dispatchers.IO) { haftarahRepository.connection(sourceUrl) }
+                withContext(Dispatchers.IO) { haftarahRepository.connection(sourceUrls) }
             } catch (error: Exception) {
                 Log.w("myquietwave", "Unable to fetch the haftarah connection", error)
                 "" // getString(R.string.haftarah_connection_error)
             }
 
-            if (content.isNotEmpty()) {
-                if (dialog.isShowing) dialog.setMessage(content)
-                if (haftarahConnectionSourceUrl == sourceUrl) {
-                    haftarahConnectionButton.isEnabled = true
+            if (!dialog.isShowing) return@launch
+            dialog.setMessage(
+                content.ifEmpty {
+                    haftarahConnectionUnavailableMessage
+                        ?: getString(R.string.haftarah_connection_content_load_failed)
                 }
-            }
+            )
         }
+    }
+
+    private fun updateHaftarahConnection(
+        sourceUrls: List<String> = emptyList(),
+        unavailableMessage: String? = null,
+    ) {
+        haftarahConnectionSourceUrls = sourceUrls
+        haftarahConnectionUnavailableMessage = unavailableMessage
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -790,14 +850,14 @@ class MainActivity : ComponentActivity() {
                             var res = ""
                             var resH = ""
                             if (summary.candleTimes.isNotEmpty()) {
-                                res = "\n${getString(R.string.candleLighting)} ${summary.candleTimes.joinToString(" ")}"
+                                res = "\n${getString(R.string.candleLighting)} ${summary.candleTimes.joinToString(" ", transform = ::shabbatTimeText)}"
                                 if (summary.candleTimes.size > 1) res += "\n"
-                                displayCache.put("candles", getString(R.string.candleLighting) + " " + summary.candleTimes.last())
+                                displayCache.put("candles", getString(R.string.candleLighting) + " " + shabbatTimeText(summary.candleTimes.last()))
                             }
                             if (summary.havdalahTimes.isNotEmpty()) {
-                                resH = "\n${getString(R.string.havdalah)} ${summary.havdalahTimes.joinToString(" ")}"
+                                resH = "\n${getString(R.string.havdalah)} ${summary.havdalahTimes.joinToString(" ", transform = ::shabbatTimeText)}"
                                 if (summary.havdalahTimes.size > 1) resH += "\n"
-                                displayCache.put("havdalah", getString(R.string.havdalah) + " " + summary.havdalahTimes.last())
+                                displayCache.put("havdalah", getString(R.string.havdalah) + " " + shabbatTimeText(summary.havdalahTimes.last()))
                             }
                             summary.mevarchim?.let { mevarchim ->
                                 res += "\n${mevarchim.title} \nהמולד: ${mevarchim.molad}\n"
@@ -828,7 +888,9 @@ class MainActivity : ComponentActivity() {
                             if (times != null && location != null) {
                                 val sunrise = HebcalPresentation.displayTime(times.sunrise)
                                 val sunset = HebcalPresentation.displayTime(times.sunset)
-                                val text = "\n${getString(R.string.sunrise)} $sunrise\n${getString(R.string.sunset)} $sunset "
+                                val sunriseText = "\n${getString(R.string.sunrise)} $sunrise"
+                                val sunsetText = "${getString(R.string.sunset)} $sunset "
+                                val (sunriseDetails, sunsetDetails) = HebcalPresentation.zmanimDetailsSections(times)
                                 displayCache.put("sunrise", getString(R.string.sunrise) + " " + sunrise)
                                 displayCache.put("sunset", getString(R.string.sunset) + " " + sunset)
                                 if (DateDisplay.hasTimePassed(times.sunset)) {
@@ -841,10 +903,17 @@ class MainActivity : ComponentActivity() {
                                     )}"
                                 }
                                 textViewClock5locTitle.text = location.title
-                                textViewClock5suns.text = text
-                                textViewClock5suns.setOnClickListener {
+                                textViewClock5sunrise.text = sunriseText
+                                textViewClock5sunset.text = sunsetText
+                                textViewClock5sunrise.setOnClickListener {
                                     AlertDialog.Builder(this@MainActivity)
-                                        .setMessage(HebcalPresentation.zmanimDetails(times))
+                                        .setMessage(sunriseDetails)
+                                        .setNegativeButton(getString(R.string.close_alert)) { dialog, _ -> dialog.cancel() }
+                                        .show()
+                                }
+                                textViewClock5sunset.setOnClickListener {
+                                    AlertDialog.Builder(this@MainActivity)
+                                        .setMessage(sunsetDetails)
                                         .setNegativeButton(getString(R.string.close_alert)) { dialog, _ -> dialog.cancel() }
                                         .show()
                                 }
@@ -878,13 +947,38 @@ class MainActivity : ComponentActivity() {
         run {
             val stations = resources.getStringArray(R.array.stations)
 
-            val adapter = ArrayAdapter(this,
-                android.R.layout.simple_spinner_item, locations)
+            fun centeredSpinnerAdapter(items: Array<String>) = object : ArrayAdapter<String>(
+                this@MainActivity,
+                android.R.layout.simple_spinner_item,
+                items,
+            ) {
+                override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup): View =
+                    super.getView(position, convertView, parent).apply {
+                        (this as? TextView)?.apply {
+                            gravity = Gravity.CENTER
+                            textAlignment = View.TEXT_ALIGNMENT_CENTER
+                        }
+                    }
+
+                override fun getDropDownView(
+                    position: Int,
+                    convertView: View?,
+                    parent: android.view.ViewGroup,
+                ): View = super.getDropDownView(position, convertView, parent).apply {
+                    (this as? TextView)?.apply {
+                        gravity = Gravity.CENTER
+                        textAlignment = View.TEXT_ALIGNMENT_CENTER
+                    }
+                }
+            }.apply {
+                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            }
+
+            val adapter = centeredSpinnerAdapter(locations)
 
             spinner.adapter = adapter
 
-            val stationsAdapter = ArrayAdapter(this,
-                android.R.layout.simple_spinner_item, stations)
+            val stationsAdapter = centeredSpinnerAdapter(stations)
 
             stationsSpinner.adapter = stationsAdapter
 

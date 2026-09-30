@@ -5,17 +5,31 @@ import java.nio.charset.StandardCharsets
 
 internal object HaftarahConnection {
     private const val TITLE = "על הקשר בין ההפטרה לפרשה"
+    private const val PARASHAT_SECTION = "פרשות"
+    private const val SPECIAL_PARASHAT_SECTION = "פרשות-מיוחדות"
+    private const val HOLIDAY_SLUG_SUFFIX = "גולד"
 
-    fun sourceUrl(parashaName: String): String {
-        val slug = parashaName
-            .replace(Regex("^פרשת\\s+"), "")
-            .replace(Regex("[\\u0591-\\u05BD\\u05BF\\u05C1-\\u05C2\\u05C4-\\u05C5\\u05C7]"), "")
-            .replace(Regex("[־‐\\-‒–—―\\s]+"), "-")
-            .trim('-')
+    fun sourceUrl(parashaName: String): String =
+        pageUrl(PARASHAT_SECTION, "הפטרה-פרשת-${slug(parashaName)}")
 
-        return "https://kol-kore.org/${encodePathSegment("פרשות")}/" +
-            "${encodePathSegment("הפטרה-פרשת-$slug")}/"
+    /**
+     * A YomTov on Saturday has no weekly parasha, but Kol-Kore still covers its special reading,
+     * and titles that page after the reading itself, e.g. "הפטרה-שמיני-עצרת-גולד".
+     */
+    fun holidaySourceUrls(holidayHebrew: String): List<String> {
+        val slug = slug(holidayHebrew)
+        return listOf("הפטרה-$slug", "הפטרה-$slug-$HOLIDAY_SLUG_SUFFIX")
+            .map { pageUrl(SPECIAL_PARASHAT_SECTION, it) }
     }
+
+    private fun pageUrl(section: String, slug: String): String =
+        "https://kol-kore.org/${encodePathSegment(section)}/${encodePathSegment(slug)}/"
+
+    private fun slug(title: String): String = title
+        .replace(Regex("^פרשת\\s+"), "")
+        .replace(Regex("[\\u0591-\\u05BD\\u05BF\\u05C1-\\u05C2\\u05C4-\\u05C5\\u05C7]"), "")
+        .replace(Regex("[־‐\\-‒–—―\\s]+"), "-")
+        .trim('-')
 
     // fun proxyUrl(sourceUrl: String): String =
     //     "https://myquietwave.lat-shahar.workers.dev/?url=${encodeQueryValue(sourceUrl)}"

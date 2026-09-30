@@ -28,6 +28,10 @@
 
     <string name="haftarah_connection">הקשר בין הפרשה להפטרה</string>
     <string name="haftarah_connection_loading">טוען...</string>
+    <string name="haftarah_connection_waiting_for_shabbat">טוען את נתוני השבת...</string>
+    <string name="haftarah_connection_no_regular_parasha">השבת חל %1$s, ולכן אין פרשת שבוע רגילה.</string>
+    <string name="haftarah_connection_shabbat_load_failed">לא הצלחנו לטעון את נתוני השבת.</string>
+    <string name="haftarah_connection_content_load_failed">לא הצלחנו לטעון את תוכן הקשר.</string>
 
     <string name="close_alert">סגור</string>
 
@@ -41,6 +45,7 @@
 
     <string name="candleLighting">הדלקת נרות🕯️</string>
     <string name="havdalah">הבדלה 🌠</string>
+    <string name="pastTime">זמן עבר</string>
 
     <string name="sunrise">זריחה 🔆</string>
     <string name="sunset">שקיעה 🌅</string>

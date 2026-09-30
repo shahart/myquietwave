@@ -4,6 +4,7 @@ import com.shahartal.myquietchannel.parasha.HebCalZmanimTimesModel
 import com.shahartal.myquietchannel.parasha.Item
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.OffsetDateTime
 
 internal data class LinkedText(val text: String, val link: String)
 
@@ -20,9 +21,14 @@ internal data class MevarchimSummary(
     val wikiUrl: String,
 )
 
+internal data class ShabbatTime(
+    val time: String,
+    val isPast: Boolean,
+)
+
 internal data class ShabbatSummary(
-    val candleTimes: List<String>,
-    val havdalahTimes: List<String>,
+    val candleTimes: List<ShabbatTime>,
+    val havdalahTimes: List<ShabbatTime>,
     val mevarchim: MevarchimSummary?,
 )
 
@@ -35,6 +41,11 @@ internal object HebcalPresentation {
     )
 
     private val bookNames = linkedMapOf(
+        "Genesis" to "בראשית",
+        "Exodus" to "שמות",
+        "Leviticus" to "ויקרא",
+        "Numbers" to "במדבר",
+        "Deuteronomy" to "דברים",
         "Joshua" to "יהושע",
         "Judges" to "שופטים",
         "I Samuel" to "שמואל א",
@@ -73,7 +84,7 @@ internal object HebcalPresentation {
         return DailyLearningSummary(daf, additional, omer, selichot)
     }
 
-    fun shabbat(items: List<Item>): ShabbatSummary {
+    fun shabbat(items: List<Item>, now: OffsetDateTime = OffsetDateTime.now()): ShabbatSummary {
         val mevarchim = items.firstOrNull { it.category == "mevarchim" }?.let { item ->
             val memo = item.memo.orEmpty()
             MevarchimSummary(
@@ -83,10 +94,18 @@ internal object HebcalPresentation {
             )
         }
         return ShabbatSummary(
-            candleTimes = items.filter { it.category == "candles" }.map { displayTime(it.date) },
-            havdalahTimes = items.filter { it.category == "havdalah" }.map { displayTime(it.date) },
+            candleTimes = items.filter { it.category == "candles" }.map { shabbatTime(it.date, now) },
+            havdalahTimes = items.filter { it.category == "havdalah" }.map { shabbatTime(it.date, now) },
             mevarchim = mevarchim,
         )
+    }
+
+    private fun shabbatTime(isoDateTime: String, now: OffsetDateTime): ShabbatTime =
+        ShabbatTime(time = displayTime(isoDateTime), isPast = hasTimePassed(isoDateTime, now))
+
+    fun hasTimePassed(isoDateTime: String, now: OffsetDateTime = OffsetDateTime.now()): Boolean {
+        val dateTime = runCatching { OffsetDateTime.parse(isoDateTime) }.getOrNull() ?: return false
+        return !dateTime.isAfter(now)
     }
 
     /**
@@ -142,6 +161,11 @@ internal object HebcalPresentation {
         "Tzeit צאת הכוכבים: ${displayTime(times.tzeit7083deg)}",
         "Tzeit 72' צאת הכוכבים רבינו תם: ${displayTime(times.tzeit72min)}",
     ).joinToString("\n")
+
+    fun zmanimDetailsSections(times: HebCalZmanimTimesModel): Pair<String, String> {
+        val details = zmanimDetails(times)
+        return details.substringBefore("\n\n") to details.substringAfter("\n\n", "")
+    }
 
     fun translateBookNames(value: String): String =
         bookNames.entries.fold(value) { result, (english, hebrew) -> result.replace(english, hebrew) }

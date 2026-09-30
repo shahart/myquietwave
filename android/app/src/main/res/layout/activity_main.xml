@@ -382,7 +382,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_button_secondary"
-                android:enabled="false"
                 android:fontFamily="sans-serif-medium"
                 android:paddingStart="18dp"
                 android:paddingEnd="18dp"
@@ -480,7 +479,16 @@
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/textViewClock5suns"
+                android:id="@+id/textViewClock5sunrise"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/body_text"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textViewClock5sunset"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""

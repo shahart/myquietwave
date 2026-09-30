@@ -81,6 +81,19 @@ class HebcalApiTest {
     }
 
     @Test
+    fun yomTovPayloadParsesTheFirstReadingOfItsLeyning() = runBlocking {
+        server.enqueue(jsonResponse("""
+            {"items":[{"category":"holiday","subcat":"major","title":"Sukkot I","date":"2026-09-26","hebrew":"סוכות יום א׳","yomtov":true,"leyning":{"1":"Leviticus 22:26-23:44","2":"Leviticus 23:1-8","haftarah":"Zechariah 14:1-21"}}]}
+        """))
+        val api = RetrofitInstance.createApi(server.url("/").toString())
+
+        val leyning = api.getShabbat().items.single().leyning
+
+        assertEquals("Leviticus 22:26-23:44", leyning?.firstReading)
+        assertEquals("Zechariah 14:1-21", leyning?.haftarah)
+    }
+
+    @Test
     fun allZmanimEndpointsParseRepresentativePayloads() = runBlocking {
         repeat(3) { server.enqueue(jsonResponse(zmanimPayload)) }
         val api = RetrofitInstance.createApi(server.url("/").toString())
