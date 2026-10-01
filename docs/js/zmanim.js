@@ -76,7 +76,7 @@ async function calc() {
     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
     const day = date.getDate().toString().padStart(2, '0');
     var formattedDate = `${year}-${month}-${day}`;
-    const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&min=on&o=on&start=` + formattedDate + `&end=` + formattedDate;
+    const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&min=on&o=on&dw=on&yyomi=on&yys=on&dr1=on&dr3=on&dsm=on&dksa=on&ahsy=on&dshl=on&dcc=on&dpa=on&start=` + formattedDate + `&end=` + formattedDate;
 
     document.getElementById('fast').innerHTML = '';
     document.getElementById('special').innerHTML = '';
@@ -350,7 +350,7 @@ async function calc() {
                     ttip += "תהלים יומי: " + resp3.items[i].hebrew + "\n";
                 }
                 else if (resp3.items[i].category === 'tanakhYomi') {
-                    ttip += "תנ'ך יומי: " + resp3.items[i].hebrew + "\n";
+                    ttip += "תנ'ך יומי: " + resp3.items[i].memo + " - " + resp3.items[i].hebrew + "\n";
                 }
                 else if (resp3.items[i].category === 'omer') {
                     // ttip += "ספירת העומר (בבוקר): " + resp3.items[i].hebrew.replace("עומר", "") + "\n";
@@ -365,12 +365,42 @@ async function calc() {
                     document.getElementById('fast').innerHTML = "ליל סליחות אשכנז/ ספרד" + " " + formattedDate;
                 }
                 else if (resp3.items[i].category === 'dafyomi') {
-                    document.getElementById('dafYomi').innerHTML = resp3.items[1].hebrew;
+                    document.getElementById('dafYomi').innerHTML = resp3.items[i].hebrew;
+                }
+                else if (resp3.items[i].category === 'dailyRambam1') {
+                    ttip += "רמב״ם יומי: " + resp3.items[i].hebrew + "\n";
+                }
+                else if (resp3.items[i].category === 'dailyRambam3') {
+                    ttip += "רמב״ם יומי 3 פרקים: " + resp3.items[i].hebrew + "\n";
+                }
+                else if (resp3.items[i].category === 'seferHaMitzvot') {
+                    ttip += "ספר המצוות: " + resp3.items[i].hebrew + "\n";
+                }
+                else if (resp3.items[i].category === 'nachyomi' && subcat === 'vilna') {
+                    ttip += "ירושלמי יומי: " + resp3.items[i].hebrew + "\n";
+                }
+                else if (resp3.items[i].category === 'shemiratHaLashon') {
+                    ttip += "שמירת הלשון יומי: " + resp3.items[i].hebrew + "\n";
+                }
+                else if (resp3.items[i].category === 'chofetzChaim') {
+                    ttip += "החפץ חיים יומי: " + resp3.items[i].hebrew + "\n";
+                }
+                else if (resp3.items[i].category === 'arukhHaShulchanYomi') {
+                    ttip += "ערוך השולחן יומי: " + resp3.items[i].hebrew + "\n";
+                }
+                else if (resp3.items[i].category === 'kitzurShulchanAruch') {
+                    ttip += "קיצור שולחן ערוך יומי: " + resp3.items[i].hebrew + "\n";
                 }
             }
             document.getElementById('dafYomi').onclick = function() {
                 alert(ttip);
             }
+            ttip += "\n";
+            ttip += "חובות הלבבות יומי: " + "TODO" + "\n";
+            ttip += "משנה ברורה עמוד יומי: " + "TODO" + "\n";
+            ttip += "דף בהלכה דרשו יומי: " + "TODO" + "\n";
+            ttip += "עמוד בהלכה דרשו יומי: " + "TODO" + "\n";
+
         } catch (error) {
             alert("Error fetching DafYomi data " + error);
         }
