@@ -376,7 +376,7 @@ async function calc() {
                 else if (resp3.items[i].category === 'seferHaMitzvot') {
                     ttip += "ספר המצוות: " + resp3.items[i].hebrew + "\n";
                 }
-                else if (resp3.items[i].category === 'nachyomi' && subcat === 'vilna') {
+                else if (resp3.items[i].category === 'yerushalmi' && resp3.items[i].subcat === 'vilna') {
                     ttip += "ירושלמי יומי: " + resp3.items[i].hebrew + "\n";
                 }
                 else if (resp3.items[i].category === 'shemiratHaLashon') {

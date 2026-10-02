@@ -11,6 +11,7 @@ internal data class LinkedText(val text: String, val link: String)
 internal data class DailyLearningSummary(
     val dafYomi: LinkedText?,
     val additionalLearning: List<String>,
+    val pendingLearning: List<String>,
     val omer: LinkedText?,
     val selichotText: String?,
 )
@@ -38,6 +39,28 @@ internal object HebcalPresentation {
         "nachyomi" to "נ'ך יומי",
         "dailyPsalms" to "תהלים יומי",
         "tanakhYomi" to "תנ'ך יומי",
+        "yerushalmi" to "ירושלמי יומי",
+        "dailyRambam1" to "רמב״ם יומי",
+        "dailyRambam3" to "רמב״ם יומי 3 פרקים",
+        "seferHaMitzvot" to "ספר המצוות",
+        "chofetzChaim" to "החפץ חיים יומי",
+        "shemiratHaLashon" to "שמירת הלשון יומי",
+        "arukhHaShulchanYomi" to "ערוך השולחן יומי",
+        "kitzurShulchanAruch" to "קיצור שולחן ערוך יומי",
+        "dafWeekly" to "דף לשבוע",
+        "pirkeiAvotSummer" to "פרקי אבות",
+    )
+
+    private val yerushalmiLabels = mapOf(
+        "vilna" to "ירושלמי יומי (ווילנא)",
+        "schottenstein" to "ירושלמי יומי (שוטנשטיין)",
+    )
+
+    private val pendingDailyLearningLabels = listOf(
+        "חובות הלבבות יומי",
+        "משנה ברורה עמוד יומי",
+        "דף בהלכה דרשו יומי",
+        "עמוד בהלכה דרשו יומי",
     )
 
     private val bookNames = linkedMapOf(
@@ -72,16 +95,14 @@ internal object HebcalPresentation {
     fun dailyLearning(items: List<Item>, isoDate: String): DailyLearningSummary {
         val daf = items.firstOrNull { it.category == "dafyomi" }
             ?.let { LinkedText(it.hebrew, it.link.orEmpty()) }
-        val additional = items.mapNotNull { item ->
-            dailyLearningLabels[item.category]?.let { label -> "$label: ${item.hebrew}" }
-        }
+        val additional = items.mapNotNull(::dailyLearningLabel)
         val omer = items.firstOrNull { it.category == "omer" }?.let {
             LinkedText("ספירת העומר (בבוקר): \n${it.hebrew.replace("עומר", "")}", it.link.orEmpty())
         }
         val selichot = items.firstOrNull {
             it.category == "holiday" && it.subcat == "minor" && it.title == "Leil Selichot"
         }?.let { "ליל סליחות ${Utils.switchDate(isoDate)}\n" }
-        return DailyLearningSummary(daf, additional, omer, selichot)
+        return DailyLearningSummary(daf, additional, pendingDailyLearningLabels, omer, selichot)
     }
 
     fun shabbat(items: List<Item>, now: OffsetDateTime = OffsetDateTime.now()): ShabbatSummary {
@@ -98,6 +119,20 @@ internal object HebcalPresentation {
             havdalahTimes = items.filter { it.category == "havdalah" }.map { shabbatTime(it.date, now) },
             mevarchim = mevarchim,
         )
+    }
+
+    private fun dailyLearningLabel(item: Item): String? {
+        val label = when {
+            item.category == "yerushalmi" -> yerushalmiLabels[item.subcat] ?: dailyLearningLabels["yerushalmi"]
+            else -> dailyLearningLabels[item.category]
+        } ?: return null
+        val value = when (item.category) {
+            "tanakhYomi" -> listOf(item.memo.orEmpty(), item.hebrew)
+                .filter { it.isNotBlank() }
+                .joinToString(" - ")
+            else -> item.hebrew
+        }
+        return "$label: $value"
     }
 
     private fun shabbatTime(isoDateTime: String, now: OffsetDateTime): ShabbatTime =

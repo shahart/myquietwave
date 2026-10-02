@@ -828,6 +828,10 @@ class MainActivity : ComponentActivity() {
                             val tooltip = buildString {
                                 append("עוד לימודים יומיים:\n\n")
                                 summary.additionalLearning.forEach { append(it).append('\n') }
+                                if (summary.pendingLearning.isNotEmpty()) {
+                                    append('\n')
+                                    summary.pendingLearning.forEach { append(it).append(": TODO\n") }
+                                }
                             }
                             textViewClock4dafYomiTitle.setOnClickListener { showMessageDialog(tooltip) }
                             textViewClock4dafYomi.setOnClickListener {

@@ -20,7 +20,8 @@ interface JsonHebCalShabbatApi {
 
     // https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&start=2025-10-20&end=2025-10-20
 
-    @GET("hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&o=on&min=on")
+    @GET("hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&min=on&o=on" +
+            "&dw=on&yyomi=on&yys=on&dr1=on&dr3=on&dsm=on&dksa=on&ahsy=on&dshl=on&dcc=on&dpa=on")
     suspend fun getDafYomi(@Query("start") start: String,
                            @Query("end") end: String): HebCal
 

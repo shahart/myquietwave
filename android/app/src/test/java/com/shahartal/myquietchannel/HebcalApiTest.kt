@@ -69,7 +69,9 @@ class HebcalApiTest {
         val response = api.getDafYomi("2026-09-18", "2026-09-18")
 
         assertEquals(
-            "/hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&o=on&min=on&start=2026-09-18&end=2026-09-18",
+            "/hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&min=on&o=on" +
+                "&dw=on&yyomi=on&yys=on&dr1=on&dr3=on&dsm=on&dksa=on&ahsy=on&dshl=on&dcc=on&dpa=on" +
+                "&start=2026-09-18&end=2026-09-18",
             server.takeRequest().path,
         )
         assertEquals("dafyomi", response.items.single().category)

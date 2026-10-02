@@ -34,6 +34,66 @@ class HebcalPresentationTest {
         assertNull(summary.dafYomi)
         assertNull(summary.omer)
         assertEquals(emptyList<String>(), summary.additionalLearning)
+        assertEquals(
+            listOf(
+                "חובות הלבבות יומי",
+                "משנה ברורה עמוד יומי",
+                "דף בהלכה דרשו יומי",
+                "עמוד בהלכה דרשו יומי",
+            ),
+            summary.pendingLearning,
+        )
+    }
+
+    @Test
+    fun labelsTheAdditionalDailyStudies() {
+        val summary = HebcalPresentation.dailyLearning(
+            listOf(
+                item(category = "mishnayomi", hebrew = "אהלות 7:1-2"),
+                item(category = "nachyomi", hebrew = "ירמיהו י״ט"),
+                item(category = "dailyPsalms", hebrew = "תהלים צ״ז-ק״ג"),
+                item(category = "tanakhYomi", hebrew = "דברי הימים ס׳ כד", memo = "II Chronicles 34:2-35:5"),
+                item(category = "yerushalmi", subcat = "vilna", hebrew = "שבועות דף לה"),
+                item(category = "yerushalmi", subcat = "schottenstein", hebrew = "יבמות דף נד"),
+                item(category = "dailyRambam1", hebrew = "הלכות גירושין פרק י"),
+                item(category = "dailyRambam3", hebrew = "הלכות מקואות פרק 8-10"),
+                item(category = "seferHaMitzvot", hebrew = "Day 241: P109"),
+                item(category = "chofetzChaim", hebrew = "עשיין 5-6"),
+                item(category = "shemiratHaLashon", hebrew = "Book I, שער הזכירה 3.1-3.5"),
+                item(category = "arukhHaShulchanYomi", hebrew = "אורח חיים שנב:ג-שנג:ו"),
+                item(category = "kitzurShulchanAruch", hebrew = "צט:ג-ק:ג"),
+            ),
+            "2026-10-01",
+        )
+
+        assertEquals(
+            listOf(
+                "משנה יומית: אהלות 7:1-2",
+                "נ'ך יומי: ירמיהו י״ט",
+                "תהלים יומי: תהלים צ״ז-ק״ג",
+                "תנ'ך יומי: II Chronicles 34:2-35:5 - דברי הימים ס׳ כד",
+                "ירושלמי יומי (ווילנא): שבועות דף לה",
+                "ירושלמי יומי (שוטנשטיין): יבמות דף נד",
+                "רמב״ם יומי: הלכות גירושין פרק י",
+                "רמב״ם יומי 3 פרקים: הלכות מקואות פרק 8-10",
+                "ספר המצוות: Day 241: P109",
+                "החפץ חיים יומי: עשיין 5-6",
+                "שמירת הלשון יומי: Book I, שער הזכירה 3.1-3.5",
+                "ערוך השולחן יומי: אורח חיים שנב:ג-שנג:ו",
+                "קיצור שולחן ערוך יומי: צט:ג-ק:ג",
+            ),
+            summary.additionalLearning,
+        )
+    }
+
+    @Test
+    fun tanakhYomiFallsBackToItsHebrewWhenTheMemoIsMissing() {
+        val summary = HebcalPresentation.dailyLearning(
+            listOf(item(category = "tanakhYomi", hebrew = "דברי הימים ס׳ כד")),
+            "2026-10-01",
+        )
+
+        assertEquals(listOf("תנ'ך יומי: דברי הימים ס׳ כד"), summary.additionalLearning)
     }
 
     @Test
