@@ -698,7 +698,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showHaftarah(haftarah: HaftarahTexts) {
-        val fullTextH = haftarah.ashkenazi
+        val fullTextH = haftarah.ashkenazi.replace("Shabbat Machar Chodesh", "שבת מחר חודש")
         val spannableStringH = SpannableString(fullTextH)
         spannableStringH.setSpan(UnderlineSpan(), " הפטרה ".length, fullTextH.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         textViewClockH.text = spannableStringH

@@ -29,3 +29,21 @@ Current approach: Pros: simplicity, Cons: not being cut at the end of the news
 
 ![iOS](ios-light.png)
 
+### chmod +x .git/hooks/pre-commit
+
+```
+#!/bin/sh
+
+# List the files you want to protect (separate multiple files with a | symbol)
+FORBIDDEN_FILES="android/app/google-services.json"
+
+STAGED_FORBIDDEN=$(git diff --cached --name-only | grep -E "($FORBIDDEN_FILES)")
+
+if [ ! -z "$STAGED_FORBIDDEN" ]; then
+    echo "❌ COMMIT BLOCKED: You are trying to commit protected local files."
+    echo "Unstage them."
+    exit 1
+fi
+
+exit 0
+```

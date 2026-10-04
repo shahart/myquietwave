@@ -11,6 +11,8 @@ test('calculates local calendar dates without UTC day rollover', () => {
     assert.equal(context.getLocalDateString(new Date(2026, 8, 22, 0, 30)), '2026-09-22');
     assert.equal(context.getNextSaturdayDate(new Date(2026, 8, 22, 12)), '2026-09-26');
     assert.equal(context.getNextSaturdayDate(new Date(2026, 8, 26, 12)), '2026-09-26');
+    assert.equal(context.getShabbatRangeEnd(new Date(2026, 8, 22, 23, 45)), '2026-09-29');
+    assert.equal(context.getShabbatRangeEnd(new Date(2026, 8, 26, 0, 15)), '2026-10-03');
 });
 
 test('fetches and renders the current calendar data', async () => {
@@ -64,7 +66,15 @@ test('fetches and renders the current calendar data', async () => {
 
     assert.equal(requestedUrls.length, 3);
     assert.match(requestedUrls[0], /hebcal\.com\/zmanim\?cfg=json&city=IL-Jerusalem/);
-    assert.match(requestedUrls[1], /hebcal\.com\/shabbat\?cfg=json&city=IL-Jerusalem/);
+    assert.match(
+        requestedUrls[1],
+        /^https:\/\/www\.hebcal\.com\/shabbat\?cfg=json&city=IL-Jerusalem&ue=on&start=\d{4}-\d{2}-\d{2}&end=\d{4}-\d{2}-\d{2}$/,
+    );
+    assert.equal(
+        requestedUrls[1],
+        `https://www.hebcal.com/shabbat?cfg=json&city=IL-Jerusalem&ue=on` +
+            `&start=${context.getLocalDateString()}&end=${context.getShabbatRangeEnd()}`,
+    );
     assert.equal(document.getElementById('sunrise').innerHTML, '6:25');
     assert.equal(document.getElementById('sunset').innerHTML, '18:39');
     assert.equal(document.getElementById('foundLoc').innerHTML, 'Jerusalem, Israel');

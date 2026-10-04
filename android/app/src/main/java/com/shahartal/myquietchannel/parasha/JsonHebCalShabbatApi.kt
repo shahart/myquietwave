@@ -8,15 +8,25 @@ interface JsonHebCalShabbatApi {
     @GET("shabbat?cfg=json")
     suspend fun getShabbat(): HebCal
 
+    /**
+     * Omitting start/end makes Hebcal answer with the Shabbat of the current week, which is
+     * already over from Sunday onwards, so callers that show upcoming times must send a range.
+     */
     @GET("shabbat?cfg=json")
-    suspend fun getShabbatPerCity(@Query("city") city: String, @Query("ue") ue: String): HebCal
+    suspend fun getShabbatPerCity(@Query("city") city: String, @Query("ue") ue: String,
+                                  @Query("start") start: String? = null,
+                                  @Query("end") end: String? = null): HebCal
 
     @GET("shabbat?cfg=json&tzid=Asia/Jerusalem")
     suspend fun getShabbatByLoc(@Query("latitude") latitude: String,
-                                @Query("longitude") longitude: String, @Query("ue") ue: String): HebCal
+                                @Query("longitude") longitude: String, @Query("ue") ue: String,
+                                @Query("start") start: String? = null,
+                                @Query("end") end: String? = null): HebCal
 
     @GET("shabbat?cfg=json")
-    suspend fun getShabbatPerGeoNameId(@Query("geonameid") geonameid: String, @Query("ue") ue: String): HebCal
+    suspend fun getShabbatPerGeoNameId(@Query("geonameid") geonameid: String, @Query("ue") ue: String,
+                                       @Query("start") start: String? = null,
+                                       @Query("end") end: String? = null): HebCal
 
     // https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&start=2025-10-20&end=2025-10-20
 

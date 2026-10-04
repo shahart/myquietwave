@@ -12,6 +12,7 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import kotlinx.coroutines.runBlocking
+import java.time.LocalDate
 
 class HebcalApiTest {
     private lateinit var server: MockWebServer
@@ -34,16 +35,26 @@ class HebcalApiTest {
 
         val responses = listOf(
             api.getShabbat(),
-            api.getShabbatPerCity("IL-Jerusalem", "off"),
-            api.getShabbatByLoc("-33.9", "151.2", "on"),
-            api.getShabbatPerGeoNameId("293222", "off"),
+            api.getShabbatPerCity("IL-Jerusalem", "off", "2026-10-04", "2026-10-11"),
+            api.getShabbatByLoc("-33.9", "151.2", "on", "2026-10-04", "2026-10-11"),
+            api.getShabbatPerGeoNameId("293222", "off", "2026-10-04", "2026-10-11"),
         )
 
         responses.forEach(::assertShabbatPayload)
         assertEquals("/shabbat?cfg=json", server.takeRequest().path)
-        assertEquals("/shabbat?cfg=json&city=IL-Jerusalem&ue=off", server.takeRequest().path)
-        assertEquals("/shabbat?cfg=json&tzid=Asia/Jerusalem&latitude=-33.9&longitude=151.2&ue=on", server.takeRequest().path)
-        assertEquals("/shabbat?cfg=json&geonameid=293222&ue=off", server.takeRequest().path)
+        assertEquals(
+            "/shabbat?cfg=json&city=IL-Jerusalem&ue=off&start=2026-10-04&end=2026-10-11",
+            server.takeRequest().path,
+        )
+        assertEquals(
+            "/shabbat?cfg=json&tzid=Asia/Jerusalem&latitude=-33.9&longitude=151.2&ue=on" +
+                "&start=2026-10-04&end=2026-10-11",
+            server.takeRequest().path,
+        )
+        assertEquals(
+            "/shabbat?cfg=json&geonameid=293222&ue=off&start=2026-10-04&end=2026-10-11",
+            server.takeRequest().path,
+        )
     }
 
     @Test
@@ -134,11 +145,46 @@ class HebcalApiTest {
         )
         val query = LocationQuery.GeoName("293222", useElevation = false)
 
-        assertShabbatPayload(repository.shabbat(query))
+        assertShabbatPayload(repository.shabbat(query, TODAY))
         assertZmanimPayload(repository.zmanim(query))
 
-        assertEquals("/shabbat?cfg=json&geonameid=293222&ue=off", server.takeRequest().path)
+        assertEquals(
+            "/shabbat?cfg=json&geonameid=293222&ue=off&start=2026-10-04&end=2026-10-11",
+            server.takeRequest().path,
+        )
         assertEquals("/zmanim?cfg=json&geonameid=293222&ue=off", server.takeRequest().path)
+    }
+
+    @Test
+    fun parashaAsksTheJerusalemFeedForTheUpcomingWeek() = runBlocking {
+        server.enqueue(jsonResponse(shabbatPayload))
+        val repository = NetworkHebcalRepository(
+            RetrofitInstance.createApi(server.url("/").toString())
+        )
+
+        assertShabbatPayload(repository.parasha(TODAY))
+
+        assertEquals(
+            "/shabbat?cfg=json&city=IL-Jerusalem&ue=off&start=2026-10-04&end=2026-10-11",
+            server.takeRequest().path,
+        )
+    }
+
+    @Test
+    fun shabbatRequestsTheUpcomingWeekInsteadOfTheElapsedOne() = runBlocking {
+        repeat(3) { server.enqueue(jsonResponse(shabbatPayload)) }
+        val repository = NetworkHebcalRepository(
+            RetrofitInstance.createApi(server.url("/").toString())
+        )
+
+        repository.shabbat(LocationQuery.City("IL-Jerusalem", useElevation = false), TODAY)
+        repository.shabbat(LocationQuery.Coordinates("41.88", "-87.63", useElevation = true), TODAY)
+        repository.shabbat(LocationQuery.GeoName("293222", useElevation = false), SUNDAY)
+
+        assertTrue(server.takeRequest().path!!.contains("start=2026-10-04&end=2026-10-11"))
+        assertTrue(server.takeRequest().path!!.contains("start=2026-10-04&end=2026-10-11"))
+        val sundayPath = server.takeRequest().path!!
+        assertTrue(sundayPath, sundayPath.contains("start=2026-10-05&end=2026-10-12"))
     }
 
     @Test
@@ -211,6 +257,8 @@ class HebcalApiTest {
     }
 
     private companion object {
+        val TODAY: LocalDate = LocalDate.of(2026, 10, 4)
+        val SUNDAY: LocalDate = LocalDate.of(2026, 10, 5)
         val shabbatPayload = """
             {"items":[{"category":"parashat","hebrew":"פרשת וילך","date":"2026-09-26","title":"Parashat Vayelech","subcat":"major","link":"https://example.test/vayelech","memo":"Shabbat Shuva","yomtov":true,"leyning":{"haftarah":"Hosea 14:2-10","haftarah_sephardic":"Joel 2:15-27"}}]}
         """

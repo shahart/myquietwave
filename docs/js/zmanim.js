@@ -16,6 +16,12 @@ function getLocalDateString(date = new Date()) {
     ].join('-');
 }
 
+function getShabbatRangeEnd(date = new Date()) {
+    const end = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    end.setDate(end.getDate() + 7);
+    return getLocalDateString(end);
+}
+
 function formatShabbatTime(item, includeLabel) {
     const time = item.date.split('T')[1].substring(0, 5);
     const pastPrefix = new Date(item.date) <= new Date() ? "זמן עבר " : "";
@@ -66,16 +72,21 @@ async function calc() {
     if (postfix.startsWith('latitude=')) {
         url += "&tzid=Asia/Jerusalem";
     }
-    var url2 = `https://www.hebcal.com/shabbat?cfg=json&` + postfix + useElevationParam;
-    if (postfix.startsWith('latitude=')) {
-        url2 += "&tzid=Asia/Jerusalem";
-    }
 
     const date = new Date();
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
     const day = date.getDate().toString().padStart(2, '0');
     var formattedDate = `${year}-${month}-${day}`;
+
+    // The range is mandatory: without it Hebcal answers with whichever Shabbat its HTTP cache
+    // holds, which is often the elapsed one, and the page then shows past times and no parasha.
+    var url2 = `https://www.hebcal.com/shabbat?cfg=json&` + postfix + useElevationParam +
+        `&start=${formattedDate}&end=${getShabbatRangeEnd(date)}`;
+    if (postfix.startsWith('latitude=')) {
+        url2 += "&tzid=Asia/Jerusalem";
+    }
+
     const url3 = `https://www.hebcal.com/hebcal?v=1&cfg=json&F=on&myomi=on&nyomi=on&dty=on&dps=on&min=on&o=on&dw=on&yyomi=on&yys=on&dr1=on&dr3=on&dsm=on&dksa=on&ahsy=on&dshl=on&dcc=on&dpa=on&start=` + formattedDate + `&end=` + formattedDate;
 
     document.getElementById('fast').innerHTML = '';
@@ -166,7 +177,7 @@ async function calc() {
                     document.getElementById('parasha').innerHTML = data.items[i].hebrew;
                     setHaftarahConnectionParasha(data.items[i].hebrew);
                     document.getElementById('haftarahUrl').innerHTML = 'הפטרה: ';
-                    document.getElementById('haftarah').innerHTML = convertEng(data.items[i].leyning.haftarah.replaceAll('|', ' <br>')); // for example: "Pinchas occurring after 17 Tammuz"
+                    document.getElementById('haftarah').innerHTML = convertEng(data.items[i].leyning.haftarah.replaceAll('|', ' <br>')).replace("Shabbat Machar Chodesh", "שבת מחר חודש"); // for example: "Pinchas occurring after 17 Tammuz"
                     document.getElementById('haftarahUrl').href = "https://shahart.github.io/heb-bible/index.html?b=" + data.items[i].leyning.haftarah.split(':')[0];
                     if (data.items[i].leyning.haftarah_sephardic) {
                         document.getElementById('haftarahSUrl').innerHTML = 'הפטרה ספרדים: ';

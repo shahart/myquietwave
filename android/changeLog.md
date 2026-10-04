@@ -1,8 +1,16 @@
 # Changelog
 
+## 2.03
+
+On YomTov on Saturday, render also its leyning
+
+More daily studies in the Daf Yomi pop-up
+
+Fix http cache state data
+
 ## 2.02
 
-On YomTov on Saturday, render also its leyning 
+Split the zmanim section into sunrise and sunset
 
 ## 2.01
 
@@ -11,24 +19,31 @@ Fix regression because of classNotFound. Now Json was reflecting into R8-obfusca
 ## 2.00
 
 Refactor, plus:
+
 Fix two 'lighting' times
+
 Pop-up the Parasha-Haftarah connection
+
 Kickoff for Leil Slihot
 
 ## 1.62
 
 Add peek the currently playing song button, in case of Glglz radio station. 
+
 Shows the current parasha even without hebCal, credits to PyLuach (and Sol).
 
 ## 1.61
 
 Add rosh-chodesh memo help.
+
 Add instrumentation test.
 
 ## 1.60
 
 Add the current and next playing song(s) for Glz stations
+
 Handle connected parashot
+
 Add Kan-Moreshet
 
 ## 1.56
@@ -74,17 +89,21 @@ More stations
 ## 1.5
 
 Add an option to listen to the radio continuously
+
 Add Galey-Israel
 
 ## 1.41
 
 Add more stations to the internal radio player, like Reshet Bet/ Gimmel/ 102FM
+
 Fix "Attempt to invoke virtual method 'java.lang.String android.content.Context.getPackageName()' on a null object reference"
 
 ## 1.4
 
 Add media player in case the user skipped the manual radio playing, defaults to GLZ/ GLGLZ.
+
 Support field request for hh:mm
+
 More zmanim
 
 ## 1.36
@@ -94,11 +113,13 @@ UX improvements
 ## 1.35
 
 Passover is approaching - Add the Omer count.
+
 After French, add Russian and Spanish support
 
 ## 1.34
 
 תיקוני באגים ושיפורי ביצועים בלוח השנה
+
 Bug fixes and performance improvements in the HebCal rendering
 
 Adar 2, Rosh Chodesh's day of week, portrait orientation, info split to two lines, פרשיות מחוברות.
@@ -118,17 +139,21 @@ Fix one line of Shabbath todo list
 ## 1.3
 
 Add more Daily Learning
+
 Add הערב אור ל- after sunSet
 
 ## 1.27
 
 Add more Zmanim (click on the sunrise/set)
+
 Add Fast times
+
 Fixed bug: tooltip for multiple holidays
 
 ## 1.26
 
 Allows edit of the next hours string
+
 Shows basic info on the upcoming holiday
 
 ## 1.25
@@ -150,8 +175,11 @@ Add link to the weekly haftarah
 ## 1.21
 
 Expose UE to the user
+
 Add link to the weekly parasha
+
 More cities
+
 Hebrew IL cities
 
 ## 1.2
@@ -161,11 +189,13 @@ Better Ux: drop-down for the supported cities
 ## 1.15
 
 Add an option to use the device's location
+
 אופציה לשימוש במיקום המכשיר
 
 ## 1.14
 
 UX: שדה חדש למיקום, ותמיכה גם ב-GeoName וב-Latitude/ Longitude
+
 UX: new field for the position, supports also GeoName, and Latitude/ Longitude
 
 ## 1.13
