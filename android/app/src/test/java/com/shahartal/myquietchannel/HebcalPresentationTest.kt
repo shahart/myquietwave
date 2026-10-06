@@ -23,7 +23,10 @@ class HebcalPresentationTest {
         )
 
         assertEquals(LinkedText("זבחים דף א", "daf"), summary.dafYomi)
-        assertEquals(listOf("משנה יומית: ברכות א"), summary.additionalLearning)
+        assertEquals(
+            listOf("נ\"ך יומי (2 פרקים): דניאל 11–דניאל 12", "משנה יומית: ברכות א"),
+            summary.additionalLearning,
+        )
         assertEquals("omer", summary.omer?.link)
         assertEquals("ליל סליחות 5-9-2026\n", summary.selichotText)
     }
@@ -33,7 +36,10 @@ class HebcalPresentationTest {
         val summary = HebcalPresentation.dailyLearning(emptyList(), "2026-09-05")
         assertNull(summary.dafYomi)
         assertNull(summary.omer)
-        assertEquals(emptyList<String>(), summary.additionalLearning)
+        assertEquals(
+            listOf("נ\"ך יומי (2 פרקים): דניאל 11–דניאל 12"),
+            summary.additionalLearning,
+        )
         assertEquals(
             listOf(
                 "חובות הלבבות יומי",
@@ -68,12 +74,12 @@ class HebcalPresentationTest {
 
         assertEquals(
             listOf(
+                "נ\"ך יומי (2 פרקים): דברי הימים א׳ 28–דברי הימים א׳ 29",
                 "משנה יומית: אהלות 7:1-2",
                 "נ'ך יומי: ירמיהו י״ט",
                 "תהלים יומי: תהלים צ״ז-ק״ג",
                 "תנ'ך יומי: II Chronicles 34:2-35:5 - דברי הימים ס׳ כד",
-                "ירושלמי יומי (ווילנא): שבועות דף לה",
-                "ירושלמי יומי (שוטנשטיין): יבמות דף נד",
+                "ירושלמי יומי: שבועות דף לה",
                 "רמב״ם יומי: הלכות גירושין פרק י",
                 "רמב״ם יומי 3 פרקים: הלכות מקואות פרק 8-10",
                 "ספר המצוות: Day 241: P109",
@@ -87,13 +93,27 @@ class HebcalPresentationTest {
     }
 
     @Test
+    fun calculatesNachYomiFrom22TishriWithoutWrapping() {
+        assertEquals("יהושע 1–יהושע 2", HebcalPresentation.nachYomi(LocalDate.of(2026, 10, 3)))
+        assertEquals("יהושע 7–יהושע 8", HebcalPresentation.nachYomi(LocalDate.of(2026, 10, 6)))
+        assertEquals("דברי הימים ב׳ 35–דברי הימים ב׳ 36", HebcalPresentation.nachYomi(LocalDate.of(2027, 10, 8)))
+        assertEquals("", HebcalPresentation.nachYomi(LocalDate.of(2027, 10, 9)))
+    }
+
+    @Test
     fun tanakhYomiFallsBackToItsHebrewWhenTheMemoIsMissing() {
         val summary = HebcalPresentation.dailyLearning(
             listOf(item(category = "tanakhYomi", hebrew = "דברי הימים ס׳ כד")),
             "2026-10-01",
         )
 
-        assertEquals(listOf("תנ'ך יומי: דברי הימים ס׳ כד"), summary.additionalLearning)
+        assertEquals(
+            listOf(
+                "נ\"ך יומי (2 פרקים): דברי הימים א׳ 28–דברי הימים א׳ 29",
+                "תנ'ך יומי: דברי הימים ס׳ כד",
+            ),
+            summary.additionalLearning,
+        )
     }
 
     @Test

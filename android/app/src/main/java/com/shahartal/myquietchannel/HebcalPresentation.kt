@@ -2,6 +2,7 @@ package com.shahartal.myquietchannel
 
 import com.shahartal.myquietchannel.parasha.HebCalZmanimTimesModel
 import com.shahartal.myquietchannel.parasha.Item
+import com.shahartal.myquietchannel.luach.HebrewDate
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -52,8 +53,7 @@ internal object HebcalPresentation {
     )
 
     private val yerushalmiLabels = mapOf(
-        "vilna" to "ירושלמי יומי (ווילנא)",
-        "schottenstein" to "ירושלמי יומי (שוטנשטיין)",
+        "vilna" to "ירושלמי יומי",
     )
 
     private val pendingDailyLearningLabels = listOf(
@@ -62,6 +62,19 @@ internal object HebcalPresentation {
         "דף בהלכה דרשו יומי",
         "עמוד בהלכה דרשו יומי",
     )
+
+    private val nachBooks = listOf(
+        "יהושע" to 24, "שופטים" to 21, "שמואל א׳" to 31, "שמואל ב׳" to 24,
+        "מלכים א׳" to 22, "מלכים ב׳" to 25, "ישעיהו" to 66, "ירמיהו" to 52,
+        "יחזקאל" to 48, "הושע" to 14, "יואל" to 4, "עמוס" to 9, "עובדיה" to 1,
+        "יונה" to 4, "מיכה" to 7, "נחום" to 3, "חבקוק" to 3, "צפניה" to 3,
+        "חגי" to 2, "זכריה" to 14, "מלאכי" to 3, "תהלים" to 150, "משלי" to 31,
+        "איוב" to 42, "שיר השירים" to 8, "רות" to 4, "איכה" to 5, "קהלת" to 12,
+        "אסתר" to 10, "דניאל" to 12, "עזרא" to 10, "נחמיה" to 13,
+        "דברי הימים א׳" to 29, "דברי הימים ב׳" to 36,
+    )
+
+    private val totalNachChapters = nachBooks.sumOf { it.second }
 
     private val bookNames = linkedMapOf(
         "Genesis" to "בראשית",
@@ -95,7 +108,12 @@ internal object HebcalPresentation {
     fun dailyLearning(items: List<Item>, isoDate: String): DailyLearningSummary {
         val daf = items.firstOrNull { it.category == "dafyomi" }
             ?.let { LinkedText(it.hebrew, it.link.orEmpty()) }
-        val additional = items.mapNotNull(::dailyLearningLabel)
+        val additional = buildList {
+            nachYomi(LocalDate.parse(isoDate)).takeIf { it.isNotBlank() }?.let {
+                add("נ\"ך יומי (2 פרקים): $it")
+            }
+            addAll(items.mapNotNull(::dailyLearningLabel))
+        }
         val omer = items.firstOrNull { it.category == "omer" }?.let {
             LinkedText("ספירת העומר (בבוקר): \n${it.hebrew.replace("עומר", "")}", it.link.orEmpty())
         }
@@ -103,6 +121,28 @@ internal object HebcalPresentation {
             it.category == "holiday" && it.subcat == "minor" && it.title == "Leil Selichot"
         }?.let { "ליל סליחות ${Utils.switchDate(isoDate)}\n" }
         return DailyLearningSummary(daf, additional, pendingDailyLearningLabels, omer, selichot)
+    }
+
+    fun nachYomi(date: LocalDate): String {
+        val hebrewDate = HebrewDate.fromLocalDate(date)
+        val anchorYear = if (hebrewDate.month == 7 && hebrewDate.day < 22) {
+            hebrewDate.year - 1
+        } else {
+            hebrewDate.year
+        }
+        val anchor = HebrewDate(anchorYear, 7, 22)
+        val firstChapter = ((hebrewDate.julianDayNumber - anchor.julianDayNumber) * 2).toInt()
+        if (firstChapter !in 0 until totalNachChapters) return ""
+        return "${nachChapterAt(firstChapter)}–${nachChapterAt(firstChapter + 1)}"
+    }
+
+    private fun nachChapterAt(index: Int): String {
+        var chapterIndex = index
+        nachBooks.forEach { (book, chapters) ->
+            if (chapterIndex < chapters) return "$book ${chapterIndex + 1}"
+            chapterIndex -= chapters
+        }
+        return ""
     }
 
     fun shabbat(items: List<Item>, now: OffsetDateTime = OffsetDateTime.now()): ShabbatSummary {
@@ -122,6 +162,7 @@ internal object HebcalPresentation {
     }
 
     private fun dailyLearningLabel(item: Item): String? {
+        if (item.category == "yerushalmi" && item.subcat != "vilna") return null
         val label = when {
             item.category == "yerushalmi" -> yerushalmiLabels[item.subcat] ?: dailyLearningLabels["yerushalmi"]
             else -> dailyLearningLabels[item.category]

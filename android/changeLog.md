@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1
+
+Add Nach Yomi 2 chapters
+
+Amharic language 
+
 ## 2.03
 
 On YomTov on Saturday, render also its leyning

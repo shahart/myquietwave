@@ -28,6 +28,54 @@ function formatShabbatTime(item, includeLabel) {
     return pastPrefix + (includeLabel ? item.hebrew + " " : "") + time;
 }
 
+const nachBooks = [
+    ['יהושע', 24], ['שופטים', 21], ['שמואל א׳', 31], ['שמואל ב׳', 24],
+    ['מלכים א׳', 22], ['מלכים ב׳', 25], ['ישעיהו', 66], ['ירמיהו', 52],
+    ['יחזקאל', 48], ['הושע', 14], ['יואל', 4], ['עמוס', 9], ['עובדיה', 1],
+    ['יונה', 4], ['מיכה', 7], ['נחום', 3], ['חבקוק', 3], ['צפניה', 3],
+    ['חגי', 2], ['זכריה', 14], ['מלאכי', 3], ['תהלים', 150], ['משלי', 31],
+    ['איוב', 42], ['שיר השירים', 8], ['רות', 4], ['איכה', 5], ['קהלת', 12],
+    ['אסתר', 10], ['דניאל', 12], ['עזרא', 10], ['נחמיה', 13],
+    ['דברי הימים א׳', 29], ['דברי הימים ב׳', 36],
+];
+
+const totalNachChapters = nachBooks.reduce((total, [, chapters]) => total + chapters, 0);
+
+function hebrewCalendarParts(date) {
+    const formatter = new Intl.DateTimeFormat('en-u-ca-hebrew', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    });
+    return Object.fromEntries(formatter.formatToParts(date)
+        .filter(({ type }) => type !== 'literal')
+        .map(({ type, value }) => [type, value]));
+}
+
+function nachChapterAt(index) {
+    if (index >= totalNachChapters) return '';
+    let chapterIndex = index;
+    for (const [book, chapters] of nachBooks) {
+        if (chapterIndex < chapters) return `${book} ${chapterIndex + 1}`;
+        chapterIndex -= chapters;
+    }
+}
+
+function getNachYomi(date = new Date()) {
+    const today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const roshHashana = new Date(today);
+    while (true) {
+        const { day, month } = hebrewCalendarParts(roshHashana);
+        if (day === '22' && month === 'Tishri') break;
+        roshHashana.setDate(roshHashana.getDate() - 1);
+    }
+
+    const daysSinceRoshHashana = (today - roshHashana) / 86400000;
+    const firstChapter = daysSinceRoshHashana * 2;
+    if (firstChapter >= totalNachChapters) return '';
+    return `${nachChapterAt(firstChapter)}–${nachChapterAt(firstChapter + 1)}`;
+}
+
 async function calc() {
     document.getElementById('havdala').innerHTML = '';
     document.getElementById('lighting').innerHTML = '';
@@ -353,6 +401,7 @@ async function calc() {
             for (let i = 0; i < resp3.items.length; i++) {
                 if (resp3.items[i].category === 'mishnayomi') {
                     ttip += "משנה יומית: " + resp3.items[i].hebrew + "\n";
+                    ttip += "נ\"ך יומי (2 פרקים): " + getNachYomi(date) + "\n";
                 }
                 else if (resp3.items[i].category === 'nachyomi') {
                     ttip += "נ'ך יומי: " + resp3.items[i].hebrew + "\n";
