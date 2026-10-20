@@ -13,7 +13,7 @@ internal data class HaftarahTexts(
 )
 
 internal object ParashaPresentation {
-    private val maqafOnlyNames = setOf("כי־תצא", "כי־תבוא", "שלח־לך", "לך־לך")
+    private val maqafOnlyNames = setOf("פרשת כי־תצא", "פרשת כי־תבוא", "פרשת שלח־לך", "פרשת לך־לך")
 
     fun names(hebrew: String): ParashaNames {
         var primary = hebrew

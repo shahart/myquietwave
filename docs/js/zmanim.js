@@ -103,6 +103,9 @@ async function calc() {
         else if (postfix.toLowerCase() === "il-mitzpe ramon") {
             postfix = "geonameid=294166";
         }
+        else if (postfix.toLowerCase() === "il-lavi") {
+            postfix = "geonameid=294427";
+        }
         else if (postfix.toLowerCase() === "il-modiin ilit") {
             postfix = "geonameid=8199378";
         }
@@ -241,10 +244,10 @@ async function calc() {
                         document.getElementById('parasha2').innerHTML = 'פרשת ' + data.items[i].hebrew.split("-")[1];
                     }
                     // acc. to https://github.com/hebcal/hebcal-swift/blob/main/Sources/Hebcal/Translations.swift
-                    else if (data.items[i].hebrew.includes("כי־תצא") ||
-                        data.items[i].hebrew.includes("כי־תבוא") ||
-                        data.items[i].hebrew.includes("שלח־לך") ||
-                        data.items[i].hebrew.includes("לך־לך")) {
+                    else if (data.items[i].hebrew.includes("פרשת כי־תצא") ||
+                        data.items[i].hebrew.includes("פרשת כי־תבוא") ||
+                        data.items[i].hebrew.includes("שלח־לךפרשת ") ||
+                        data.items[i].hebrew.includes("לך־לךפרשת ")) {
                         parashaUrl += data.items[i].hebrew.replace("־", "_");
                     }
                     else if (data.items[i].hebrew.includes("־")) {
