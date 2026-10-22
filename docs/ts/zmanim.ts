@@ -28,7 +28,7 @@ function formatShabbatTime(item, includeLabel) {
     return pastPrefix + (includeLabel ? item.hebrew + " " : "") + time;
 }
 
-const nachBooks = [
+const nachBooks: Array<[string, number]> = [
     ['יהושע', 24], ['שופטים', 21], ['שמואל א׳', 31], ['שמואל ב׳', 24],
     ['מלכים א׳', 22], ['מלכים ב׳', 25], ['ישעיהו', 66], ['ירמיהו', 52],
     ['יחזקאל', 48], ['הושע', 14], ['יואל', 4], ['עמוס', 9], ['עובדיה', 1],
@@ -41,7 +41,7 @@ const nachBooks = [
 
 const totalNachChapters = nachBooks.reduce((total, [, chapters]) => total + chapters, 0);
 
-function hebrewCalendarParts(date) {
+function hebrewCalendarParts(date: Date): Record<string, string> {
     const formatter = new Intl.DateTimeFormat('en-u-ca-hebrew', {
         day: 'numeric',
         month: 'long',
@@ -52,7 +52,7 @@ function hebrewCalendarParts(date) {
         .map(({ type, value }) => [type, value]));
 }
 
-function nachChapterAt(index) {
+function nachChapterAt(index: number): string {
     if (index >= totalNachChapters) return '';
     let chapterIndex = index;
     for (const [book, chapters] of nachBooks) {
@@ -70,7 +70,7 @@ function getNachYomi(date = new Date()) {
         roshHashana.setDate(roshHashana.getDate() - 1);
     }
 
-    const daysSinceRoshHashana = (today - roshHashana) / 86400000;
+    const daysSinceRoshHashana = (today.getTime() - roshHashana.getTime()) / 86400000;
     const firstChapter = daysSinceRoshHashana * 2;
     if (firstChapter >= totalNachChapters) return '';
     return `${nachChapterAt(firstChapter)}–${nachChapterAt(firstChapter + 1)}`;
@@ -246,8 +246,8 @@ async function calc() {
                     // acc. to https://github.com/hebcal/hebcal-swift/blob/main/Sources/Hebcal/Translations.swift
                     else if (data.items[i].hebrew.includes("פרשת כי־תצא") ||
                         data.items[i].hebrew.includes("פרשת כי־תבוא") ||
-                        data.items[i].hebrew.includes("שלח־לךפרשת ") ||
-                        data.items[i].hebrew.includes("לך־לךפרשת ")) {
+                        data.items[i].hebrew.includes("פרשת שלח־לך") ||
+                        data.items[i].hebrew.includes("פרשת לך־לך")) {
                         parashaUrl += data.items[i].hebrew.replace("־", "_");
                     }
                     else if (data.items[i].hebrew.includes("־")) {
@@ -287,7 +287,7 @@ async function calc() {
                     document.getElementById('roshchodesh').innerHTML += data.items[i].hebrew + " - " + days.split(",")[new Date(data.items[i].date).getDay()] + " " + reverseYMD + "<br><br>";
                     roshchodeshDate = data.items[i].date;
                     let today = new Date().toISOString().split('T')[0];
-                    if (today > roshchodeshDate || new Date().getDate() > reverseYMD.split('/')[0]) {
+                    if (today > roshchodeshDate || new Date().getDate() > Number(reverseYMD.split('/')[0])) {
                         document.getElementById('roshchodesh').innerHTML = "";
                     }
                     else {

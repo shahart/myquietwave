@@ -31,12 +31,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
 })
 
-let cookieInput = this.loadInput("zmanim-location");
+let cookieInput = loadInput("zmanim-location");
 if (cookieInput !== "") {
     document.getElementById('locationSelect').value = cookieInput;
     if (cookieInput === 'other') {
         document.getElementById('otherLocation').style.display = 'block';
-        document.getElementById('otherLocation').value = this.loadInput("zmanim-location-other");
+        document.getElementById('otherLocation').value = loadInput("zmanim-location-other");
     }
     else {
         document.getElementById('otherLocation').style.display = 'none';
@@ -44,7 +44,7 @@ if (cookieInput !== "") {
     }
 }
 
-let todocookieInput = this.loadInput("todo");
+let todocookieInput = loadInput("todo");
 if (todocookieInput !== "") {
     document.getElementById('todo').value = todocookieInput;
 }

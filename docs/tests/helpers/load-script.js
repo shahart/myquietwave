@@ -24,7 +24,8 @@ function createBrowserContext(overrides = {}) {
 }
 
 function loadScript(context, relativePath) {
-    const filename = path.resolve(__dirname, '..', '..', relativePath);
+    const compiledPath = relativePath.replace(/^js\//, 'dist/');
+    const filename = path.resolve(__dirname, '..', '..', compiledPath);
     const source = fs.readFileSync(filename, 'utf8');
     vm.runInContext(source, context, { filename });
 }

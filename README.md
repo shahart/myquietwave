@@ -47,3 +47,9 @@ fi
 
 exit 0
 ```
+
+/docs/ - js -> ts
+
+
+    npm run typecheck
+    npm test

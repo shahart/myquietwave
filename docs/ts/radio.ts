@@ -7,7 +7,7 @@ function fetchOnAirXml(station) {
   const target = "http://glzxml.blob.core.windows.net/dalet/" + station + "-onair/onair.xml";
   const proxy = "https://myquietwave.lat-shahar.workers.dev/?url=" + encodeURIComponent(target);
   return fetch(proxy, { signal: AbortSignal.timeout(8000) })
-    .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
+    .then(r => { if (!r.ok) throw new Error(String(r.status)); return r.text(); });
 }
 
 function fetchAndShowNowPlaying(station, isNewWin) {

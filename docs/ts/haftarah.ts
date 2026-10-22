@@ -62,7 +62,7 @@ function extractHaftarahConnection(html) {
         throw new Error("The requested section was not found");
     }
 
-    const textContent = content.cloneNode(true);
+    const textContent = content.cloneNode(true) as Element;
     textContent.querySelectorAll("br").forEach(element => element.replaceWith("\n"));
     textContent.querySelectorAll("p, li").forEach(element => element.append("\n\n"));
 
