@@ -12,6 +12,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.action.ViewActions.scrollTo
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers.isChecked
@@ -208,6 +209,8 @@ class DialogInstrumentedTest {
         onView(withId(android.R.id.button2))
             .inRoot(isDialog())
             .perform(click())
+        onView(withId(android.R.id.message))
+            .check(doesNotExist())
 
         onView(withId(R.id.toggleButton))
             .perform(scrollTo())

@@ -24,7 +24,7 @@ class ParashaPresentationTest {
     fun preservesKnownMaqafOnlyNamesForWikiLinks() {
         assertEquals(
             ParashaNames("כי־תצא".replace("־", "_"), null),
-            ParashaPresentation.names("כי־תצא"),
+            ParashaPresentation.names("כי_תצא"),
         )
     }
 
