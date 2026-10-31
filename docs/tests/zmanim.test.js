@@ -23,6 +23,7 @@ test('calculates the two-chapters-per-day Nach Yomi cycle from 22 Tishri', () =>
     assert.equal(context.getNachYomi(new Date(2026, 9, 3, 12)), 'יהושע 1–יהושע 2');
     assert.equal(context.getNachYomi(new Date(2026, 9, 4, 12)), 'יהושע 3–יהושע 4');
     assert.equal(context.getNachYomi(new Date(2026, 9, 6, 12)), 'יהושע 7–יהושע 8');
+    assert.equal(context.getNachYomi(new Date(2026, 9, 25, 12)), 'שופטים 21–שמואל א׳ 1');
     assert.equal(context.getNachYomi(new Date(2027, 9, 8, 12)), 'דברי הימים ב׳ 35–דברי הימים ב׳ 36');
     assert.equal(context.getNachYomi(new Date(2027, 9, 9, 12)), '');
     assert.equal(context.getNachYomi(new Date(2027, 9, 22, 12)), '');

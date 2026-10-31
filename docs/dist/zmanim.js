@@ -85,7 +85,9 @@ function getNachYomi(date = /* @__PURE__ */ new Date()) {
     if (day === "22" && month === "Tishri") break;
     roshHashana.setDate(roshHashana.getDate() - 1);
   }
-  const daysSinceRoshHashana = (today.getTime() - roshHashana.getTime()) / 864e5;
+  const todayUtc = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const roshHashanaUtc = Date.UTC(roshHashana.getFullYear(), roshHashana.getMonth(), roshHashana.getDate());
+  const daysSinceRoshHashana = (todayUtc - roshHashanaUtc) / 864e5;
   const firstChapter = daysSinceRoshHashana * 2;
   if (firstChapter >= totalNachChapters) return "";
   return `${nachChapterAt(firstChapter)}\u2013${nachChapterAt(firstChapter + 1)}`;

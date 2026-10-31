@@ -70,7 +70,9 @@ function getNachYomi(date = new Date()) {
         roshHashana.setDate(roshHashana.getDate() - 1);
     }
 
-    const daysSinceRoshHashana = (today.getTime() - roshHashana.getTime()) / 86400000;
+    const todayUtc = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+    const roshHashanaUtc = Date.UTC(roshHashana.getFullYear(), roshHashana.getMonth(), roshHashana.getDate());
+    const daysSinceRoshHashana = (todayUtc - roshHashanaUtc) / 86400000;
     const firstChapter = daysSinceRoshHashana * 2;
     if (firstChapter >= totalNachChapters) return '';
     return `${nachChapterAt(firstChapter)}–${nachChapterAt(firstChapter + 1)}`;
