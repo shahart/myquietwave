@@ -1,3 +1,5 @@
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/shahart/myquietwave)](https://github.com)
+
 # Auto listen to radio news #
 
 As the "quiet channel" on the radio doesn't include news, allow such an ability.

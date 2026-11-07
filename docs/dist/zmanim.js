@@ -189,6 +189,14 @@ async function calc() {
         return;
       }
       let ttip2 = "";
+      const tooltipExplanations = /* @__PURE__ */ new Set();
+      const addTooltipExplanation = (item) => {
+        const memo = (item.memo || "").trim();
+        const key = memo || (item.hebrew || "").trim();
+        if (!key || tooltipExplanations.has(key)) return;
+        tooltipExplanations.add(key);
+        ttip2 += item.hebrew + ": " + item.memo + "\n\n";
+      };
       let shabbatExists = false;
       let yomTovExists = false;
       let yomTovName = "";
@@ -258,7 +266,7 @@ async function calc() {
           } else {
             document.getElementById("roshchodeshUrl").href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" \u05E8\u05D0\u05E9 \u05D7\u05D5\u05D3\u05E9 ".length - 1).replace("\u05E1\u05D9\u05D5\u05DF", "\u05E1\u05D9\u05D5\u05D5\u05DF") + (data.items[i].hebrew.includes("\u05E9\u05D1\u05D8") ? "_(\u05D7\u05D5\u05D3\u05E9)" : "");
           }
-          ttip2 += data.items[i].hebrew + ": " + data.items[i].memo + "\n\n";
+          addTooltipExplanation(data.items[i]);
         } else if (data.items[i].category === "mevarchim") {
           document.getElementById("lightingM").innerHTML = // document.getElementById('lighting').innerHTML + "<br>" +
           data.items[i].hebrew + "<br> \u05D4\u05DE\u05D5\u05DC\u05D3: " + data.items[i].memo.substring(data.items[i].memo.indexOf(": ") + 2).replace("chalakim", "\u05D7\u05DC\u05E7\u05D9\u05DD").replace("and", "\u05D5-").replace("Sunday", "\u05E8\u05D0\u05E9\u05D5\u05DF").replace("Monday", "\u05E9\u05E0\u05D9").replace("Tuesday", "\u05E9\u05DC\u05D9\u05E9\u05D9").replace("Wednesday", "\u05E8\u05D1\u05D9\u05E2\u05D9").replace("Thursday", "\u05D7\u05DE\u05D9\u05E9\u05D9").replace("Friday", "\u05E9\u05D9\u05E9\u05D9").replace("Saturday", "\u05E9\u05D1\u05EA") + "<br>";
@@ -287,9 +295,7 @@ async function calc() {
             } else {
               document.getElementById("special").innerHTML += d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear() + " " + data.items[i].hebrew + " - " + days.split(",")[new Date(data.items[i].date).getDay()] + "<br><br>";
             }
-            if (ttip2.indexOf(data.items[i].memo) < 0) {
-              ttip2 += data.items[i].hebrew + ": " + data.items[i].memo + "\n\n";
-            }
+            addTooltipExplanation(data.items[i]);
           }
           if (data.items[i].yomtov && data.items[i].yomtov === true) {
             yomTovExists = true;

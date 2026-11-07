@@ -1,5 +1,5 @@
 [versions]
-agp = "9.4.1"
+agp = "9.5.0"
 kotlin = "2.4.21"
 coreKtx = "1.19.1"
 junit = "4.13.2"
@@ -19,7 +19,7 @@ playServicesMeasurementApi = "24.0.0"
 googleGmsGoogleServices = "4.5.0"
 playServicesLocation = "21.4.0"
 
-firebase-bom = "35.0.2"
+firebase-bom = "35.1.0"
 firebase-analytics= "24.0.0"
 appUpdateKtx = "2.1.0"
 rules = "1.7.0"

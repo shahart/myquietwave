@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
-    // id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    // id("dev.detekt")
     id("com.google.firebase.crashlytics")
 
 }

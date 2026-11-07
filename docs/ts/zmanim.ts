@@ -211,6 +211,14 @@ async function calc() {
                 return;
             }
             let ttip = '';
+            const tooltipExplanations = new Set<string>();
+            const addTooltipExplanation = (item: any) => {
+                const memo = (item.memo || '').trim();
+                const key = memo || (item.hebrew || '').trim();
+                if (!key || tooltipExplanations.has(key)) return;
+                tooltipExplanations.add(key);
+                ttip += item.hebrew + ": " + item.memo + "\n\n";
+            };
             let shabbatExists = false;
             let yomTovExists = false;
             let yomTovName = '';
@@ -295,7 +303,7 @@ async function calc() {
                     else {
                         document.getElementById('roshchodeshUrl').href = "https://he.wikipedia.org/wiki/" + data.items[i].hebrew.substring(" ראש חודש ".length-1).replace("סיון", "סיוון") + (data.items[i].hebrew.includes("שבט") ? "_(חודש)" : "");
                     }
-                    ttip += data.items[i].hebrew + ": " + data.items[i].memo + "\n\n";
+                    addTooltipExplanation(data.items[i]);
                 }
                 else if (data.items[i].category === 'mevarchim') {
                     document.getElementById('lightingM').innerHTML =
@@ -343,9 +351,7 @@ async function calc() {
                         else {
                             document.getElementById('special').innerHTML += d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear() + " " + data.items[i].hebrew + " - " + days.split(",")[new Date(data.items[i].date).getDay()] + "<br><br>";
                         }
-                        if (ttip.indexOf(data.items[i].memo) < 0) {
-                            ttip += data.items[i].hebrew + ": " + data.items[i].memo + "\n\n";
-                        }
+                        addTooltipExplanation(data.items[i]);
                     }
                     if (data.items[i].yomtov && data.items[i].yomtov === true) {
                         yomTovExists = true;
