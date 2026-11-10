@@ -136,10 +136,13 @@ class MainActivity : ComponentActivity() {
     private lateinit var textViewClockH : TextView
     private lateinit var textViewClockHS : TextView
     private lateinit var haftarahConnectionButton: Button
+    private lateinit var haftarahArticleButton: Button
 
     private var haftarahConnectionSourceUrls: List<String> = emptyList()
+    private var haftarahArticleParashaName: String = ""
     private var haftarahConnectionUnavailableMessage: String? = null
     private var haftarahConnectionDialog: AlertDialog? = null
+    private var haftarahArticleDialog: AlertDialog? = null
     private val songRepository: SongRepository by lazy {
         NetworkSongRepository(UrlConnectionTextHttpClient())
     }
@@ -151,6 +154,11 @@ class MainActivity : ComponentActivity() {
     }
     private val haftarahRepository: HaftarahRepository by lazy {
         CachedHaftarahRepository(
+            UrlConnectionTextHttpClient(connectTimeoutMillis = 30_000, readTimeoutMillis = 30_000)
+        )
+    }
+    private val haftarahArticleRepository: CachedHaftarahArticleRepository by lazy {
+        CachedHaftarahArticleRepository(
             UrlConnectionTextHttpClient(connectTimeoutMillis = 30_000, readTimeoutMillis = 30_000)
         )
     }
@@ -202,6 +210,7 @@ class MainActivity : ComponentActivity() {
         textViewClockH = binding.textViewClockH
         textViewClockHS = binding.textViewClockHS
         haftarahConnectionButton = binding.haftarahConnectionButton
+        haftarahArticleButton = binding.haftarahArticleButton
         updateHaftarahConnection(
             unavailableMessage = getString(R.string.haftarah_connection_waiting_for_shabbat),
         )
@@ -551,6 +560,7 @@ class MainActivity : ComponentActivity() {
                             else if (it.category == "parashat") {
                                 // return it.hebrew;
 
+                                haftarahArticleParashaName = it.hebrew
                                 updateHaftarahConnection(
                                     sourceUrls = listOf(HaftarahConnection.sourceUrl(it.hebrew)),
                                 )
@@ -766,9 +776,9 @@ class MainActivity : ComponentActivity() {
             .setTitle(R.string.haftarah_connection)
             .setMessage(R.string.haftarah_connection_loading)
             .setNegativeButton(R.string.close_alert, null)
-//            .setNeutralButton(R.string.haftarah_connection_source) { _, _ ->
-//                startActivity(Intent(Intent.ACTION_VIEW, sourceUrl.toUri()))
-//            }
+            .setNeutralButton(R.string.haftarah_connection_source) { _, _ ->
+                startActivity(Intent(Intent.ACTION_VIEW, sourceUrls.first().toUri()))
+            }
             .create()
         haftarahConnectionDialog = dialog
         dialog.show()
@@ -788,6 +798,39 @@ class MainActivity : ComponentActivity() {
                         ?: getString(R.string.haftarah_connection_content_load_failed)
                 }
             )
+        }
+    }
+
+    private fun showHaftarahArticle() {
+        if (haftarahArticleDialog?.isShowing == true) return
+        val parashaName = haftarahArticleParashaName
+        if (parashaName.isBlank()) {
+            showMessageDialog(getString(R.string.haftarah_article_load_failed))
+            return
+        }
+
+        val sourceUrl = HaftarahArticleParser.sourceUrl(parashaName)
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.haftarah_article)
+            .setMessage(R.string.haftarah_article_loading)
+            .setNegativeButton(R.string.close_alert, null)
+            .setNeutralButton(R.string.haftarah_article_source) { _, _ ->
+                startActivity(Intent(Intent.ACTION_VIEW, sourceUrl.toUri()))
+            }
+            .create()
+        haftarahArticleDialog = dialog
+        dialog.show()
+
+        lifecycleScope.launch {
+            val article = try {
+                withContext(Dispatchers.IO) { haftarahArticleRepository.article(parashaName) }
+            } catch (error: Exception) {
+                Log.w("myquietwave", "Unable to fetch the haftarah article", error)
+                null
+            }
+
+            if (!dialog.isShowing) return@launch
+            dialog.setMessage(article?.text ?: getString(R.string.haftarah_article_load_failed))
         }
     }
 
@@ -939,6 +982,7 @@ class MainActivity : ComponentActivity() {
         }
 
         haftarahConnectionButton.setOnClickListener { showHaftarahConnection() }
+        haftarahArticleButton.setOnClickListener { showHaftarahArticle() }
 
         firebaseAnalytics = Firebase.analytics
 
@@ -1240,8 +1284,9 @@ class MainActivity : ComponentActivity() {
                                     alertDialog.setMessage(
                                         getString(
                                             R.string.next_30_sec_with_sec, (31 - i),
-                                            100 * audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) / audioManager.getStreamMaxVolume(
-                                                AudioManager.STREAM_MUSIC
+                                            PlaybackPolicy.volumePercent(
+                                                currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),
+                                                maximumVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
                                             )
                                         )
                                     )

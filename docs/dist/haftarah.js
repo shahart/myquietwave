@@ -1,5 +1,8 @@
 let haftarahConnectionUrl = "";
 const haftarahConnectionCache = /* @__PURE__ */ new Map();
+const haftarahArticleCache = /* @__PURE__ */ new Map();
+const haftarahWeeklyUrl = "https://www.haftara.co.il/\u05D4\u05E4\u05D8\u05E8\u05EA-\u05D4\u05E9\u05D1\u05D5\u05E2/";
+let haftarahArticleParasha = "";
 function getKolKoreParashaUrl(parashaName) {
   const parashaSlug = parashaName.replace(/^פרשת\s+/, "").replace(/[\u0591-\u05BD\u05BF\u05C1-\u05C2\u05C4-\u05C5\u05C7]/g, "").replace(/[־‐\-‒–—―\s]+/g, "-").replace(/^-|-$/g, "");
   return "https://kol-kore.org/" + encodeURIComponent("\u05E4\u05E8\u05E9\u05D5\u05EA") + "/" + encodeURIComponent("\u05D4\u05E4\u05D8\u05E8\u05D4-\u05E4\u05E8\u05E9\u05EA-" + parashaSlug) + "/";
@@ -20,7 +23,72 @@ async function fetchWithRetry(url, attempts = 2) {
 }
 function setHaftarahConnectionParasha(parashaName) {
   haftarahConnectionUrl = getKolKoreParashaUrl(parashaName);
+  haftarahArticleParasha = parashaName.replace(/^פרשת\s+/, "");
   setHaftarahConnectionButtonState(true);
+}
+function normalizeHaftarahArticleText(text) {
+  return text.replace(/[\u0591-\u05BD\u05BF\u05C1-\u05C2\u05C4-\u05C5\u05C7]/g, "").replace(/[־‐\-‒–—―\s]+/g, " ").trim();
+}
+function extractHaftarahArticleLink(html) {
+  const page = new DOMParser().parseFromString(html, "text/html");
+  const candidates = Array.from(page.querySelectorAll("a[href]")).filter((link) => /^הפטרת\s+פרשת/.test(link.textContent.replace(/\s+/g, " ").trim()));
+  if (!candidates.length) throw new Error("The weekly article link was not found");
+  const selected = normalizeHaftarahArticleText(haftarahArticleParasha);
+  const matchingLink = selected && candidates.find((link) => normalizeHaftarahArticleText(link.textContent).includes(selected));
+  return matchingLink ? new URL(matchingLink.getAttribute("href"), haftarahWeeklyUrl).href : "";
+}
+function buildHaftarahArticleUrl(parashaName) {
+  const slug = normalizeHaftarahArticleText(parashaName.replace(/^פרשת\s+/, "")).replace(/\s+/g, "-");
+  if (!slug) return "";
+  return new URL("/" + encodeURIComponent("\u05D4\u05E4\u05D8\u05E8\u05EA-\u05E4\u05E8\u05E9\u05EA-" + slug) + "/", haftarahWeeklyUrl).href;
+}
+function extractHaftarahArticle(html) {
+  const page = new DOMParser().parseFromString(html, "text/html");
+  const article = page.querySelector(".entry-content, .post-content, article");
+  if (!article) throw new Error("The article text was not found");
+  const content = article.cloneNode(true);
+  content.querySelectorAll("script, style, nav, .sharedaddy, .entry-footer, .post-navigation").forEach((element) => element.remove());
+  content.querySelectorAll("br").forEach((element) => element.replaceWith("\n"));
+  content.querySelectorAll("p, li, h1, h2, h3, h4").forEach((element) => element.append("\n\n"));
+  return content.textContent.replace(/\u00a0/g, " ").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+async function showHaftarahArticle() {
+  const dialog = document.getElementById("haftarahArticleDialog");
+  const content = document.getElementById("haftarahArticleContent");
+  const source = document.getElementById("haftarahArticleSource");
+  content.textContent = "\u05D8\u05D5\u05E2\u05DF...";
+  if (typeof dialog.showModal === "function") {
+    if (!dialog.open) dialog.showModal();
+  } else {
+    dialog.setAttribute("open", "");
+  }
+  try {
+    let articleUrl = haftarahArticleCache.get("url:" + haftarahArticleParasha);
+    if (!articleUrl) {
+      try {
+        const weeklyProxyUrl = "https://myquietwave.lat-shahar.workers.dev/?url=" + encodeURIComponent(haftarahWeeklyUrl);
+        const weeklyResponse = await fetchWithRetry(weeklyProxyUrl);
+        articleUrl = extractHaftarahArticleLink(await weeklyResponse.text());
+      } catch (error) {
+        console.warn("Could not resolve the article from the weekly page", error);
+      }
+      articleUrl = articleUrl || buildHaftarahArticleUrl(haftarahArticleParasha);
+      articleUrl = articleUrl || haftarahWeeklyUrl;
+      haftarahArticleCache.set("url:" + haftarahArticleParasha, articleUrl);
+    }
+    source.href = articleUrl;
+    let articleText = haftarahArticleCache.get(articleUrl);
+    if (!articleText) {
+      const articleProxyUrl = "https://myquietwave.lat-shahar.workers.dev/?url=" + encodeURIComponent(articleUrl);
+      const articleResponse = await fetchWithRetry(articleProxyUrl);
+      articleText = extractHaftarahArticle(await articleResponse.text());
+      haftarahArticleCache.set(articleUrl, articleText);
+    }
+    content.textContent = articleText;
+  } catch (error) {
+    console.error("Failed to fetch the haftarah article", error);
+    content.textContent = "\u05DC\u05D0 \u05D4\u05E6\u05DC\u05D7\u05E0\u05D5 \u05DC\u05D8\u05E2\u05D5\u05DF \u05D0\u05EA \u05D4\u05EA\u05D5\u05DB\u05DF. \u05D0\u05E4\u05E9\u05E8 \u05DC\u05E4\u05EA\u05D5\u05D7 \u05D0\u05EA \u05D4\u05DE\u05E7\u05D5\u05E8 \u05D1\u05E7\u05D9\u05E9\u05D5\u05E8 \u05DC\u05DE\u05D8\u05D4.";
+  }
 }
 function setHaftarahConnectionButtonState(enabled, disabledReason = "") {
   const button = document.getElementById("haftarahConnectionButton");

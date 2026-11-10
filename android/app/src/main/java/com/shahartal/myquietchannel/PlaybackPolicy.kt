@@ -76,6 +76,11 @@ internal object PlaybackPolicy {
 
     fun remainingNewsMinutes(newsDurationMinutes: Int, currentMinute: Int): Int =
         (newsDurationMinutes - currentMinute).coerceAtLeast(0)
+
+    fun volumePercent(currentVolume: Int, maximumVolume: Int): Int {
+        if (maximumVolume <= 0) return 0
+        return currentVolume.coerceIn(0, maximumVolume) * 100 / maximumVolume
+    }
 }
 
 internal data class PlaybackConfig(

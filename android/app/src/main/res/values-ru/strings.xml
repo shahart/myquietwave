@@ -39,6 +39,12 @@
     <string name="haftarah_connection_content_load_failed">Unable to load the connection content.</string>
     <string name="pastTime">Past time</string>
 
+    <string name="haftarah_connection_source">Open source: Kol-Kore site</string>
+    <string name="haftarah_article">About the Haftara</string>
+    <string name="haftarah_article_source">Open source: Haftara site</string>
+    <string name="haftarah_article_loading">Loading...</string>
+    <string name="haftarah_article_load_failed">Unable to load the haftara article.</string>
+    
     <string name="share">Поделиться</string>
     <string name="rate">Оценить</string>
     <string name="share_text">Посмотрите это отличное приложение:</string>

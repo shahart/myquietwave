@@ -1,37 +1,28 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
+These instructions apply only to the current Android app in `android/` and the companion website in `docs/`. Ignore the iOS project and other repository areas when following this file.
 
-This repository contains three active code areas:
+## Project Structure
 
-- `src/main/java/edu/automations/news/`: the original Java/Selenium utility (`Radio.java`).
-- `android/`: the current Android app project. Main code lives in `android/app/src/main/java/com/shahartal/myquietchannel`, unit tests in `android/app/src/test`, UI/device tests in `android/app/src/androidTest`, and resources in `android/app/src/main/res`.
-- `ios/`: SwiftUI-based iOS prototype files and setup notes. See `ios/README.md` for Xcode wiring.
-
-Supporting material lives in `docs/`. The top-level `app/` directory is an older Android mirror; prefer `android/` for new work.
+- `android/`: Android app. Main code is under `android/app/src/main/java/com/shahartal/myquietchannel`, unit tests under `android/app/src/test`, instrumentation tests under `android/app/src/androidTest`, and resources under `android/app/src/main/res`.
+- `docs/`: companion website. TypeScript source is under `docs/ts`, tests under `docs/tests`, static assets and page markup are at the directory root, and compiled browser scripts are under `docs/dist`.
 
 ## Build, Test, and Development Commands
 
-- `.\gradlew build`: builds the root Java utility and runs its Gradle checks.
-- `.\gradlew test`: runs root JVM tests from `src/test`.
-- `cd android; .\gradlew assembleDebug`: builds the Android debug APK.
-- `cd android; .\gradlew testDebugUnitTest`: runs Android unit tests.
-- `cd android; .\gradlew connectedDebugAndroidTest`: runs Android instrumentation and Compose UI tests on a device/emulator.
+- From `android/`, run `./gradlew assembleDebug` to build the Android debug APK.
+- From `android/`, run `./gradlew testDebugUnitTest` for Android unit tests.
+- From `android/`, run `./gradlew connectedDebugAndroidTest` for device or emulator tests.
+- From `docs/`, run `npm run build` to compile TypeScript into `dist/`.
+- From `docs/`, run `npm test` to build and run the Node.js test suite.
 
-The iOS app is developed from Xcode rather than a repo-level script. Open the files under `ios/` in an iOS app target and run on a physical device.
+## Coding Style
 
-## Coding Style & Naming Conventions
+Use standard language conventions and match nearby code. Kotlin classes use `PascalCase`, methods and properties use `camelCase`, and Android resource names use `snake_case`. Keep changes focused and update generated `docs/dist` scripts when changing website TypeScript.
 
-Use standard language conventions with 4-space indentation. Keep Java and Kotlin classes in `PascalCase`, methods and properties in `camelCase`, and resource names in Android `snake_case` style where required. Match the existing package name `com.shahartal.myquietchannel` for Android code.
+## Testing
 
-No formatter is enforced in the repo today. Detekt is referenced but commented out, so keep changes small and consistent with surrounding code.
+Add or update Android JUnit 4 or instrumentation tests for behavior changes in the Android app. Add or update Node.js tests under `docs/tests` when changing website logic.
 
-## Testing Guidelines
+## Commit and Pull Request Guidelines
 
-Android unit tests use JUnit 4; instrumentation tests use AndroidX, Espresso, and Compose test APIs. Name tests after the subject under test, for example `VolumeCycleServiceTest.kt`. Add or update tests when changing scheduling, API parsing, or UI flows.
-
-## Commit & Pull Request Guidelines
-
-Recent commits are short and scope-first, for example `Android 1.41...`, `web. Fix race condition...`, and `claude /init...`. Follow that pattern: start with the area (`Android`, `web`, `ios`, `java`) and then a concise imperative summary.
-
-Pull requests should include a clear description, linked issue if applicable, test evidence, and screenshots for UI or store-asset changes. Call out config-sensitive files such as `google-services.json` explicitly and avoid committing secrets.
+Use short, area-first commit subjects such as `Android: ...` or `web: ...`. Pull requests should describe the change, include relevant test evidence, and provide screenshots for UI changes. Call out config-sensitive files such as `google-services.json` and do not commit secrets.

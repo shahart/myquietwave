@@ -214,7 +214,10 @@ class VolumeCycleService : Service() {
                             text = getString(
                                 R.string.notif_text_2,
                                 (61 - i) / 2,
-                                100 * audioManager.getStreamVolume(stream) / maxVolume,
+                                PlaybackPolicy.volumePercent(
+                                    currentVolume = audioManager.getStreamVolume(stream),
+                                    maximumVolume = maxVolume,
+                                ),
                             ),
                         )
 

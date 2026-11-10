@@ -512,3 +512,23 @@ button:disabled {
     padding: 0 20px 20px;
 }
 
+.article-dialog {
+    width: min(960px, calc(100% - 24px));
+    height: min(82vh, 900px);
+    max-height: 82vh;
+    overflow: hidden;
+}
+
+.article-dialog .dialog-header {
+    position: static;
+}
+
+.article-content {
+    height: calc(100% - 142px);
+    overflow-y: auto;
+}
+
+.article-dialog .dialog-footer {
+    padding-top: 12px;
+}
+

@@ -27,6 +27,11 @@
     <string name="alert_message">האם אפליקציית הרדיו מנגנת? ואולי עוצמת השמע היא אפס?!תוכל להפעיל תחנת רדיו כרצונך באפליקציה מתאימה; אחרת כברירת מחדל התחנה שנבחרה תשודר</string>
 
     <string name="haftarah_connection">הקשר בין הפרשה להפטרה</string>
+    <string name="haftarah_connection_source">למקור באתר כל קורא</string>
+    <string name="haftarah_article">על ההפטרה</string>
+    <string name="haftarah_article_source">למקור באתר על ההפטרה</string>
+    <string name="haftarah_article_loading">טוען...</string>
+    <string name="haftarah_article_load_failed">לא הצלחנו לטעון את ההפטרה.</string>
     <string name="haftarah_connection_loading">טוען...</string>
     <string name="haftarah_connection_waiting_for_shabbat">טוען את נתוני השבת...</string>
     <string name="haftarah_connection_no_regular_parasha">השבת חל %1$s, ולכן אין פרשת שבוע רגילה.</string>

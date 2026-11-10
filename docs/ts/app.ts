@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     document.getElementById('refreshButton').addEventListener('click', calc);
     document.getElementById('haftarahConnectionButton').addEventListener('click', showHaftarahConnection);
     document.getElementById('closeHaftarahConnectionButton').addEventListener('click', closeHaftarahConnection);
+    document.getElementById('haftarahArticleButton').addEventListener('click', openHaftarahArticle);
+    document.getElementById('closeHaftarahArticleButton').addEventListener('click', closeHaftarahArticle);
 
     dropdown.addEventListener('change', function() {
         if (this.value === 'other') {
@@ -29,7 +31,25 @@ document.addEventListener('DOMContentLoaded', (event) => {
     haftarahDialog.addEventListener('click', function(event) {
         if (event.target === haftarahDialog) closeHaftarahConnection();
     });
+
+    const haftarahArticleDialog = document.getElementById('haftarahArticleDialog');
+    haftarahArticleDialog.addEventListener('click', function(event) {
+        if (event.target === haftarahArticleDialog) closeHaftarahArticle();
+    });
 })
+
+function openHaftarahArticle() {
+    showHaftarahArticle();
+}
+
+function closeHaftarahArticle() {
+    const dialog = document.getElementById('haftarahArticleDialog');
+    if (typeof dialog.close === 'function') {
+        dialog.close();
+    } else {
+        dialog.removeAttribute('open');
+    }
+}
 
 let cookieInput = loadInput("zmanim-location");
 if (cookieInput !== "") {

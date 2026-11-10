@@ -95,6 +95,18 @@ class DialogInstrumentedTest {
     }
 
     @Test
+    fun bothHaftaraActionsAreAvailableInTheParashaSection() {
+        launchActivity()
+
+        onView(withId(R.id.haftarahConnectionButton))
+            .perform(scrollTo())
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.haftarahArticleButton))
+            .perform(scrollTo())
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
     fun radioOnlyModeDisablesScheduleFieldsUntilUnchecked() {
         launchActivity()
 

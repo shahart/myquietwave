@@ -33,6 +33,11 @@
 
     <string name="close_alert">Close</string>
     <string name="haftarah_connection">Parasha-Haftara connection</string>
+    <string name="haftarah_connection_source">Open source: Kol-Kore site</string>
+    <string name="haftarah_article">About the Haftara</string>
+    <string name="haftarah_article_source">Open source: Haftara site</string>
+    <string name="haftarah_article_loading">Loading...</string>
+    <string name="haftarah_article_load_failed">Unable to load the haftara article.</string>
     <string name="haftarah_connection_loading">Loading...</string>
 
     <string name="haftarah_connection_waiting_for_shabbat">Loading Shabbat information...</string>
